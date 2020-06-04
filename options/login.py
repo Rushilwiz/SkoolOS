@@ -15,16 +15,6 @@ def login():
             'message': 'Password?',
         },
     ]
+
     answers = prompt(questions)
-    print(answers)
-    f = open(".login.txt", "w")
-    f.write(str(answers["user_name"]))
     print_json(answers)  # use the answers as input for your app
-
-if(os.path.exists(".login.txt") == False):
-    login()
-else:
-    print("Hello!")
-
-
-
