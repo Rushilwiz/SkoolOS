@@ -6,6 +6,10 @@ import argparse
 
 
 #already ccrerrated account through website, has to login
+def update():
+    #get data from database
+    return
+
 def yesorno(question):
     questions = [
         {
@@ -42,7 +46,7 @@ def login():
             if(user["webmail"] == data[i]["webmail"] and user["password"]) == data[i]["password"]:
                 print("Logged in!")
                 return data[i]
-        print("Error in your submission. Please re-enter")
+        print("User not found. Please Try again")
         return None
 
 #did not create account through website, has to signup/login
@@ -68,7 +72,7 @@ def signup():
         {
             'type': 'input',
             'name': 'webmail',
-            'message': 'What\'s TJ Webmail?',
+            'message': 'What\'s your TJ Webmail?',
         },
         {
             'type': 'password',
@@ -77,6 +81,19 @@ def signup():
         },
     ]
     user = prompt(questions)
+    for i in user:
+        if user[i] == "":
+            print("Some forms were left blank. Try again.\n")
+            return
+    if len(user["password"]) < 6:
+        print("Password is too short. Try again.")
+        return
+    if (("@tjhsst.edu" in user['webmail']) == False):
+        print("Webmail entered was not a @tjhhsst.edu. Try again.")
+        return
+
+    print("@tjhsst.edu" in user['webmail'] == False)
+
     user["classes"] = []
     with open('users.json', 'r') as json_file:
         data = json.load(json_file)
@@ -90,7 +107,6 @@ def setup(user):
         os.makedirs(c)
         for a in user["classes"][c]:
             os.makedirs(c + "/" + a)
-
 
 def start():
     if(os.path.exists(".login.txt") == True):
