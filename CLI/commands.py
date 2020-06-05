@@ -118,9 +118,9 @@ def setup(user):
     #Read classes/assignenments and setup directory:
     #SkoolOS/Math/Week1
     for c in user["classes"]:
-        os.makedirs(c)
+        os.makedirs("../" + c)
         for a in user["classes"][c]:
-            os.makedirs(c + "/" + a)
+            os.makedirs("../" + c + "/" + a)
 
 def start():
     if(os.path.exists(".login.txt") == False):
