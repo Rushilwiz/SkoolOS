@@ -7,26 +7,22 @@ class AssignmentSerializer(serializers.HyperlinkedModelSerializer):
         model = Assignment
         fields = ['name', 'due_date', 'url']
 
-class StudentSerializer(serializers.HyperlinkedModelSerializer):
-    assignments = AssignmentSerializer(many=True, read_only=True)
-    class Meta:
-        model = Student
-        fields = ['url', 'first_name', 'last_name', 'assignments']
-
 class ClassesSerializer(serializers.HyperlinkedModelSerializer):
     assignments = AssignmentSerializer(many=True, read_only=True,allow_null=True)
-    students = StudentSerializer(many=True, read_only=True, allow_null=True)
     class Meta:
         model = Classes
-        fields = ['url', 'name', 'students', 'assignments']
-    
-    def create(self, validated_data):
-        return Classes.objects.create(**validated_data)
+        fields = ['url', 'name','assignments']
 
+class StudentSerializer(serializers.HyperlinkedModelSerializer):
+    classes = ClassesSerializer(many=True, read_only=True,allow_null=True)
+    class Meta:
+        model = Student
+        fields = ['url', 'first_name', 'last_name', 'grade','webmail','student_id','classes']
 
 class TeacherSerializer(serializers.ModelSerializer):
-    classes = ClassesSerializer(many=True, read_only=True)
+    classes = ClassesSerializer(many=True, read_only=True,allow_null=True)
     class Meta:
         model = Teacher
         fields = ['url', 'first_name', 'last_name', 'classes']
+
 
