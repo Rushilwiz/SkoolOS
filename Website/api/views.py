@@ -17,6 +17,8 @@ class TeacherViewSet(viewsets.ModelViewSet):
     """
     queryset = Teacher.objects.all()
     serializer_class = TeacherSerializer
+    permissions_classes = [permissions.IsAuthenticatedOrReadOnly]
+
 
 class ClassesViewSet(viewsets.ModelViewSet):
     """
@@ -24,11 +26,14 @@ class ClassesViewSet(viewsets.ModelViewSet):
     """
     queryset = Classes.objects.all()
     serializer_class = ClassesSerializer
+    permissions_classes = [permissions.IsAuthenticatedOrReadOnly]
+
 
 class AssignmentViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
     """
-    permissions_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permissions_classes = [permissions.IsAdminUser]
     queryset = Assignment.objects.all()
     serializer_class = AssignmentSerializer
+    permissions_classes = [permissions.IsAuthenticatedOrReadOnly]
