@@ -1,6 +1,8 @@
 from .models import Student, Teacher, Classes, Assignment, DefFiles
 from .serializers import StudentSerializer, TeacherSerializer, ClassesSerializer, AssignmentSerializer, DefFilesSerializer
-from rest_framework import generics, viewsets, permissions
+from rest_framework import generics, viewsets, permissions, response, status
+from django.http import Http404
+from rest_framework.views import APIView
 
 class StudentViewSet(viewsets.ModelViewSet):
     """

@@ -1,4 +1,3 @@
-from api.models import Assignment, Student, Classes, Teacher, DefFiles
 from datetime import datetime
 
 f1 = DefFiles(

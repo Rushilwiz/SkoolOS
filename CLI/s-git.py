@@ -1,7 +1,8 @@
 import subprocess
 import os
 import requests
-
+import pprint
+import json
 
 #git clone student directory ==> <student-id>/classes/assignments
 def initStudent(ion_user):
@@ -57,6 +58,8 @@ def initStudent(ion_user):
     else:
         print(r.status_code)
 
+
+
 #Teachers
 
 #make student repo by student id
@@ -82,14 +85,17 @@ def updateAssignment(name):
 def comment(filename, text):
     print(text)
 
-initStudent("2022rkhondak")
-
-os.chdir("2022rkhondak")
-process = subprocess.Popen(['git', 'init'], stdout=subprocess.PIPE,stderr=subprocess.PIPE)
-process.wait()
-process = subprocess.Popen(['git', 'add', '.'], stdout=subprocess.PIPE,stderr=subprocess.PIPE)
-process.wait()
-process = subprocess.Popen(['git', 'commit', '-m', "First Commit"], stdout=subprocess.PIPE,stderr=subprocess.PIPE)
-process.wait()
-process = subprocess.Popen(['git', 'push', '-u', 'origin','master'], stdout=subprocess.PIPE,stderr=subprocess.PIPE)
-process.wait()
+#initStudent("2022rkhondak")    
+ion_user = "2022rkhondak"
+headers = {'Content-type': 'application/json'}
+data = {'first_name': 'Jeff',
+        'git': 'https://github.com/',
+        'grade': 10,
+        'ion_user': '2022jlol1',
+        'last_name': 'lol.',
+        'student_id': 11111
+ }
+data = json.dumps(data)
+URL = "http://127.0.0.1:8000/students/" + ion_user + "/"
+r = requests.put(url = URL, data= data, headers=headers ,auth=('raffukhondaker','hackgroup1')) 
+pprint.pprint(r.json())

@@ -13,6 +13,7 @@ class Assignment(models.Model):
 class Classes(models.Model):
     name = models.CharField(max_length=100)
     assignments = models.ManyToManyField(Assignment, default="")
+    repo=models.URLField(default="")
     def save(self, *args, **kwargs):
         return super(Classes, self).save(*args, **kwargs)
 

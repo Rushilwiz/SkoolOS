@@ -19,7 +19,7 @@ class ClassesSerializer(serializers.HyperlinkedModelSerializer):
     assignments = AssignmentSerializer(many=True, read_only=True,allow_null=True)
     class Meta:
         model = Classes
-        fields = ['url', 'name','assignments']
+        fields = ['url', 'name','assignments', 'repo']
 
 class StudentSerializer(serializers.HyperlinkedModelSerializer):
     classes = ClassesSerializer(many=True, read_only=True,allow_null=True)
