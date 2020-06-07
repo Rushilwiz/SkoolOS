@@ -9,6 +9,8 @@ router.register(r'students', views.StudentViewSet)
 router.register(r'teachers', views.TeacherViewSet)
 router.register(r'assignments', views.AssignmentViewSet)
 router.register(r'classes', views.ClassesViewSet)
+router.register(r'files', views.DefFilesViewSet)
+
 
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.

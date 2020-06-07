@@ -1,37 +1,62 @@
-from api.models import Assignment, Student, Classes, Teacher
-from datetime import datetime    
+from api.models import Assignment, Student, Classes, Teacher, DefFiles
+from datetime import datetime
 
-#students
-raffu = Student(
-    first_name = "Raffu",
-    last_name = "Khondaker",
-    student_id = 1579460,
-    webmail = "2022rkhondak@tjhsst.edu",
-    grade = 10,
+f1 = DefFiles(
+    name="instructions.txt"
 )
-raffu.save()
-
-#teachers
-ng = Teacher(
-    first_name = "Kim",
-    last_name = "Ng",
+f1.save()
+f2 = DefFiles(
+    name="instructions.txt"
 )
-
-ng.save()
-
-chao = Teacher(
-    first_name = "Susie",
-    last_name = "Lebryk-Chao",
+f2.save()
+f3 = DefFiles(
+    name="sample.txt"
 )
+f3.save()
+f4 = DefFiles(
+    name="rubric.txt"
+)
+f4.save()
 
-chao.save()
+a1 = Assignment.objects.get(pk=1)
+a1.files.add(f1)
+a1.save()
+a2 = Assignment.objects.get(pk=2)
+a2.files.add(f2)
+a2.save()
+a3 = Assignment.objects.get(pk=3)
+a3.files.add(f3)
+a3.files.add(f4)
+a3.save()
 
-#Assignments
+####################################
+
+from api.models import Assignment, Student, Classes, Teacher, DefFiles
+from datetime import datetime
+
+f1 = DefFiles(
+    name="instructions.txt"
+)
+f1.save()
+f2 = DefFiles(
+    name="instructions.txt"
+)
+f2.save()
+f3 = DefFiles(
+    name="sample.txt"
+)
+f3.save()
+f4 = DefFiles(
+    name="rubric.txt"
+)
+f4.save()
+
 A1 = Assignment(
     name='Week1_HW',
     due_date=datetime.now(),
-    
 )
+A1.save()
+A1.files.add(f1)
 A1.save()
 
 A2 = Assignment(
@@ -39,6 +64,8 @@ A2 = Assignment(
     due_date=datetime.now(),
      
 )
+A2.save()
+A2.files.add(f2)
 A2.save()
 
 A3 = Assignment(
@@ -46,49 +73,8 @@ A3 = Assignment(
      due_date=datetime.now(),
 )
 A3.save()
-
-#classes
-C1 = Classes(
-    name='Math5',
-
-)
-C1.save()
-
-C2 = Classes(
-    name='English',
-)
-C2.save()
-
-C2.teachers = chao
-C2.students.add(raffu)
-C2.save()
-
-C1.teachers = ng
-C1.students.add(raffu)
-C1.save()
-
-################################################################################################################
-from api.models import Assignment, Student, Classes, Teacher
-from datetime import datetime
-
-A1 = Assignment(
-    name='Week1_HW',
-    due_date=datetime.now(),
-    
-)
-A1.save()
-
-A2 = Assignment(
-    name='Week2_HW',
-    due_date=datetime.now(),
-     
-)
-A2.save()
-
-A3 = Assignment(
-     name='Journal1',
-     due_date=datetime.now(),
-)
+A3.files.add(f3)
+A3.files.add(f4)
 A3.save()
 
 #classes
@@ -113,8 +99,10 @@ raffu = Student(
     first_name = "Raffu",
     last_name = "Khondaker",
     student_id = 1579460,
+    ion_user="2022rkhondak",
     webmail = "2022rkhondak@tjhsst.edu",
     grade = 10,
+    repo="https://github.com/therealraffi/2022rkhondak.git",
 )
 raffu.save()
 raffu.classes.add(math)
@@ -123,16 +111,18 @@ raffu.save()
 
 #teachers
 ng = Teacher(
-    first_name = "Kim",
-    last_name = "Ng",
+    first_name = "Errin",
+    last_name = "Harris",
+    ion_user="eharris1"
 )
 ng.save()
 ng.classes.add(math)
 ng.save()
 
 chao = Teacher(
-    first_name = "Susie",
-    last_name = "Lebryk-Chao",
+    first_name = "Abagail",
+    last_name = "Bailey",
+    ion_user="AKBailey"
 )
 chao.save()
 chao.classes.add(english)
