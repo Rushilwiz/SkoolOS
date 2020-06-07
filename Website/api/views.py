@@ -1,8 +1,6 @@
 from .models import Student, Teacher, Classes, Assignment
 from .serializers import StudentSerializer, TeacherSerializer, ClassesSerializer, AssignmentSerializer
-from rest_framework import generics, viewsets
-
-
+from rest_framework import generics, viewsets, permissions
 
 class StudentViewSet(viewsets.ModelViewSet):
     """
@@ -10,6 +8,7 @@ class StudentViewSet(viewsets.ModelViewSet):
     """
     queryset = Student.objects.all()
     serializer_class = StudentSerializer
+    permissions_classes = [permissions.IsAuthenticatedOrReadOnly]
 
 
 class TeacherViewSet(viewsets.ModelViewSet):
@@ -30,5 +29,6 @@ class AssignmentViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
     """
+    permissions_classes = [permissions.IsAuthenticatedOrReadOnly]
     queryset = Assignment.objects.all()
     serializer_class = AssignmentSerializer

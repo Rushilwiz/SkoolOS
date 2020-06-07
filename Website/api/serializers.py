@@ -1,8 +1,9 @@
 from django.contrib.auth.models import User, Group
 from .models import Student, Teacher, Classes, Assignment
-from rest_framework import serializers
+from rest_framework import serializers, permissions
 
 class AssignmentSerializer(serializers.HyperlinkedModelSerializer):
+    permissions_classes = [permissions.IsAuthenticatedOrReadOnly]
     class Meta:
         model = Assignment
         fields = ['name', 'due_date', 'url']
