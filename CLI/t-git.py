@@ -2,6 +2,8 @@ import subprocess
 import os
 import requests
 import webbrowser
+import pprint
+import json
 
 #git clone student directory ==> <student-id>/classes/assignments
 '''
@@ -131,7 +133,12 @@ class Teacher:
             self.command('git commit -m Hello_Class')
             self.command('git push -u origin master')
                 
-    
+    def checkGit(self, ass):
+        for a in ass:
+            if a =='.git':
+                return True
+        return False
+
     #update API and Github, all  assignments / classes
     def update(self):
         #lists all classes
@@ -139,24 +146,32 @@ class Teacher:
 
         #checks all class directories first
         for c in classes:
-            if(checkClass(self, c) == False):
+            path = self.username  +  "/" + c
+            if(self.checkClass(path) == False):
+                print(path)
                 return
         cdict = []
         for c in classes:
+            path = self.username  +  "/" + c
             #lists all assignments and default files
-            ass =  os.listdir(c)
+            ass =  os.listdir(path)
             #if  no  .git, directory not synced to  git  or  API
-            if '.git' in ass == False:
-                addClass(self, c)
+            if (self.checkGit(ass)==False):
+                print(path)
+                self.addClass(path)
             else:
                 #push to git
                 loc = os.getcwd()
-                os.chdir(c)
-                command(self, 'git init')
-                command(self, 'git add .')
-                command(self, 'git commit -m "Update"')
-                command(self, 'git push -u origin master')
+                os.chdir(path)
+                print(path)
+                print(ass)
+                self.command('git add .')
+                self.command('git commit -m "Update"')
+                self.command('git push -u origin master')
                 os.chdir(loc)
+                ass.remove('.git')
+                print(ass)
+
             #assignments
             adict = []
             #default  files for classes
@@ -165,31 +180,46 @@ class Teacher:
             afdict=[]
             for a in ass:
                 aname=a
+                path = self.username  +  "/" + c + "/" + a
                 #need to add  option
-                due_date="2020-06-07T07:46:30.537197Z",
-                if(os.path.isfile(a)):
+                due_date= '2020-06-07T07:46:30.537197Z',
+                #check for default file
+                if(os.path.isfile(path)):
                     fdict.append({
                         'name':a
                     })
-                elif(os.path.isdir(a)):
-                    for af in  a:
-                        if(os.path.isfile(af)):
+                elif(os.path.isdir(path)):
+                    for af in os.listdir(path):
+                        path =  path+ "/" + af
+                        if(os.path.isfile(path)):
                             afdict.append({
                                 'name':af
                             })
                     adict.append({
                         'name':aname,
-                        'due_date':due_date,
-                        'files':fdict
+                        'due_date': due_date[0],
+                        'files':afdict
                     })
 
             cdict.append({
                 'name':c,
-                'repo': 'https://github.com:"' + self.git + "/" + c + ".git",
+                'repo': 'https://github.com:' + self.git + "/" + c + ".git",
                 'assignments':adict,
                 'default_file':fdict
             })
-        r = requests.put(url = self.url, data= cdict, headers={'Content-type': 'application/json'} ,auth=('raffukhondaker','hackgroup1'))
+
+        mdict= {
+            'first_name':self.first_name,
+            'last_name':self.last_name,
+            'classes':cdict,
+            'git':self.git,
+            'ion_user':self.username
+        }
+        data = json.dumps(mdict)
+        print(pprint.pprint(mdict))
+
+        r = requests.put(url = self.url, data= data, headers={'Content-type': 'application/json'} ,auth=('raffukhondaker','hackgroup1'))
+        print(pprint.pprint(r.json()))
 
     #class name format: <course-name>_<ion_user>
 
@@ -210,8 +240,8 @@ class Teacher:
 
         for d in dirs:
             if(os.path.isfile(d)):
-                count=count+1
-            if(os.path.isdir(d)):
+                deffile=True
+            if(os.path.isdir(d)) and d != '.git':
                 #checks if there  is a file in an Assignment, need at least 1
                 as_file = False
                 asdir = os.listdir(d)
@@ -225,26 +255,37 @@ class Teacher:
             print("Assignment '" + as_bad + "' does  not  have a default file!")
             return False
 
-        if(count == 0):
+        if(deffile):
             print("Need a default file in the " + path + " Directory!")
             return  False
         return True
 
+    #adds class to  git,  not API
     def addClass(self, path):
         cname = path.split("/")
         cname = cname[len(cname)-1]
         #push to remote repo
-        if(os.path.exists(path)):
-            print("Already synced")
-            return 
-        if(checkClass(self, path)):
-            os.chdir(cname)
-            command(self, 'git init')
-            command(self, 'git add .')
-            command(self, 'git commit -m "Hello Class!"')
-            #git remote add origin git@github.com:alexpchin/<reponame>.git
-            command(self, 'git remote add origin git@github.com:'+ self.git + "/" + cname + ".git")
-            command(self, 'git push -u origin master')
+        if(self.checkClass(path)):
+            input("Make new Git Repo with name: "  + cname + " (Press  any key to continue)\n")
+            webbrowser.open('https://github.com/new')
+            input("Repo created? (Press any key to continue)\n")
+
+            url='https://github.com/' + self.git + "/" + cname
+            print(url)
+            while(requests.get(url).status_code  != 200):
+                print(requests.get(url))
+                r = input("Repo not created yet. (Press any key to continue after repo created, or 'N' to exit)\n")
+                if(r=="N" or r=="No"):
+                    return
+            cdir = os.getcwd()
+            os.chdir(path)
+            self.command('git init')
+            self.command('git add .')
+            self.command('git commit -m Hello_Class')
+            self.command('git remote add origin ' + url + '.git')
+            self.command('git push -u origin master')
+            os.chdir(cdir)
+
 
 
     #make a new class from scratch
@@ -302,8 +343,7 @@ class Teacher:
         print("heheheh")
 
 data = getData("eharris1")
-print(data)
 t = Teacher(data)
-t.initTeacher()
+t.update()
 
 
