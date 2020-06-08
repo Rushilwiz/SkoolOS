@@ -14,6 +14,7 @@ class Classes(models.Model):
     name = models.CharField(max_length=100)
     assignments = models.ManyToManyField(Assignment, default="")
     repo=models.URLField(default="")
+    default_file = models.ManyToManyField(DefFiles)
     def save(self, *args, **kwargs):
         return super(Classes, self).save(*args, **kwargs)
 
@@ -23,7 +24,7 @@ class Teacher(models.Model):
     last_name = models.CharField(max_length=100)
     classes = models.ManyToManyField(Classes, default="")
     ion_user=models.CharField(primary_key=True, max_length=100)
-    git = models.URLField(default="")
+    git=models.CharField(max_length=100)
 
 class Student(models.Model):
     created = models.DateTimeField(auto_now_add=True)
@@ -33,7 +34,7 @@ class Student(models.Model):
     ion_user=models.CharField(primary_key=True, max_length=100)
     webmail = models.EmailField(blank=True)
     grade = models.IntegerField()
-    git = models.URLField()
+    git=models.CharField(max_length=100)
     classes = models.ManyToManyField(Classes, default="")
     repo = models.URLField(default="")
 
