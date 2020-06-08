@@ -17,6 +17,7 @@ class AssignmentSerializer(serializers.HyperlinkedModelSerializer):
 
 class ClassesSerializer(serializers.HyperlinkedModelSerializer):
     assignments = AssignmentSerializer(many=True, read_only=True,allow_null=True)
+    default_file=DefFilesSerializer(many=True, read_only=True,allow_null=True)
     class Meta:
         model = Classes
         fields = ['url', 'name','assignments', 'repo',"default_file"]
