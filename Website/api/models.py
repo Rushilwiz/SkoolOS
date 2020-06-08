@@ -2,18 +2,21 @@ from django.db import models
 
 class DefFiles(models.Model):
     name=models.CharField(max_length=100)
+    path=models.CharField(max_length=100)
 
 class Assignment(models.Model):
     name=models.CharField(max_length=100)
     due_date=models.DateTimeField()
-    files = models.ManyToManyField(DefFiles, default="")
+    files = models.ManyToManyField(DefFiles)
+    path=models.CharField(max_length=100)
     def __str__(self):
         return '%s' % (self.name)
 
 class Classes(models.Model):
     name = models.CharField(max_length=100)
-    assignments = models.ManyToManyField(Assignment, default="")
     repo=models.URLField(default="")
+    path=models.CharField(max_length=100, default="")
+    assignments = models.ManyToManyField(Assignment, default="")
     default_file = models.ManyToManyField(DefFiles)
     def save(self, *args, **kwargs):
         return super(Classes, self).save(*args, **kwargs)
