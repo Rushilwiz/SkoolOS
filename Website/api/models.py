@@ -36,7 +36,7 @@ class Teacher(models.Model):
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     # classes = models.ManyToManyField(Classes, default="")
-    classes=models.CharField(max_length=100, default="")
+    classes=models.CharField(max_length=100, default="", blank=True)
     ion_user=models.CharField(primary_key=True, max_length=100)
     git=models.CharField(max_length=100)
 
