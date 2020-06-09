@@ -3,15 +3,19 @@ from urllib.parse import urlparse
 
 import requests
 from requests_oauthlib import OAuth2Session
-from selenium import webdriver;
+from selenium import webdriver
 import os.path
 import time
+import http.server
+import socketserver
+import threading
+from werkzeug.urls import url_decode
 
 client_id = r'QeZPBSKqdvWFfBv1VYTSv9iFGz5T9pVJtNUjbEr6'
 client_secret = r'0Wl3hAIGY9SvYOqTOLUiLNYa4OlCgZYdno9ZbcgCT7RGQ8x2f1l2HzZHsQ7ijC74A0mrOhhCVeZugqAmOADHIv5fHxaa7GqFNtQr11HX9ySTw3DscKsphCVi5P71mlGY'
 redirect_uri = 'http://localhost:8000/'
 token_url = 'https://ion.tjhsst.edu/oauth/token/'
-scope=["read"]
+scope = ["read"]
 
 
 def main():
@@ -28,19 +32,44 @@ def main():
     else:
         print(open(".profile", "r").read())
 
+    while True:
+        pass
 
 
 def authenticate():
     oauth = OAuth2Session(client_id=client_id, redirect_uri=redirect_uri, scope=scope)
     authorization_url, state = oauth.authorization_url("https://ion.tjhsst.edu/oauth/authorize/")
+
+    web_dir = os.path.join(os.path.dirname(__file__), 'oauth')
+    os.chdir(web_dir)
+    if os.path.exists("index.html"):
+        os.remove("index.html")
+
+    template = open("template.html", "rt")
+    index = open("index.html", "wt")
+    for line in template:
+        index.write(line.replace('AUTH_URL', authorization_url))
+    template.close()
+    index.close()
+
+    threading.Thread(target=create_server).start()
+
     browser = webdriver.Chrome()
-    browser.get(authorization_url)
+    browser.get("localhost:8000/")
 
     while "http://localhost:8000/?code" not in browser.current_url:
         time.sleep(0.25)
 
-    code = urlparse(browser.current_url).query[5:]
+    url = browser.current_url
+    gets = url_decode(url.replace("http://localhost:8000/?", ""))
+    code = gets.get("code")
+    if state == gets.get("state"):
+        state = gets.get("state")
+        print("states good")
     browser.quit()
+
+    print(code)
+    print(state)
 
     payload = {'grant_type': 'authorization_code', 'code': code, 'redirect_uri': redirect_uri, 'client_id': client_id,
                'client_secret': client_secret, 'csrfmiddlewaretoken': state}
@@ -55,8 +84,14 @@ def authenticate():
     # first_name = profile['first_name']
     # last_name = profile['last_name']
 
-    #print(profile)
+    # print(profile)
 
+def create_server():
+    port = 8000
+    handler = http.server.SimpleHTTPRequestHandler
+    httpd = socketserver.TCPServer(("", port), handler)
+    print("serving at port:" + str(port))
+    httpd.serve_forever()
 
 if __name__ == "__main__":
     main()
