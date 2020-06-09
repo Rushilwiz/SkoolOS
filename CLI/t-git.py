@@ -6,7 +6,7 @@ import pprint
 import json
 import shutil
 import time
-import prompt_toolkit.clipboard.pyperclip
+import pyperclip
 
 #git clone student directory ==> <student-id>/classes/assignments
 
@@ -199,7 +199,6 @@ class Teacher:
             input("Make new Git Repo with name: "  + cname + " (Press  any key to continue)\n")
             try:
                 pyperclip.copy(cname)
-                spam = pyperclip.paste()
                 print(cname + " copied to clipboard.")
             except:
                 pass
@@ -241,7 +240,6 @@ class Teacher:
 
     #make class from existing directory, add to git and api
     def addClass(self, path):
-
         if (self.checkClass(path)):
             data = self.addClasstoGit(path)
             #make class instance in db
@@ -311,7 +309,6 @@ class Teacher:
             if cname == c['name']:
                 cid = str(c['id'])
                 repo  =  c['repo']
-        print(cid)
 
         #remove from api
         for i in range(len(self.classes)):
@@ -319,8 +316,9 @@ class Teacher:
                 print("DELETE: " + self.classes[i]['name'])
                 del self.classes[i]
                 s=""
+                #recreate sclass field, using ids
                 for c in self.classes:
-                    s = s + str(self.classes[i]['id']) + ","
+                    s = s + str(c['id']) + ","
                 print(s)
                 s = s[:-1]
                 print(s)
@@ -364,5 +362,5 @@ class Teacher:
 
 data = getTeacher("eharris1")
 t = Teacher(data)
-t.deleteClass("eharris1/Crypto_eharris1")
+t.makeClass('English11_eharris1', ["Essay1"])
 t.update()
