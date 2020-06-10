@@ -14,9 +14,3 @@ update()
 outputs = vars(args)
 if(outputs['init']):
     start()
-
-
-
-
-
-
