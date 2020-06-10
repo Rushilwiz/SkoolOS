@@ -194,56 +194,6 @@ class Teacher:
                 return True
         return False
 
-    #adds class to  git,  not API
-    #Assuming valid  class name
-    def addClasstoGit(self, path):
-        cname = path.split("/")
-        cname = cname[len(cname)-1]
-        #push to remote repo
-        url='https://github.com/' + self.git + "/" + cname
-        if(requests.get(url).status_code != 200):
-            input("Make new Git Repo with name: "  + cname + " (Press  any key to continue)\n")
-            try:
-                pyperclip.copy(cname)
-                print(cname + " copied to clipboard.")
-            except:
-                pass
-            time.sleep(2)
-            webbrowser.open('https://github.com/new')
-            input("Repo created? (Press any key to continue)\n")
-
-            print(url)
-            while(requests.get(url).status_code  != 200):
-                r = input("Repo not created yet. (Press any key to continue after repo created, or 'N' to exit)\n")
-                if(r=="N" or r=="No"):
-                    return None
-            cdir = os.getcwd()
-            os.chdir(path)
-            command('git init')
-            command('git add .')
-            command('git commit -m Hello_Class')
-            command('git remote add origin ' + url + '.git')
-            command('git push -u origin master')
-        else:
-            cdir = os.getcwd()
-            os.chdir(path)
-            print("Repo already exists. Cloning instead.")
-            command('git clone')
-            command('git fetch origin')
-            command('git pull')
-            command('git add .')
-            command('git commit -m Hello_Class')
-            command('git push -u origin master')
-        os.chdir(cdir)
-        print(cdir)
-        data={
-            'name':cname,
-            'repo':url,
-            'path':path,
-            'teacher':self.username,
-        }
-        return data
-
     #make class from existing directory, add to git and api
     def addClass(self, path):
         if (self.checkClass(path)):
@@ -369,6 +319,13 @@ class Teacher:
             print(c['name'])
             if classes == c['name']:
                 cid = str(c['id'])
+                data1 = getDB("http://127.0.0.1:8000/classes/" + cid)
+                if(student in data1['unconfirmed']):
+                    print (student + " already requested.")
+                    return
+                if(student in data1['confirmed']):
+                    print (student + " alredy enrolled.")
+                break
         if(cid==None):
             print(classes +" does not exist.")
             return
@@ -409,7 +366,7 @@ class Teacher:
             "teacher": self.username,
             "assignments": "",
             "default_file": "",
-            "confirmed": "",
+            "confirmed": data1["confirmed"],
             "unconfirmed": data1['unconfirmed']
         }
         print(putDB(d, data1['url']))
@@ -418,23 +375,33 @@ class Teacher:
     def addStudent(self, student, classes):
         cdir = os.getcwd()
         cpath = self.username + "/" + classes
-        path = "Students/" + classes
+        path = self.username + "/Students/" + classes
         if(os.path.isdir(path) == False):
-            os.mkdir(path)
+            os.makedirs(path)
         os.chdir(path)
         student = getDB("http://127.0.0.1:8000/students/" + student)
         command("git clone " + student['repo'])
         os.chdir(cdir)
         copy_tree(cpath, path + "/" + student['ion_user'])
-        os.chdir("Students/" + classes + "/" + student['ion_user'])
+        os.chdir(self.username + "/Students/" + classes + "/" + student['ion_user'])
 
         command('git add .')
+        command('git checkout -b ' + classes)
         command('git commit -m Hello')
         command('git push -u origin ' + classes)
 
     def comment(self):
         print("heheheh")
+    
+    def addAssignment():
+        print()
+    
+    def updateAssignnment():
+        print()
 
-data = getTeacher("eharris1")
+data = getTeacher("mlauerbach")
 t = Teacher(data)
-t.addStudent('2022rkhondak','English11_eharris1')
+t.makeClass("Math5_mlauerbach", ["Week1_HW", "Test1"])
+input()
+t.reqStudent()
+t.addStudent("2022rkhondak", "Math5_mlauerbach")

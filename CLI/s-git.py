@@ -110,19 +110,27 @@ class Student:
         self.new = nclasses
         self.snew=str(data['added_to'])
         self.repo = data['repo']
-        if(self.repo == ""):
-            user= self.git
-            pwd= input("Enter Github password: ")
-            #curl -i -u USER:PASSWORD -d '{"name":"REPO"}' https://api.github.com/user/repos
-            url= "curl -i -u " + user + ":" + pwd + " -d '" + '{"name":"' + self.username + '"}' + "' " + "https://api.github.com/user/repos"
-            os.system(url)
+
+        if(os.path.isdir(self.username) == False):
+            if(self.repo == ""):
+                user= self.git
+                pwd= input("Enter Github password: ")
+                #curl -i -u USER:PASSWORD -d '{"name":"REPO"}' https://api.github.com/user/repos
+                url= "curl -i -u " + user + ":" + pwd + " -d '" + '{"name":"' + self.username + '"}' + "' " + "https://api.github.com/user/repos"
+                print(url)
+                os.system(url)
+            cdir = os.getcwd()
+            os.mkdir(self.username)
+            os.chdir(self.username)
             command('git clone https://github.com/' + self.git + '/' + self.username + '.git')
+            os.chdir(self.username)
+            command('git checkout master')
             command('touch README.md')
-            command('git add .')
-            command('git commit -m Hello')
+            command('git add README.md')
+            command('git commit -m "Hello"')
             command('git push -u origin master')
+            os.chdir(cdir)
             self.repo = 'https://github.com/' + self.git + '/' + self.username + '.git'
-            print(url)
             data={
                 'first_name':self.first_name,
                 'last_name':self.last_name,
@@ -142,38 +150,16 @@ class Student:
                 
     #update API and Github, all  assignments / classes
     def update(self):
-        #lists all classes
-        ignore=['.DS_Store']
-        classes = os.listdir(self.username)
-        for i in ignore:
-            try:
-                classes.remove(i)
-            except:
-                pass
-
-        for i in range(len(classes)):
-            c = classes[i]
-            path = self.username  +  "/" + c
-            #lists all assignments and default files
-            #push to git
-            isclass = False
-            for d in os.listdir(path):
-                if(d  == '.git'):
-                    isclass=True
-                    break
-            if(isclass):
-                loc = os.getcwd()
-                os.chdir(path)
-                command('git fetch origin')
-                command('git checkout ' + self.username)
-                command('git add .')
-                command('git commit -m ' + self.username + '-update')
-                command('git push -u origin ' + self.username)
-                command('git merge master')
-                os.chdir(loc)
-                print("Updated: " + c)
-            else:
-                print(d + " is not a class")
+        for c in self.classes:
+            data = getDB("http://127.0.0.1:8000/classes/" + str(c['id']))
+            os.chdir(self.username + "/" + data['name'])
+            command("git checkout -b " + data['name'])
+            command("git add " + data['name'])
+            command("git commit -m " + data['name'])
+            command("git push -u origin " + data['name'])
+            command("git pull origin " + data['name'])
+        for c in self.new:
+            self.addClass(str(c['id']))
 
     #class name format: <course-name>_<ion_user>
 
@@ -187,29 +173,49 @@ class Student:
                 print("Not added by teacher yet.")
             return None
 
+        data = getDB('http://127.0.0.1:8000/classes/'+ str(cid))
         pwd= input("Enter Github password: ")
-        url= "curl -i -u " + user + ":" + pwd + " -X PUT -d '' " + "'https://api.github.com/repos/" + self.git + "/" + data['name'] + "/collaborators/" + data['teacher'] + "'"
-        
-        data = getDB('http://127.0.0.1:8000/classes/'+cid)
+        tgit = getDB("http://127.0.0.1:8000/teachers/" + data['teacher'] + "/")['git']
+        url= "curl -i -u " + self.git + ":" + pwd + " -X PUT -d '' " + "'https://api.github.com/repos/" + self.git + "/" + self.username + "/collaborators/" + tgit + "'"
+        print(url)
+        os.system(url)
+
         data['unconfirmed'] = data['unconfirmed'].replace("," + self.username, "")
         data['unconfirmed'] = data['unconfirmed'].replace(self.username, "")
         data['confirmed'] = data['confirmed'] + "," + self.username
         if(data['confirmed'][0] == ','):
             data['confirmed'] = data['confirmed'][1:]
             print(data['confirmed'])
-        print(putDB(data, 'http://127.0.0.1:8000/classes/'+cid + "/"))
+        print(putDB(data, 'http://127.0.0.1:8000/classes/'+ str(cid) + "/"))
 
         #add teacher as collaborator 
         #curl -i -u "USER:PASSWORDD" -X PUT -d '' 'https://api.github.com/repos/USER/REPO/collaborators/COLLABORATOR'
         user = self.git
-        print(url)
-        os.system(url)
+
         self.classes.append(data)
         if(len(self.sclass)==0):
             self.sclass = data['id']
         else:
             self.sclass = self.sclass + "," + str(data['id'])
 
+        cdir = os.getcwd()
+        path1 = self.username + "/" + self.username
+        path2 = self.username
+        if(os.path.isdir(path1)):
+            os.chdir(path1)
+        else:
+            os.chdir(self.username)
+            command("git clone " + self.repo)
+            os.chdir(self.username)
+
+        command("git checkout -b " + data['name'])
+        command("touch welcome.txt")
+        command("git add welcome.txt")
+        command("git commit -m initial")
+        command("git push origin " + data['name'])
+        #git clone --single-branch --branch <branchname> <remote-repo>
+        os.chdir(cdir)
+        shutil.move(path1, self.username + "/" + data['name'])
         #upddate self.new
         s=""
         nar = ''
@@ -283,6 +289,6 @@ class Student:
             }
             #print(putDB(data, "http://127.0.0.1:8000/students/" + self.username + "/"))
 
-data = getStudent("2022inafi")
+data = getStudent("2022rkhondak")
 s = Student(data)
-s.addClass('57')
+s.update()
