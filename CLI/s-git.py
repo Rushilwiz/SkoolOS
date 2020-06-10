@@ -291,4 +291,4 @@ class Student:
 
 data = getStudent("2022rkhondak")
 s = Student(data)
-s.update()
+#s.update()

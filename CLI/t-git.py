@@ -373,6 +373,17 @@ class Teacher:
 
     #confirmed students    
     def addStudent(self, student, classes):
+        for c in self.classes:
+            if(c['name'] == classes):
+                cid = c['id']
+                data = getDB("http://127.0.0.1:8000/classes/" + str(cid))
+                if(student in data['confirmed']):
+                    print("Student already added to " + classes)
+                    return
+                if(student in data['unconfirmed']):
+                    print("Student has been enrolled in " + classes)
+                    return    
+
         cdir = os.getcwd()
         cpath = self.username + "/" + classes
         path = self.username + "/Students/" + classes
@@ -403,5 +414,5 @@ data = getTeacher("mlauerbach")
 t = Teacher(data)
 t.makeClass("Math5_mlauerbach", ["Week1_HW", "Test1"])
 input()
-t.reqStudent()
+t.reqStudent("2022rkhondak", "Math5_mlauerbach")
 t.addStudent("2022rkhondak", "Math5_mlauerbach")
