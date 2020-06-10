@@ -23,15 +23,15 @@ class ClassesSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['url', 'name', 'repo','path', "teacher",'assignments',"default_file",'id']
 
 class StudentSerializer(serializers.HyperlinkedModelSerializer):
-    classes = ClassesSerializer(many=True, read_only=True,allow_null=True)
+    # classes = ClassesSerializer(many=True, read_only=True,allow_null=True)
     class Meta:
         model = Student
-        fields = ['url', 'first_name', 'last_name', 'grade','webmail','student_id', 'git','repo','ion_user','classes']
+        fields = ['url', 'first_name', 'last_name', 'grade','email','student_id', 'git','ion_user','classes','added_to','completed']
 
 class TeacherSerializer(serializers.ModelSerializer):
     # classes = ClassesSerializer(many=True, read_only=True,allow_null=True)
     class Meta:
         model = Teacher
-        fields = ['url', 'first_name', 'last_name','git','ion_user','classes']
+        fields = ['url', 'first_name', 'last_name','git','ion_user', 'email','classes']
 
 

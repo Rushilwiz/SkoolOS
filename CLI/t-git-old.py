@@ -4,46 +4,12 @@ import requests
 import webbrowser
 import pprint
 import json
+import shutil
+import time
+import pyperclip
 
 #git clone student directory ==> <student-id>/classes/assignments
-'''
-{
-            "url": "http://127.0.0.1:8000/teachers/eharris1/",
-            "first_name": "Errin",
-            "last_name": "Harris",
-            "classes": [
-                {
-                    "url": "http://127.0.0.1:8000/classes/1/",
-                    "name": "Math5",
-                    "assignments": [
-                        {
-                            "name": "Week1_HW",
-                            "due_date": "2020-06-07T07:46:30.537197Z",
-                            "url": "http://127.0.0.1:8000/assignments/1/",
-                            "files": [
-                                {
-                                    "name": "instructions.txt"
-                                }
-                            ]
-                        },
-                        {
-                            "name": "Week2_HW",
-                            "due_date": "2020-06-07T07:46:30.548596Z",
-                            "url": "http://127.0.0.1:8000/assignments/2/",
-                            "files": [
-                                {
-                                    "name": "instructions.txt"
-                                }
-                            ]
-                        }
-                    ],
-                    "repo": ""
-                }
-            ],
-            "git": "therealraffi",
-            "ion_user": "eharris1"
-        },
-'''
+
 #get teacher info from api
 def getTeacher(ion_user):
         URL = "http://127.0.0.1:8000/teachers/" + ion_user + "/"
@@ -63,8 +29,37 @@ def getTeacher(ion_user):
 
 def getDB(url):
     r = requests.get(url = url, auth=('raffukhondaker','hackgroup1')) 
-    return r.json()
+    print("GET:" + str(r.status_code))
+    return(r.json())
 
+def postDB(data, url):
+    r = requests.post(url = url, data=data, auth=('raffukhondaker','hackgroup1')) 
+    print("POST:" + str(r.status_code))
+    return(r.json())
+
+def putDB(data, url):
+    r = requests.put(url = url, data=data, auth=('raffukhondaker','hackgroup1'))
+    print("PUT:" + str(r.status_code))
+    return(r.json())
+
+def delDB(url):
+    r = requests.delete(url = url, auth=('raffukhondaker','hackgroup1'))
+    print("DELETE:" + str(r.status_code))
+    return None
+
+def command(command):
+    ar = []
+    command = command.split(" ")
+    for c in command:
+        ar.append(c)
+    process = subprocess.Popen(ar, stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+    p=process.poll()
+    output = process.communicate()[1]
+    #print(output.decode('utf-8'))
+
+####################################################################################################################################
+
+#public methods: deleteClass, makeClass, update
 class Teacher:
     def __init__(self, data):
         # teacher info already  stored in API
@@ -74,260 +69,78 @@ class Teacher:
         self.git=data['git']
         self.username=data['ion_user']
         self.url= "http://127.0.0.1:8000/teachers/" + self.username + "/"
+        self.email = data['email']
+        #classes in id form (Example: 4,5)
         
-        classes=data['classes'].split(",")
-        cdict = []
-        for cid in classes:
-            adict=[]
-            c = getDB("http://127.0.0.1:8000/classes/" + cid + "/")
-            name=c['name']
-            repo=c['repo']
-            path=c['path']
-            teacher=c['teacher']
-            id=c['id']
-            assignments=c['assignments'].split(",")
-            dfs = c['default_file'].split(' ')
-            dfdict=[]
-            for fid in dfs:
-                f =  getDB("http://127.0.0.1:8000/files/" + fid + "/")
-                fname=f['name']
-                fpath=f['path']
-                dfdict.append({
-                    'name':fname,
-                    'path':fpath,
-                    'classes':classes,
-                    'assignment':"none",
-                    'id':fid,
-                })    
-            for aid in assignments:
-                fdict=[]
-                a = getDB("http://127.0.0.1:8000/assignments/" + aid + "/")
-                aname= a['name']
-                due_date = a['due_date']
-                apath=a['path']
-                classes=a['classes']
-                files = a['files'].split(' ')
-                for fid in files:
-                    f =  getDB("http://127.0.0.1:8000/files/" + fid + "/")
-                    fname=f['name']
-                    fpath=f['path']
-                    fdict.append({
-                        'name':fname,
-                        'path':fpath,
-                        'classes':classes,
-                        'assignment':aname,
-                        'id':fid,
-                    })
-                adict.append({
-                    'name':aname,
-                    'due_date':due_date,
-                    'path':apath,
-                    'classes':classes,
-                    'teacher':teacher,
-                    'files':fdict,
-                })
-            cdict.append({
-                'name':name,
-                'path':path,
-                'teacher':teacher,
-                'assignments':adict,
-                'default_file':adict,
-            })
-            
-        self.classes = cdict
+        cid=data['classes'].split(",")
+        try:
+            cid.remove('')
+        except:
+            pass
+        try:
+            cid.remove("")
+        except:
+            pass
+        classes=[]
+        for c in cid:
+            url = "http://127.0.0.1:8000/classes/" + str(c) + "/"
+            classes.append(getDB(url))
+        
+        self.classes = classes
+        self.sclass=str(data['classes'])
+        if(os.path.isdir(self.username)):
+            print("Synced to " +  self.username)
+        else:
+            os.mkdir(self.username)
 
-    def command(self,command):
-        ar = []
-        command = command.split(" ")
-        for c in command:
-            ar.append(c)
-        process = subprocess.Popen(ar, stdout=subprocess.PIPE,stderr=subprocess.PIPE)
-        p=process.poll()
-        output = process.communicate()[0]
-        #print(output.decode('utf-8'))
-
-    def initTeacher(self):
-        if(os.path.exists(self.username )):
-            print("Already synced to: " + str(self.username))
-            return
-        os.mkdir(self.username)
-        classes = self.classes
-        # make classes directory
-        for c in classes:
-            cname= c['name']
-            cpath = self.username + "/" + cname
-
-            input("Make new Git Repo with name: "  + cname + " (Press  any key to continue)\n")
-            webbrowser.open('https://github.com/new')
-            input("Repo created? (Press any key to continue)\n")
-
-            url='https://github.com/' + self.git + "/" + cname
-            print(url)
-            while(requests.get(url).status_code  != 200):
-                print(requests.get(url))
-                r = input("Repo not created yet. (Press any key to continue after repo created, or 'N' to exit)\n")
-                if(r=="N" or r=="No"):
-                    return
-            cdir = os.getcwd()
-            os.chdir(self.username)
-            self.command('git clone ' + url)
-            os.chdir(cdir)
-
-            #make class directory
-            #make default files for each class
-            for filename in c['default_file']:
-                f=open(cpath+"/"+filename['name'], "w")
-                f.close()
-            
-            #make assignments directory
-            for a in c['assignments']:
-                path = cpath + "/" + a['name']
-                if(os.path.exists(path)):
-                    print(path + " already exists...")
-                else:
-                    os.mkdir(path)
-                    f=open(path + "/instructions.txt", "w")
-                    f.close()
-
-            #push to remote repo
-            os.chdir(cpath)
-            print(cpath)
-            self.command('git add .')
-            self.command('git commit -m Hello_Class')
-            self.command('git push -u origin master')
                 
-    def checkGit(self, ass):
-        for a in ass:
-            if a =='.git':
-                return True
-        return False
-
-    def compareDB(self, fdict, url):
-        URL = url
-        r = requests.get(url = URL, auth=('raffukhondaker','hackgroup1')) 
-        data = r.json()['results']
-        allfiles = data
-        # far = []
-        # for f in allfiles:
-        #     far.append(f['path'])
-
-        for f in  fdict:
-            URL = url
-            in_db = False
-            pid=None
-            for dbf in allfiles:
-                if(dbf['path'] == f['path']):
-                    in_db=True
-                    break
-            if(in_db==False):
-                r = requests.post(url = URL, data=f , auth=('raffukhondaker','hackgroup1')) 
-                print("POST: (" + URL  + "): " + f['path'])
-                f['url']=r.json()['url']
-                print(r.status_code)
-            else:
-                URL = URL + str(dbf['id']) + "/"
-                r = requests.put(url = URL, data=f , auth=('raffukhondaker','hackgroup1')) 
-                print(r.status_code)
-                print("UPDATED: (" + URL  + "): " + f['path'])
-                f['url']=r.json()['url']
-                f['id']=dbf['id']
-                print(f)
-
-        return fdict
-
     #update API and Github, all  assignments / classes
     def update(self):
         #lists all classes
+        ignore=['.git','.DS_Store']
         classes = os.listdir(self.username)
-
+        for i in ignore:
+            try:
+                classes.remove(i)
+            except:
+                pass
+        #list of classes that have been deleted (not  with  deleteClass)
+        extra = []
+        for c in self.classes:
+            extra.append(c)
+        for i in range(len(extra)):
+            e = extra[i]['path']
+            extra[i] = e
+        print("Extra: "+str(extra))
+        print("Local:" + str(classes))
         #checks all class directories first
         for c in classes:
             path = self.username  +  "/" + c
             if(self.checkClass(path) == False):
                 return
-        cdict = []
-        for c in classes:
+            extra.remove(path)
+            print("Current classes: " + path)
+
+        for e in extra:
+            self.deleteClass(e)
+
+        for i in range(len(classes)):
+            c = classes[i]
             path = self.username  +  "/" + c
             #lists all assignments and default files
-            ass =  os.listdir(path)
             #if  no  .git, directory not synced to  git  or  API
-            if (self.checkGit(ass)==False):
+            if (self.checkInDB(path)==False):
                 self.addClass(path)
             else:
                 #push to git
                 loc = os.getcwd()
                 os.chdir(path)
-                self.command('git add .')
-                self.command('git commit -m "Update"')
-                self.command('git push -u origin master')
+                command('git fetch origin')
+                command('git pull origin master')
+                command('git add .')
+                command('git commit -m "Update"')
+                command('git push -u origin master')
                 os.chdir(loc)
-                ass.remove('.git')
-
-            loc = os.getcwd()
-            os.chdir(path)
-            repo = self.command('git config --get remote.origin.url')
-            os.chdir(loc)
-
-            #assignments
-            adict = []
-            #default  files for classes
-            fdict=[]
-            #default files  for assignments
-            afdict=[]
-            for a in ass:
-                aname=a
-                path = self.username  +  "/" + c + "/" + a
-                #need to add  option
-                due_date= '2020-06-07T07:46:30.537197Z',
-                #check for default file
-                if(os.path.isfile(path)):
-                    fdict.append({
-                        'name':a,
-                        'path':path
-                    })
-                elif(os.path.isdir(path)):
-                    for af in os.listdir(path):
-                        path =  path+ "/" + af
-                        if(os.path.isfile(path)):
-                            afdict.append({
-                                'name':af,
-                                'path':path
-                            })
-                    path = self.username  +  "/" + c + "/" + a
-                    adict.append({
-                        'name':aname,
-                        'due_date': due_date[0],
-                        'path':path,
-                        'files':afdict
-                    })
-
-                fdict=self.compareDB(fdict, "http://127.0.0.1:8000/files/")
-                afdict=self.compareDB(afdict,"http://127.0.0.1:8000/files/")
-                
-            adict=self.compareDB(adict, 'http://127.0.0.1:8000/assignments/')
-
-            path = self.username  +  "/" + c
-            cdict.append({
-                'name':c,
-                'repo': repo,
-                'path':path,
-                'assignments':adict,
-                'default_file':fdict,
-            })
-        cdict=self.compareDB(cdict,'http://127.0.0.1:8000/classes/')
-
-        mdict= {
-            'first_name':self.first_name,
-            'last_name':self.last_name,
-            'git':self.git,
-            'ion_user':self.username,
-            'classes':cdict,
-        }
-
-        data = json.dumps(mdict)
-        # r = requests.put(url = 'http://127.0.0.1:8000/teachers/eharris1/', data=data, headers={'Content-type': 'application/json'} ,  auth=('raffukhondaker','hackgroup1'))
-        # print(print(r.json()))
-
 
     #class name format: <course-name>_<ion_user>
 
@@ -336,8 +149,11 @@ class Teacher:
     def checkClass(self,path):
         cname = path.split("/")
         cname = cname[len(cname)-1]
+        if(os.path.isfile(path)):
+            print(path + " must be in a Class directory.")
+            return False
         if(("_" + self.username) in cname) == False:
-            print("Incorrect class name: Must be in the format: <course-name>_<ion_user>")
+            print("Incorrect class name: Must be in the format: " + self.username+ "/<course-name>_<ion_user>, not " + path)
             return False
         dirs = os.listdir(path)
         #checks if there  is a file (not within Assignments) in class, need at least 1
@@ -349,98 +165,199 @@ class Teacher:
         for d in dirs:
             if(os.path.isfile(d)):
                 deffile=True
-            if(os.path.isdir(d)) and d != '.git':
+            else:
                 #checks if there  is a file in an Assignment, need at least 1
                 as_file = False
-                asdir = os.listdir(d)
+                asdir = os.listdir(path + "/" + d)
                 for a in asdir:
-                    if(os.path.isfile(a)):
+                    if(os.path.isfile(path + "/" + d + "/" +a)):
                         as_file=True
                 if(as_file==False):
-                    as_bad = a
+                    as_bad = d
                     break
         if(as_file==False):
             print("Assignment '" + as_bad + "' does  not  have a default file!")
             return False
 
-        if(deffile):
+        if(deffile==False):
             print("Need a default file in the " + path + " Directory!")
             return  False
         return True
+    
+    def checkInDB(self, path):
+        n  = path.split("/")
+        n = n[len(n)-1]
+        for c in self.classes:
+            if(n == c['name']):
+                return True
+        return False
 
     #adds class to  git,  not API
+    #Assuming valid  class name
     def addClasstoGit(self, path):
         cname = path.split("/")
         cname = cname[len(cname)-1]
         #push to remote repo
-        if(self.checkClass(path)):
+        url='https://github.com/' + self.git + "/" + cname
+        if(requests.get(url).status_code != 200):
             input("Make new Git Repo with name: "  + cname + " (Press  any key to continue)\n")
+            try:
+                pyperclip.copy(cname)
+                print(cname + " copied to clipboard.")
+            except:
+                pass
+            time.sleep(2)
             webbrowser.open('https://github.com/new')
             input("Repo created? (Press any key to continue)\n")
 
-            url='https://github.com/' + self.git + "/" + cname
             print(url)
             while(requests.get(url).status_code  != 200):
-                print(requests.get(url))
                 r = input("Repo not created yet. (Press any key to continue after repo created, or 'N' to exit)\n")
                 if(r=="N" or r=="No"):
                     return None
             cdir = os.getcwd()
             os.chdir(path)
-            self.command('git init')
-            self.command('git add .')
-            self.command('git commit -m Hello_Class')
-            self.command('git remote add origin ' + url + '.git')
-            self.command('git push -u origin master')
-            os.chdir(cdir)
+            command('git init')
+            command('git add .')
+            command('git commit -m Hello_Class')
+            command('git remote add origin ' + url + '.git')
+            command('git push -u origin master')
+        else:
+            cdir = os.getcwd()
+            os.chdir(path)
+            print("Repo already exists. Cloning instead.")
+            command('git clone')
+            command('git fetch origin')
+            command('git pull')
+            command('git add .')
+            command('git commit -m Hello_Class')
+            command('git push -u origin master')
+        os.chdir(cdir)
+        print(cdir)
+        data={
+            'name':cname,
+            'repo':url,
+            'path':path,
+            'teacher':self.username,
+        }
+        return data
+
+    #make class from existing directory, add to git and api
+    def addClass(self, path):
+        if (self.checkClass(path)):
+            data = self.addClasstoGit(path)
+            #make class instance in db
+            data = postDB(data, 'http://127.0.0.1:8000/classes/')
+            #add to  instance
+            #upate  self.classes
+            self.classes.append(data)
+            if(len(self.sclass)==0):
+                self.sclass = data['id']
+            else:
+                self.sclass = self.sclass + "," + str(data['id'])
+            
+            #update teacher instance in db, classes field
+            data={
+                'first_name':self.first_name,
+                'last_name':self.last_name,
+                'git':self.git,
+                'ion_user':self.username,
+                'url':self.url,
+                'classes':self.sclass,
+                'email':self.email
+            }
+            putDB(data, self.url)
+
+            return data
 
 
     #make a new class from scratch
-    def makeClass(self, subject):
-        cname = subject + "_" + self.username
-        os.chdir(self.username)
+    #subject: string, assignments: list
+    #class name must be: <subject>_<ion_user>
+    def makeClass(self, cname, assignments):
         #check if class exists
-        if(os.path.exists(cname)):
-            print("Already synced to: " + str(self.username))
+        path = self.username + "/" + cname
+        if(os.path.exists(path)):
+            print("Class already exists: " + cname)
             return
         else:
-            os.mkdir(cname)
-            f=open(cname + "/README.md", "w")
+            if((("_" + self.username) in cname) == False):
+                print("class name must be: "+ cname + "_" + self.username)
+                return
+            cdir = os.getcwd()
+            os.mkdir(path)
+            f=open(path + "/README.md", "w")
             f.close()
             #push to remote repo
-            os.chdir(cname)
-            command(self, 'git init')
-            command(self, 'git add .')
-            command(self, 'git commit -m "Hello Class!"')
-            #git remote add origin git@github.com:alexpchin/<reponame>.git
-            command(self, 'git remote add origin git@github.com:'+ self.git + "/" + cname + ".git")
-            command(self, 'git push -u origin master')
+            os.chdir(path)
+            for a in assignments:
+                os.mkdir(a)
+                f=open(a + "/instructions.txt", "w")
+                f.close()
+            os.chdir(cdir)
 
-            cinfo=[
-            {
-                "name":cname,
-                "assignments":[],
-                "repo": "https://github.com:" + self.git + "/" + cname + ".git",
-                "default_file": [
-                    {
-                        "name":"README.md"
-                    }
-                ]
-            }
-            ]
+            data = self.addClass(path)
+            return data
+    
+    def deleteClass(self, path):
+        if(os.path.exists(path) == False):
+            print(path + " does not exist locally.")
+        resp = input("Do you want to delete " + path + " from the SkoolOS system? (y/N) ")
+        if(resp != 'y'):
+            return
 
-            #update  rest API
-            self.classes.append(cinfo)
-            update(self)
-            data = {
-                "url": self.url,
-                "first_name": self.first_name,
-                "last_name": self.first_name,
-                "classes": self.classes,
-                "git": self.git,
-                "ion_user": self.username
-            },
-            r = requests.put(url = self.url, data= data, headers={'Content-type': 'application/json'} ,auth=('raffukhondaker','hackgroup1'))
+        cname = path.split("/")
+        cname = cname[len(cname)-1]
+        cid = None
+        repo = ''
+        for c in self.classes:
+            if cname == c['name']:
+                cid = str(c['id'])
+                repo  =  c['repo']
+
+        #remove from api
+        for i in range(len(self.classes)):
+            if(self.classes[i]['id'] == int(cid)):
+                print("DELETE: " + self.classes[i]['name'])
+                del self.classes[i]
+                s=""
+                #recreate sclass field, using ids
+                for c in self.classes:
+                    s = s + str(c['id']) + ","
+                print(s)
+                s = s[:-1]
+                print(s)
+                data={
+                    'first_name':self.first_name,
+                    'last_name':self.last_name,
+                    'git':self.git,
+                    'ion_user':self.username,
+                    'url':self.url,
+                    'classes':s,
+                    'email':self.email
+                }
+                print(putDB(data, self.url))
+                delDB("http://127.0.0.1:8000/classes/" + cid + "/")
+                break
+        
+        #remove locally
+        try:
+            shutil.rmtree(path)
+        except:
+            pass
+
+        #remove from git
+        input("Delete repository: "  + cname + ". Scroll to the bottom of the page and press 'Delete this repository' (Press  any key to continue) ")
+        print(repo)
+        time.sleep(2)
+        webbrowser.open(repo  + "/settings")
+        input("Repo deleted? (Press any key to continue) ")
+
+        print(repo)
+        while(requests.get(repo).status_code  == 200):
+            r = input("Repo still no deleted yet. (Press any key to continue after repo deleted, or 'N' to exit)\n")
+            if(r=="N" or r=="No" or r=='n'):
+                return None
 
 #make student repo by student id
     def addStudent(self,stid):
@@ -449,9 +366,7 @@ class Teacher:
     def comment(self):
         print("heheheh")
 
-# data = getData("eharris1")
-data={'url': 'http://127.0.0.1:8000/teachers/eharris1/', 'first_name': 'Errin', 'last_name': 'Harris', 'git': 'therealraffi', 'ion_user': 'eharris1', 'classes': [{'url': 'http://127.0.0.1:8000/classes/1/', 'name': 'Math5_eharris1', 'repo': 'http://127.0.0.1:8000/assignments/3/', 'assignments': [{'name': 'Week1_HW', 'due_date': '2020-06-07T07:46:30.537197Z', 'url': 'http://127.0.0.1:8000/assignments/1/', 'files': [{'name': 'instructions.txt'}]}, {'name': 'Week2_HW', 'due_date': '2020-06-07T07:46:30.548596Z', 'url': 'http://127.0.0.1:8000/assignments/2/', 'files': [{'name': 'instructions.txt'}]}], 'default_file': [{'name': 'instructions.txt'}]}]}
+data = getTeacher("eharris1")
 t = Teacher(data)
+t.makeClass('English11_eharris1', ["Essay1"])
 t.update()
-
-

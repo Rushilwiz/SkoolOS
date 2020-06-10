@@ -39,6 +39,7 @@ class Teacher(models.Model):
     classes=models.CharField(max_length=100, default="", blank=True)
     ion_user=models.CharField(primary_key=True, max_length=100)
     git=models.CharField(max_length=100)
+    email=models.CharField(max_length=100, default="", blank=True)
 
 class Student(models.Model):
     created = models.DateTimeField(auto_now_add=True)
@@ -46,12 +47,13 @@ class Student(models.Model):
     last_name = models.CharField(max_length=100)
     student_id = models.IntegerField()
     ion_user=models.CharField(primary_key=True, max_length=100)
-    webmail = models.EmailField(blank=True)
+    email=models.CharField(max_length=100, default="", blank=True)
     grade = models.IntegerField()
     git=models.CharField(max_length=100)
-    classes = models.ManyToManyField(Classes, default="")
-    repo = models.URLField(default="")
-
+    classes=models.CharField(max_length=100, default="", blank=True)
+    added_to=models.CharField(max_length=100, default="", blank=True)
+    completed=models.TextField(default="", blank=True)
+    
     def save(self, *args, **kwargs):
         return super(Student, self).save(*args, **kwargs)
 
