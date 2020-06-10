@@ -117,6 +117,10 @@ class Student:
             url= "curl -i -u " + user + ":" + pwd + " -d '" + '{"name":"' + self.username + '"}' + "' " + "https://api.github.com/user/repos"
             os.system(url)
             command('git clone https://github.com/' + self.git + '/' + self.username + '.git')
+            command('touch README.md')
+            command('git add .')
+            command('git commit -m Hello')
+            command('git push -u origin master')
             self.repo = 'https://github.com/' + self.git + '/' + self.username + '.git'
             print(url)
             data={
@@ -279,6 +283,6 @@ class Student:
             }
             #print(putDB(data, "http://127.0.0.1:8000/students/" + self.username + "/"))
 
-data = getStudent("2022rkhondak")
+data = getStudent("2022inafi")
 s = Student(data)
 s.addClass('57')

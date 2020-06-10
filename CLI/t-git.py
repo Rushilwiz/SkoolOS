@@ -57,7 +57,7 @@ def command(command):
     process = subprocess.Popen(ar, stdout=subprocess.PIPE,stderr=subprocess.PIPE)
     p=process.poll()
     output = process.communicate()[1]
-    #print(output.decode('utf-8'))
+    print(output.decode('utf-8'))
 
 ####################################################################################################################################
 
@@ -426,7 +426,8 @@ class Teacher:
         command("git clone " + student['repo'])
         os.chdir(cdir)
         copy_tree(cpath, path + "/" + student['ion_user'])
-        command('git branch ' + classes)
+        os.chdir("Students/" + classes + "/" + student['ion_user'])
+
         command('git add .')
         command('git commit -m Hello')
         command('git push -u origin ' + classes)
