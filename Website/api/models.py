@@ -25,6 +25,8 @@ class Classes(models.Model):
     teacher=models.CharField(max_length=100, default="")
     assignments=models.CharField(max_length=100, default="")
     default_file=models.CharField(max_length=100, default="")
+    confirmed=models.TextField(default="", blank=True)
+    unconfirmed=models.TextField(default="", blank=True)
 
     # assignments = models.ManyToManyField(Assignment, default="")
     # default_file = models.ManyToManyField(DefFiles)
@@ -50,6 +52,7 @@ class Student(models.Model):
     email=models.CharField(max_length=100, default="", blank=True)
     grade = models.IntegerField()
     git=models.CharField(max_length=100)
+    repo=models.URLField(default="", blank=True)
     classes=models.CharField(max_length=100, default="", blank=True)
     added_to=models.CharField(max_length=100, default="", blank=True)
     completed=models.TextField(default="", blank=True)

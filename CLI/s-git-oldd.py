@@ -54,7 +54,7 @@ def command(command):
         ar.append(c)
     process = subprocess.Popen(ar, stdout=subprocess.PIPE,stderr=subprocess.PIPE)
     p=process.poll()
-    output = process.communicate()[0]
+    output = process.communicate()[1]
     print(output.decode('utf-8'))
 
 ####################################################################################################################################
@@ -74,6 +74,7 @@ class Student:
         self.student_id=data['student_id']
         self.completed  = data['completed']
         #classes in id form (Example: 4,5)
+       
         #storing  actual classes
         cid=data['classes'].split(",")
         try:
@@ -109,32 +110,11 @@ class Student:
         
         self.new = nclasses
         self.snew=str(data['added_to'])
-        self.repo = data['repo']
-        if(self.repo == ""):
-            user= self.git
-            pwd= input("Enter Github password: ")
-            #curl -i -u USER:PASSWORD -d '{"name":"REPO"}' https://api.github.com/user/repos
-            url= "curl -i -u " + user + ":" + pwd + " -d '" + '{"name":"' + self.username + '"}' + "' " + "https://api.github.com/user/repos"
-            os.system(url)
-            command('git clone https://github.com/' + self.git + '/' + self.username + '.git')
-            self.repo = 'https://github.com/' + self.git + '/' + self.username + '.git'
-            print(url)
-            data={
-                'first_name':self.first_name,
-                'last_name':self.last_name,
-                'git':self.git,
-                'ion_user':self.username,
-                'student_id':self.student_id,
-                'added_to':self.snew,
-                'url':self.url,
-                'classes':self.sclass,
-                'email':self.email,
-                'grade':self.grade,
-                'completed':self.completed,
-                'repo':self.repo
-            }
-            print(putDB(data, self.url))
-        print("Synced to " +  self.username)
+        if(os.path.isdir(self.username)):
+            print("Synced to " +  self.username)
+        else:
+            os.mkdir(self.username)
+
                 
     #update API and Github, all  assignments / classes
     def update(self):
@@ -182,24 +162,15 @@ class Student:
             else:
                 print("Not added by teacher yet.")
             return None
-
-        pwd= input("Enter Github password: ")
-        url= "curl -i -u " + user + ":" + pwd + " -X PUT -d '' " + "'https://api.github.com/repos/" + self.git + "/" + data['name'] + "/collaborators/" + data['teacher'] + "'"
-        
         data = getDB('http://127.0.0.1:8000/classes/'+cid)
-        data['unconfirmed'] = data['unconfirmed'].replace("," + self.username, "")
-        data['unconfirmed'] = data['unconfirmed'].replace(self.username, "")
-        data['confirmed'] = data['confirmed'] + "," + self.username
-        if(data['confirmed'][0] == ','):
-            data['confirmed'] = data['confirmed'][1:]
-            print(data['confirmed'])
-        print(putDB(data, 'http://127.0.0.1:8000/classes/'+cid + "/"))
 
-        #add teacher as collaborator 
-        #curl -i -u "USER:PASSWORDD" -X PUT -d '' 'https://api.github.com/repos/USER/REPO/collaborators/COLLABORATOR'
-        user = self.git
-        print(url)
-        os.system(url)
+        #clone class repo and make student branch (branch name: username)
+        os.chdir(self.username)
+        command("git clone " + data['repo'])
+        os.chdir(data['name'])
+        command("git checkout " + self.username)
+        command("git push -u origin " + self.username)
+
         self.classes.append(data)
         if(len(self.sclass)==0):
             self.sclass = data['id']
@@ -211,6 +182,7 @@ class Student:
         nar = ''
         for i in range(len(self.new)):
             if(self.new[i]['id'] == int(data['id'])):
+                print("DELETE: " + self.new[i]['name'])
                 del self.new[i]
                 #recreate sclass field, using ids
                 for c in self.new:
@@ -281,4 +253,4 @@ class Student:
 
 data = getStudent("2022rkhondak")
 s = Student(data)
-s.addClass('57')
+s.update()
