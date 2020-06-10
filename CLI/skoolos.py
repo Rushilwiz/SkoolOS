@@ -8,7 +8,7 @@ import os.path
 import time
 import http.server
 import socketserver
-import threading
+from threading import Thread
 from werkzeug.urls import url_decode
 
 client_id = r'QeZPBSKqdvWFfBv1VYTSv9iFGz5T9pVJtNUjbEr6'
@@ -29,6 +29,7 @@ def main():
 
     if not os.path.exists(".profile"):
         authenticate()
+        print(open(".profile", "r").read())
     else:
         print(open(".profile", "r").read())
 
@@ -45,19 +46,22 @@ def authenticate():
     if os.path.exists("index.html"):
         os.remove("index.html")
 
-    template = open("template.html", "rt")
-    index = open("index.html", "wt")
+    template = open("template.html", "r")
+    index = open("index.html", "w")
     for line in template:
         index.write(line.replace('AUTH_URL', authorization_url))
     template.close()
     index.close()
 
-    threading.Thread(target=create_server).start()
+    # server = Thread(target=create_server)
+    # server.daemon = True
+    # server.start()
 
     browser = webdriver.Chrome()
     browser.get("localhost:8000/")
 
     while "http://localhost:8000/?code" not in browser.current_url:
+        http.server.
         time.sleep(0.25)
 
     url = browser.current_url
@@ -75,16 +79,22 @@ def authenticate():
                'client_secret': client_secret, 'csrfmiddlewaretoken': state}
     token = requests.post("https://ion.tjhsst.edu/oauth/token/", data=payload).json()
     print(token)
-    # headers = {'Authorization': f"Bearer {token['access_token']}"}
-    #
-    # # And finally get the user's profile!
-    # profile = requests.get("https://ion.tjhsst.edu/api/profile", headers=headers).json()
-    # username = profile['ion_username']
-    # email = profile['tj_email']
-    # first_name = profile['first_name']
-    # last_name = profile['last_name']
+    headers = {'Authorization': f"Bearer {token['access_token']}"}
 
-    # print(profile)
+    # And finally get the user's profile!
+    profile = requests.get("https://ion.tjhsst.edu/api/profile", headers=headers).json()
+    print(profile)
+    username = profile['ion_username']
+    email = profile['tj_email']
+    first_name = profile['first_name']
+    last_name = profile['last_name']
+
+    profileFile = open(".profile", "w")
+    profileFile.write(profile)
+    profileFile.close()
+
+    # server.stop
+
 
 def create_server():
     port = 8000
