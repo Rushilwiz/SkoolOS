@@ -425,7 +425,7 @@ class Teacher:
         student = getDB("http://127.0.0.1:8000/students/" + student)
         command("git clone " + student['repo'])
         os.chdir(cdir)
-        shutil.copytree(path, cpath + "/" + student['ion_user'])
+        copy_tree(cpath, path + "/" + student['ion_user'])
         command('git branch ' + classes)
         command('git add .')
         command('git commit -m Hello')
