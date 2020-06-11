@@ -19,7 +19,7 @@ class Assignment(models.Model):
         return '%s' % (self.name)
 
 class Classes(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(primary_key=True, max_length=100)
     repo=models.URLField(default="")
     path=models.CharField(max_length=100, default="")
     teacher=models.CharField(max_length=100, default="")

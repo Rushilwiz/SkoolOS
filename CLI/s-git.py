@@ -56,6 +56,7 @@ def command(command):
     p=process.poll()
     output = process.communicate()[0]
     print(output.decode('utf-8'))
+    return output.decode('utf-8')
 
 ####################################################################################################################################
 
@@ -152,30 +153,35 @@ class Student:
         cdir = os.getcwd()
         os.chdir(self.username)
         for c in self.classes:
-            data = getDB("http://127.0.0.1:8000/classes/" + str(c['id']))
+            print("UPDATING CLASS: " + str(c['name']))
+            data = getDB("http://127.0.0.1:8000/classes/" + str(c['name']))
+            command("git checkout master")
             command("git checkout " + data['name'])
-            command("git add " + data['name'])
+            command("git add .")
             command("git commit -m " + data['name'])
             command("git pull origin " + data['name'])
             command("git push -u origin " + data['name'])
+            command("git checkout master")
         os.chdir(cdir)
         for c in self.new:
-            self.addClass(str(c['id']))
+            print("ADDING CLASS: " + str(c['name']))
+            self.addClass(str(c['name']))
         command("git checkout master")
 
     #class name format: <course-name>_<ion_user>
 
     #add  classes from 'new' field
     def addClass(self, cid):
-        if((cid in self.snew) == False):
-            if((cid in self.sclass) == True):
-                print("Already enrolled in this class.")
-                return None
-            if((cid in self.snew) == True):
-                print("Not added by teacher yet.")
-                return None
 
         data = getDB('http://127.0.0.1:8000/classes/'+ str(cid))
+        if((cid in self.snew) == False or (self.username in data['confirmed'])):
+            print("Already enrolled in this class.")
+            return None
+        if((cid in self.sclass) or (self.username in data['unconfirmed']) == False):
+            print("Not added by teacher yet.")
+            return None
+
+        #add class teacher as cocllaborator to student repo
         print(os.getcwd())
         pwd= input("Enter Github password: ")
         tgit = getDB("http://127.0.0.1:8000/teachers/" + data['teacher'] + "/")['git']
@@ -183,26 +189,7 @@ class Student:
         print(url)
         os.system(url)
 
-        data['unconfirmed'] = data['unconfirmed'].replace("," + self.username, "")
-        data['unconfirmed'] = data['unconfirmed'].replace(self.username, "")
-        data['confirmed'] = data['confirmed'] + "," + self.username
-        if(data['confirmed'][0] == ','):
-            data['confirmed'] = data['confirmed'][1:]
-            print(data['confirmed'])
-        print(putDB(data, 'http://127.0.0.1:8000/classes/'+ str(cid) + "/"))
-
-        #add teacher as collaborator 
-        #curl -i -u "USER:PASSWORDD" -X PUT -d '' 'https://api.github.com/repos/USER/REPO/collaborators/COLLABORATOR'
-        user = self.git
-
-        self.classes.append(data)
-        if(len(self.sclass)==0):
-            self.sclass = data['id']
-        else:
-            self.sclass = self.sclass + "," + str(data['id'])
-
         cdir = os.getcwd()
-        print(cdir)
         # path1 = self.username + "/" + self.username
         # path2 = self.username
         # if(os.path.isdir(path1)):
@@ -212,24 +199,46 @@ class Student:
         #     command("git clone " + self.repo)
         #     os.chdir(self.username)
 
+        #push to git, start at master
         os.chdir(self.username)
+        command("git checkout master")
         command("git branch " + data['name'])
         command("git commit -m initial")
         command("git push origin " + data['name'])
+        command("git checkout master")
         #git clone --single-branch --branch <branchname> <remote-repo>
         os.chdir(cdir)
+
+        # data['unconfirmed'] = data['unconfirmed'].replace("," + self.username, "")
+        # data['unconfirmed'] = data['unconfirmed'].replace(self.username, "")
+        # data['confirmed'] = data['confirmed'] + "," + self.username
+        # if(data['confirmed'][0] == ','):
+        #     data['confirmed'] = data['confirmed'][1:]
+        #     print(data['confirmed'])
+        # print(putDB(data, 'http://127.0.0.1:8000/classes/'+ str(cid) + "/"))
+
+        #add teacher as collaborator 
+        #curl -i -u "USER:PASSWORDD" -X PUT -d '' 'https://api.github.com/repos/USER/REPO/collaborators/COLLABORATOR'
+        user = self.git
+
+        self.classes.append(data)
+        if(len(self.sclass)==0):
+            self.sclass = data['name']
+        else:
+            self.sclass = self.sclass + "," + str(data['name'])
+
         #upddate self.new
-        s=""
-        nar = ''
+        snew=""
+        new = []
         for i in range(len(self.new)):
-            if(self.new[i]['id'] == int(data['id'])):
+            if(self.new[i]['name'] == data['name']):
                 del self.new[i]
                 #recreate sclass field, using ids
                 for c in self.new:
-                    s = s + str(c['id']) + ","
-                    nar.append(c)
-                self.snew=s
-                self.new=nar
+                    snew = snew + str(c['name']) + ","
+                    new.append(getDB("http://127.0.0.1:8000/classes/" + str(cid)))
+                self.snew=snew
+                self.new=new
                 break
         
         #update teacher instance in db, classes field
@@ -296,7 +305,6 @@ class Student:
         os.chdir(self.username)
         for c in self.classes:
             if c['name'] == courses:
-                print(courses)
                 command("git checkout " + courses)
                 print(os.listdir())
                 return
@@ -304,15 +312,35 @@ class Student:
         print("Class not found")
         return
         
-    def submit(self, courses):
+    def submit(self, course, assignment):
+        cdir = os.getcwd()
+        os.chdir(self.username)
+        print(os.getcwd())
+        command("git add .")
+        command("git commit -m update")
+        command('git checkout ' + course)
+        time.sleep(5)
+        ass = os.listdir()
+        inclass = False
+        for a in ass:
+            if a == assignment:
+                inclass = True
+                break
+        if(inclass == False):
+            print(assignment + " not an assignment of " + course)
+            command('git checkout master')
+            os.chdir(cdir)
+            return
+
+        command('touch ' + assignment + '/SUBMISSION')
         command("git add .")
         command("git commit -m submit")
-        command("git tag " + parts[1] + "-final")
-        command("git push -u origin " + self.username + " --tags")
+        command("git tag " + assignment + "-final")
+        command("git push -u origin " + course + " --tags")
+        command('git checkout master')
+        os.chdir(cdir)
 
-data = getStudent("2023rumareti")
+data = getStudent("2022rkhondak")
 s = Student(data)
-s.update()
-
-
-#s.update()
+#s.viewClass("English11_eharris1")
+s.submit("English11_eharris1", "Entry1")

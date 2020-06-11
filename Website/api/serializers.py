@@ -20,7 +20,7 @@ class ClassesSerializer(serializers.HyperlinkedModelSerializer):
     # default_file=DefFilesSerializer(many=True, read_only=True,allow_null=True)
     class Meta:
         model = Classes
-        fields = ['url', 'name', 'repo','path', "teacher",'assignments',"default_file",'id', 'confirmed', 'unconfirmed']
+        fields = ['url', 'name', 'repo','path', "teacher",'assignments',"default_file", 'confirmed', 'unconfirmed']
 
 class StudentSerializer(serializers.HyperlinkedModelSerializer):
     # classes = ClassesSerializer(many=True, read_only=True,allow_null=True)
