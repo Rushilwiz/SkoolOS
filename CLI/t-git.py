@@ -371,33 +371,34 @@ class Teacher:
         }
         print(putDB(d, data1['url']))
 
-    #confirmed students    
-    def addStudent(self, student, classes):
+    #confirmed students  
+    # pull student work and push updates  
+    def updateStudent(self, student, classes):
         for c in self.classes:
             if(c['name'] == classes):
                 cid = c['id']
                 data = getDB("http://127.0.0.1:8000/classes/" + str(cid))
-                if(student in data['confirmed']):
-                    print("Student already added to " + classes)
-                    return
                 if(student in data['unconfirmed']):
-                    print("Student has been enrolled in " + classes)
+                    print(student + " has not accepted request to " + classes)
                     return    
 
         cdir = os.getcwd()
         cpath = self.username + "/" + classes
         path = self.username + "/Students/" + classes
+        spath = self.username + "/Students/" + classes + "/" + student
         if(os.path.isdir(path) == False):
             os.makedirs(path)
-        os.chdir(path)
-        student = getDB("http://127.0.0.1:8000/students/" + student)
-        command("git clone " + student['repo'])
-        os.chdir(cdir)
+        if(os.path.isdir(spath) == False):
+            os.chdir(path)
+            student = getDB("http://127.0.0.1:8000/students/" + student)
+            command("git clone " + student['repo'])
+            os.chdir(cdir)
         copy_tree(cpath, path + "/" + student['ion_user'])
         os.chdir(self.username + "/Students/" + classes + "/" + student['ion_user'])
 
+        command('git checkout ' + classes)
+        command('git pull origin ' + classes)
         command('git add .')
-        command('git checkout -b ' + classes)
         command('git commit -m Hello')
         command('git push -u origin ' + classes)
 
@@ -412,7 +413,7 @@ class Teacher:
 
 data = getTeacher("mlauerbach")
 t = Teacher(data)
-t.makeClass("Math5_mlauerbach", ["Week1_HW", "Test1"])
-input()
-t.reqStudent("2022rkhondak", "Math5_mlauerbach")
-t.addStudent("2022rkhondak", "Math5_mlauerbach")
+t.reqStudent("2023rumareti", 'Math5_mlauerbach')
+t.updateStudent("2023rumareti", 'Math5_mlauerbach')
+
+

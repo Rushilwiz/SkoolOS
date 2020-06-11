@@ -120,8 +120,6 @@ class Student:
                 print(url)
                 os.system(url)
             cdir = os.getcwd()
-            os.mkdir(self.username)
-            os.chdir(self.username)
             command('git clone https://github.com/' + self.git + '/' + self.username + '.git')
             os.chdir(self.username)
             command('git checkout master')
@@ -147,33 +145,38 @@ class Student:
             }
             print(putDB(data, self.url))
         print("Synced to " +  self.username)
-                
+
+
     #update API and Github, all  assignments / classes
     def update(self):
+        cdir = os.getcwd()
+        os.chdir(self.username)
         for c in self.classes:
             data = getDB("http://127.0.0.1:8000/classes/" + str(c['id']))
-            os.chdir(self.username + "/" + data['name'])
-            command("git checkout -b " + data['name'])
+            command("git checkout " + data['name'])
             command("git add " + data['name'])
             command("git commit -m " + data['name'])
-            command("git push -u origin " + data['name'])
             command("git pull origin " + data['name'])
+            command("git push -u origin " + data['name'])
+        os.chdir(cdir)
         for c in self.new:
             self.addClass(str(c['id']))
+        command("git checkout master")
 
     #class name format: <course-name>_<ion_user>
-
 
     #add  classes from 'new' field
     def addClass(self, cid):
         if((cid in self.snew) == False):
             if((cid in self.sclass) == True):
                 print("Already enrolled in this class.")
-            else:
+                return None
+            if((cid in self.snew) == True):
                 print("Not added by teacher yet.")
-            return None
+                return None
 
         data = getDB('http://127.0.0.1:8000/classes/'+ str(cid))
+        print(os.getcwd())
         pwd= input("Enter Github password: ")
         tgit = getDB("http://127.0.0.1:8000/teachers/" + data['teacher'] + "/")['git']
         url= "curl -i -u " + self.git + ":" + pwd + " -X PUT -d '' " + "'https://api.github.com/repos/" + self.git + "/" + self.username + "/collaborators/" + tgit + "'"
@@ -199,23 +202,22 @@ class Student:
             self.sclass = self.sclass + "," + str(data['id'])
 
         cdir = os.getcwd()
-        path1 = self.username + "/" + self.username
-        path2 = self.username
-        if(os.path.isdir(path1)):
-            os.chdir(path1)
-        else:
-            os.chdir(self.username)
-            command("git clone " + self.repo)
-            os.chdir(self.username)
+        print(cdir)
+        # path1 = self.username + "/" + self.username
+        # path2 = self.username
+        # if(os.path.isdir(path1)):
+        #     os.chdir(path1)
+        # else:
+        #     os.chdir(self.username)
+        #     command("git clone " + self.repo)
+        #     os.chdir(self.username)
 
-        command("git checkout -b " + data['name'])
-        command("touch welcome.txt")
-        command("git add welcome.txt")
+        os.chdir(self.username)
+        command("git branch " + data['name'])
         command("git commit -m initial")
         command("git push origin " + data['name'])
         #git clone --single-branch --branch <branchname> <remote-repo>
         os.chdir(cdir)
-        shutil.move(path1, self.username + "/" + data['name'])
         #upddate self.new
         s=""
         nar = ''
@@ -288,7 +290,29 @@ class Student:
                 'completed':self.completed
             }
             #print(putDB(data, "http://127.0.0.1:8000/students/" + self.username + "/"))
+    
+    def viewClass(self, courses):
+        cdir = os.getcwd()
+        os.chdir(self.username)
+        for c in self.classes:
+            if c['name'] == courses:
+                print(courses)
+                command("git checkout " + courses)
+                print(os.listdir())
+                return
+        os.chdir(cdir)
+        print("Class not found")
+        return
+        
+    def submit(self, courses):
+        command("git add .")
+        command("git commit -m submit")
+        command("git tag " + parts[1] + "-final")
+        command("git push -u origin " + self.username + " --tags")
 
-data = getStudent("2022rkhondak")
+data = getStudent("2023rumareti")
 s = Student(data)
+s.update()
+
+
 #s.update()
