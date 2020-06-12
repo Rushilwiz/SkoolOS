@@ -1,5 +1,5 @@
-import subprocess
 import os
+import subprocess
 import requests
 import webbrowser
 import pprint
@@ -8,13 +8,13 @@ import shutil
 import time
 import pyperclip
 from distutils.dir_util import copy_tree
-
+from datetime import datetime 
 
 #git clone student directory ==> <student-id>/classes/assignments
 
 #get teacher info from api
 def getTeacher(ion_user):
-        URL = "http://127.0.0.1:8000/teachers/" + ion_user + "/"
+        URL = "http://127.0.0.1:8000/api/teachers/" + ion_user + "/"
         r = requests.get(url = URL, auth=('raffukhondaker','hackgroup1')) 
         if(r.status_code == 200):
             data = r.json() 
@@ -70,7 +70,7 @@ class Teacher:
         self.last_name=data['last_name']
         self.git=data['git']
         self.username=data['ion_user']
-        self.url= "http://127.0.0.1:8000/teachers/" + self.username + "/"
+        self.url= "http://127.0.0.1:8000/api/teachers/" + self.username + "/"
         self.email = data['email']
         #classes in id form (Example: 4,5)
         
@@ -85,64 +85,19 @@ class Teacher:
             pass
         classes=[]
         for c in cid:
-            url = "http://127.0.0.1:8000/classes/" + str(c) + "/"
+            url = "http://127.0.0.1:8000/api/classes/" + str(c) + "/"
             classes.append(getDB(url))
         
         self.classes = classes
         self.sclass=str(data['classes'])
-        if(os.path.isdir(self.username)):
+        if(os.path.isdir(self.username + "/Students")):
             print("Synced to " +  self.username)
         else:
-            os.mkdir(self.username)
+            os.makedirs(self.username + "/Students")
 
-                
-    #update API and Github, all  assignments / classes
-    def update(self):
-        #lists all classes
-        ignore=['.git','.DS_Store']
-        classes = os.listdir(self.username)
-        for i in ignore:
-            try:
-                classes.remove(i)
-            except:
-                pass
-        #list of classes that have been deleted (not  with  deleteClass)
-        extra = []
-        for c in self.classes:
-            extra.append(c)
-        for i in range(len(extra)):
-            e = extra[i]['path']
-            extra[i] = e
-        print("Extra: "+str(extra))
-        print("Local:" + str(classes))
-        #checks all class directories first
-        for c in classes:
-            path = self.username  +  "/" + c
-            if(self.checkClass(path) == False):
-                return
-            extra.remove(path)
-            print("Current classes: " + path)
+        #2020-05-11 12:25:00
 
-        for e in extra:
-            self.deleteClass(e)
-
-        for i in range(len(classes)):
-            c = classes[i]
-            path = self.username  +  "/" + c
-            #lists all assignments and default files
-            #if  no  .git, directory not synced to  git  or  API
-            if (self.checkInDB(path)==False):
-                self.addClass(path)
-            else:
-                #push to git
-                loc = os.getcwd()
-                os.chdir(path)
-                command('git fetch origin')
-                command('git pull origin master')
-                command('git add .')
-                command('git commit -m "Update"')
-                command('git push -u origin master')
-                os.chdir(loc)
+        
 
     #class name format: <course-name>_<ion_user>
 
@@ -211,17 +166,17 @@ class Teacher:
                 "unconfirmed": ""
             }
             #make class instance in db
-            data = postDB(data, 'http://127.0.0.1:8000/classes/')
+            data = postDB(data, 'http://127.0.0.1:8000/api/classes/')
             #add to  instance
             #upate  self.classes
             self.classes.append(data)
             if(len(self.sclass)==0):
-                self.sclass = data['id']
+                self.sclass = data['name']
             else:
-                self.sclass = self.sclass + "," + str(data['id'])
+                self.sclass = self.sclass + "," + str(data['name'])
             
             #update teacher instance in db, classes field
-            data={
+            teacher={
                 'first_name':self.first_name,
                 'last_name':self.last_name,
                 'git':self.git,
@@ -230,9 +185,9 @@ class Teacher:
                 'classes':self.sclass,
                 'email':self.email
             }
-            putDB(data, self.url)
+            putDB(teacher, self.url)
 
-            return data
+            return teacher
 
 
     #make a new class from scratch
@@ -241,8 +196,16 @@ class Teacher:
     def makeClass(self, cname, assignments):
         #check if class exists
         path = self.username + "/" + cname
-        if(os.path.exists(path)):
+        isclass = False
+        acourses = getDB("http://127.0.0.1:8000/api/classes/")['results']
+        for c in acourses:
+            if c['name'] == cname:
+                isclass=True
+                break
+        if(os.path.exists(path) or isclass):
             print("Class already exists: " + cname)
+            if(isclass):
+                print("Class already exists in Database")
             return
         else:
             if((("_" + self.username) in cname) == False):
@@ -254,11 +217,12 @@ class Teacher:
             f.close()
             #push to remote repo
             os.chdir(path)
-            for a in assignments:
-                os.mkdir(a)
-                f=open(a + "/instructions.txt", "w")
-                f.close()
-            os.chdir(cdir)
+            # for a in assignments:
+                
+            #     os.mkdir(a)
+            #     f=open(a + "/instructions.txt", "w")
+            #     f.close()
+            # os.chdir(cdir)
 
             data = self.addClass(path)
             return data
@@ -272,22 +236,16 @@ class Teacher:
 
         cname = path.split("/")
         cname = cname[len(cname)-1]
-        cid = None
         repo = ''
-        for c in self.classes:
-            if cname == c['name']:
-                cid = str(c['id'])
-                repo  =  c['repo']
-
-        #remove from api
+        print("DELETE: " + self.classes[i]['name'])
         for i in range(len(self.classes)):
-            if(self.classes[i]['id'] == int(cid)):
-                print("DELETE: " + self.classes[i]['name'])
+            c = self.classes[i]
+            if(c['name'] == cname):
                 del self.classes[i]
                 s=""
                 #recreate sclass field, using ids
                 for c in self.classes:
-                    s = s + str(c['id']) + ","
+                    s = s + str(c['name']) + ","
                 print(s)
                 s = s[:-1]
                 print(s)
@@ -301,7 +259,7 @@ class Teacher:
                     'email':self.email
                 }
                 print(putDB(data, self.url))
-                delDB("http://127.0.0.1:8000/classes/" + cid + "/")
+                delDB("http://127.0.0.1:8000/api/classes/" + cname + "/")
                 break
         
         #remove locally
@@ -312,107 +270,305 @@ class Teacher:
         
         #remove from student directories
 
-#make student repo by student id
-    def reqStudent(self, student, classes):
-        cid = None
-        for c in self.classes:
-            print(c['name'])
-            if classes == c['name']:
-                cid = str(c['id'])
-                data1 = getDB("http://127.0.0.1:8000/classes/" + cid)
-                if(student in data1['unconfirmed']):
-                    print (student + " already requested.")
-                    return
-                if(student in data1['confirmed']):
-                    print (student + " alredy enrolled.")
-                break
-        if(cid==None):
-            print(classes +" does not exist.")
-            return
 
-        data = getDB("http://127.0.0.1:8000/students/" + student)
-        try:
-            if(data['added_to']==""):
-                data['added_to']=cid
-            else:
-                data['added_to']=data['added_to']+ "," + cid
-        except:
-            print(student + " does not exist.")
+    def isStudent(self, student):
+        r = requests.get(url = "http://127.0.0.1:8000/api/students/" + student + "/", auth=('raffukhondaker','hackgroup1')) 
+        if(r.status_code != 200):
+            return False
+        return True
+
+    def reqStudent(self, sname, cname):
+        if(self.isStudent(sname) == False):
+            print(sname + " does not exist.")
             return
-        print(data['added_to'])
-        d={
-            'first_name':data["first_name"],
-            'last_name':data["last_name"],
-            'git':data["git"],
-            'ion_user':data["ion_user"],
-            'student_id':data["student_id"],
-            'added_to':data['added_to'],
-            'classes':data["classes"],
-            'email':data["email"],
-            'grade':data["grade"],
-            'completed':data["completed"],
-            'repo':data["repo"]
+        course = getDB("http://127.0.0.1:8000/api/classes/" + cname)
+        if(sname in course['unconfirmed']):
+            print (sname + " already requested.")
+            return
+        if(sname in course['confirmed']):
+            print (sname + " alredy enrolled.")
+            return
+        
+        student = getDB("http://127.0.0.1:8000/api/students/" + sname)
+        try:
+            if(student['added_to']==""):
+                student['added_to']=course['name']
+            else:
+                student['added_to']=student['added_to']+ "," + course['name']
+        except:
+            print(sname + " does not exist.")
+            return
+        print(student['added_to'])
+        s={
+            'first_name':student["first_name"],
+            'last_name':student["last_name"],
+            'git':student["git"],
+            'ion_user':student["ion_user"],
+            'student_id':student["student_id"],
+            'added_to':student['added_to'],
+            'classes':student["classes"],
+            'email':student["email"],
+            'grade':student["grade"],
+            'completed':student["completed"],
+            'repo':student["repo"]
         }
-        print(putDB(d, data['url']))
-        data1 = getDB("http://127.0.0.1:8000/classes/" + cid)
-        if(data1['unconfirmed']==""):
-            data1['unconfirmed']=data['ion_user']
+        student = putDB(s, student['url'])
+        
+        if(course['unconfirmed']==""):
+            course['unconfirmed']=student['ion_user']
         else:
-            data1['unconfirmed']=data1['unconfirmed']+ "," + data['ion_user']
-        d = {
-            "name": classes,
+            course['unconfirmed']=course['unconfirmed']+ "," + student['ion_user']
+        cinfo = {
+            "name": course['name'],
             "repo": "",
-            "path": self.username + "/" + classes,
+            "path": self.username + "/" + course['name'],
             "teacher": self.username,
             "assignments": "",
             "default_file": "",
-            "confirmed": data1["confirmed"],
-            "unconfirmed": data1['unconfirmed']
+            "confirmed": course["confirmed"],
+            "unconfirmed": course['unconfirmed']
         }
-        print(putDB(d, data1['url']))
+        print(putDB(cinfo, course['url']))
 
-    #confirmed students    
-    def addStudent(self, student, classes):
-        for c in self.classes:
-            if(c['name'] == classes):
-                cid = c['id']
-                data = getDB("http://127.0.0.1:8000/classes/" + str(cid))
-                if(student in data['confirmed']):
-                    print("Student already added to " + classes)
-                    return
-                if(student in data['unconfirmed']):
-                    print("Student has been enrolled in " + classes)
-                    return    
+    #Student should have confirmed on their endd, but class had not been updated yet
+    #git clone confirmed student repo, copy files into repo and push branch
+    def addStudent(self, sname, cname):
+        if(self.isStudent(sname) == False):
+            print(sname + " does not exist.")
+            return
 
+        student = getDB("http://127.0.0.1:8000/api/students/" + sname)
+        course = getDB("http://127.0.0.1:8000/api/classes/" + cname)
+
+        if((student['ion_user'] in course['unconfirmed']) == False):
+            print("Student has not been requested to join yet.")
+            return
+        if((cname in student['added_to']) == True or (cname in student['classes']) == False):
+            print("Student has not confirmed class yet")
+            return
+        if(os.path.exists(self.username + "/Students/" + cname + "/" + student['ion_user']) or (student['ion_user'] in course['confirmed']) == True):
+            print("Student already added to class")
+                
+        #git clone and make student/class directories
         cdir = os.getcwd()
-        cpath = self.username + "/" + classes
-        path = self.username + "/Students/" + classes
+        cpath = self.username + "/" + cname
+        path = self.username + "/Students/" + cname
+        spath = self.username + "/Students/" + cname + "/" + student['ion_user']
         if(os.path.isdir(path) == False):
             os.makedirs(path)
-        os.chdir(path)
-        student = getDB("http://127.0.0.1:8000/students/" + student)
-        command("git clone " + student['repo'])
-        os.chdir(cdir)
-        copy_tree(cpath, path + "/" + student['ion_user'])
-        os.chdir(self.username + "/Students/" + classes + "/" + student['ion_user'])
+        if(os.path.isdir(spath) == False):
+            os.chdir(path)
+            command("git clone " + student['repo'])
+            os.chdir(cdir)
 
+        #push to git
+        copy_tree(cpath, path + "/" + student['ion_user'])
+        os.chdir(spath)
+        command('git checkout ' + cname)
+        command('git pull origin ' + cname)
         command('git add .')
-        command('git checkout -b ' + classes)
         command('git commit -m Hello')
-        command('git push -u origin ' + classes)
+        command('git push -u origin ' + cname)
+        command('git checkout master')
+
+        if(course['confirmed']==""):
+            course['confirmed']=student['ion_user']
+        else:
+            course['confirmed']=course['confirmed']+ "," + student['ion_user']
+        cinfo = {
+            "name": course['name'],
+            "repo": "",
+            "path": course['path'],
+            "teacher": course['name'],
+            "assignments": "",
+            "default_file": "",
+            "confirmed": course["confirmed"],
+            "unconfirmed": course['unconfirmed']
+        }
+        print(putDB(cinfo, course['url']))
+
+    #add local path to student directory, make new instance in api
+    def addAssignment(self, path, course, due):
+        parts = path.split("/")
+        aname = parts[len(parts)-1]
+        if(os.path.isdir(path) == 0 or len(parts) < 3) or aname in self.sclass:
+            print("Not valid path.")
+            return
+        if((parts[1] in self.sclass) == False):
+            print("Not in valid class directory")
+            return
+        ar  = [x[2] for x in os.walk(path)]
+        print(ar)
+        for folder in ar:
+            if len(folder) == 0:
+                print("Assignment is completely empty, need a file.")
+                return
+        aname =  parts[len(parts)-1]
+        p1 = course.split("_")[0]
+        if(p1 in aname == False):
+            print(aname + "incorrectly formated: must be " + aname + "_" + p1 + ".")
+            return
+        try:
+            datetime.strptime(due, '%Y-%m-%d %H:%M:%S.%f')
+        except:
+            print("Due-date format is incorrect")
+            return
+        
+        ass = {
+            'name': aname,
+            'path':path,
+            'classes':course,
+            'teacher':self.username,
+            'due_date':due
+        }
+        postDB(ass, 'http://127.0.0.1:8000/api/assignments/' + aname + "/")
+        course = getDB("http://127.0.0.1:8000/api/classes/" + course)
+        slist = os.listdir(os.getcwd() + "/" + self.username + "/Students/" + course['name'])
+        cdir = os.getcwd()
+        for st in slist:
+            if st in course['confirmed']:
+                spath =  os.path.join(os.getcwd() + "/" + self.username + "/Students/" + course['name'], st)
+                if(os.path.exists(spath + "/" + aname) == False):
+                    os.mkdir(spath + "/"  + aname)
+                    print(st)
+                    print(copy_tree(path, spath + "/" + aname))
+                    os.chdir(spath)
+                    command('git checkout ' + course['name'])
+                    command('git pull origin ' + course['name'])
+                    command('git add .')
+                    command('git commit -m Hello')
+                    command('git push -u origin ' + course['name'])
+                    os.chdir(cdir)
+                else:
+                    print(st + " already has assignment")
+    
+    #try to avoid
+    #copy modified assignments to student directories
+    def updateAssignment(self, path, course, due):
+        if(os.path.isdir(path) == False):
+            print(path + " is not an assignment.")
+            return
+        try:
+            if(due != None or due == ""):
+                datetime.strptime(due, '%Y-%m-%d %H:%M:%S.%f')
+        except:
+            print("Due-date format is incorrect")
+            return
+        input()
+        parts = path.split("/")
+        aname =  parts[len(parts)-1]
+        course = getDB("http://127.0.0.1:8000/api/classes/" + course)
+        slist = os.listdir(os.getcwd() + "/" + self.username + "/Students/" + course['name'])
+        cdir = os.getcwd()
+        for st in slist:
+            if st in course['confirmed']:
+                spath =  os.path.join(os.getcwd() + "/" + self.username + "/Students/" + course['name'], st)
+                if(os.path.exists(spath + "/" + aname) == False):
+                    os.mkdir(spath + "/"  + aname)
+                    print(st)
+                    print(copy_tree(path, spath + "/" + aname))
+                    os.chdir(spath)
+                    command('git checkout ' + course['name'])
+                    command('git pull origin ' + course['name'])
+                    command('git add .')
+                    command('git commit -m Hello')
+                    command('git push -u origin ' + course['name'])
+                    os.chdir(cdir)
+                else:
+                    print(st + " already has assignment")
+
+    #pull student's work, no modifications
+    def getStudents(self, course):
+        if((course in self.sclass) == False):
+            print(course + " not a class.")
+            return
+        path = self.username + "/Students/" + course 
+        slist = os.listdir(path)
+        cdir = os.getcwd()
+        for st in slist:
+            os.chdir(path + "/" + st)
+            command('git checkout ' + course)
+            command('git pull origin ' + course)
+            os.chdir(cdir)
+
+    def getHistory(self, student, course):
+        course = getDB("http://127.0.0.1:8000/api/classes/" + course)
+        try:
+            if((student in course['confirmed']) == False):
+                print("Student not in class")
+                return
+        except:
+            print("class does not exist")
+            return
+
+        cdir = os.getcwd()
+        os.chdir(self.username + "/Students/" + course['name'] + "/" + student)
+        process = subprocess.Popen(['git', 'log', '-30', course['name']], stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+        p=process.poll()
+        output = process.communicate()[0].decode('utf-8').split('\n\n')
+        months = ['Jan', 'Feb', 'Mar', "Apr", "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"]
+        for i in range(len(output)):
+            if("Date" in output[i]):
+                c = output[i].split("\n")
+                for k in range(len(c)):
+                    temp = []
+                    if('commit' in c[k]):
+                        c[k] = c[k].replace('commit', '').strip()
+                    elif('Date:' in c[k]):
+                        c[k] = c[k].replace('Date:', '').strip()
+                date = c[2].split(" ")
+                times = date[3].split(":")
+                mon = -1
+                for m in range(len(months)):
+                    if date[1] == months[m]:
+                        mon = m
+                d1 = datetime(int(date[4]), mon, int(date[2]), int(times[0]), int(times[1]))
+                #datetime1 = datetime.strptime('07/11/2019 02:45PM', '%m/%d/%Y %I:%M%p')
+                output[i] = [c[0], d1]
+        os.chdir(cdir)
+        return output
+        
+        '''
+        assignment = {
+            'name': English11_eharris1,
+            'due_date': 2020-06-11 16:58:33.383124
+        }
+        '''
+        #check if assignment changed after due date
+    def afterSubmit(self, course, assignment, student):
+        '''
+        assignment = getDB()
+        '''
+        assignment = {
+            'name': assignment,
+            'due_date': "2020-04-11 16:58:33.383124",
+            'classes':course
+        }
+        log = self.getHistory(student, course)
+        assignment['due_date'] = datetime.strptime(assignment['due_date'], '%Y-%m-%d %H:%M:%S.%f')
+        late = False
+        cdir = os.getcwd()
+        os.chdir(self.username + "/Students/" + course + "/" + student)
+        for l in log:
+            process = subprocess.Popen(['git', 'show', l[0]], stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+            p=process.poll()
+            output = process.communicate()[0].decode('utf-8')
+            if(assignment['name'] in output):
+                print(l[1])
+                print(assignment['due_date'])
+                print("--------------")
+                if(l[1] > assignment['due_date']):
+                    print("LATE")
+                    os.chdir(cdir)
+                    return True
+        print("On time")
+        os.chdir(cdir)
+        return False
 
     def comment(self):
         print("heheheh")
-    
-    def addAssignment():
-        print()
-    
-    def updateAssignnment():
-        print()
 
-data = getTeacher("mlauerbach")
+
+data = getTeacher("eharris1")
 t = Teacher(data)
-t.makeClass("Math5_mlauerbach", ["Week1_HW", "Test1"])
-input()
-t.reqStudent("2022rkhondak", "Math5_mlauerbach")
-t.addStudent("2022rkhondak", "Math5_mlauerbach")
+t.getStudents("English11_eharris1")

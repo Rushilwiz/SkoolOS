@@ -12,7 +12,7 @@ import pyperclip
 
 #get teacher info from api
 def getStudent(ion_user):
-        URL = "http://127.0.0.1:8000/students/" + ion_user + "/"
+        URL = "http://127.0.0.1:8000/api/students/" + ion_user + "/"
         r = requests.get(url = URL, auth=('raffukhondaker','hackgroup1')) 
         if(r.status_code == 200):
             data = r.json() 
@@ -56,6 +56,7 @@ def command(command):
     p=process.poll()
     output = process.communicate()[0]
     print(output.decode('utf-8'))
+    return output.decode('utf-8')
 
 ####################################################################################################################################
 
@@ -68,7 +69,7 @@ class Student:
         self.last_name=data['last_name']
         self.git=data['git']
         self.username=data['ion_user']
-        self.url= "http://127.0.0.1:8000/students/" + self.username + "/"
+        self.url= "http://127.0.0.1:8000/api/students/" + self.username + "/"
         self.email = data['email']
         self.grade = data['grade']
         self.student_id=data['student_id']
@@ -86,7 +87,7 @@ class Student:
             pass
         classes=[]
         for c in cid:
-            url = "http://127.0.0.1:8000/classes/" + str(c) + "/"
+            url = "http://127.0.0.1:8000/api/classes/" + str(c) + "/"
             classes.append(getDB(url))
         
         self.classes = classes
@@ -104,7 +105,7 @@ class Student:
             pass
         nclasses=[]
         for c in nid:
-            url = "http://127.0.0.1:8000/classes/" + str(c) + "/"
+            url = "http://127.0.0.1:8000/api/classes/" + str(c) + "/"
             nclasses.append(getDB(url))
         
         self.new = nclasses
@@ -120,8 +121,6 @@ class Student:
                 print(url)
                 os.system(url)
             cdir = os.getcwd()
-            os.mkdir(self.username)
-            os.chdir(self.username)
             command('git clone https://github.com/' + self.git + '/' + self.username + '.git')
             os.chdir(self.username)
             command('git checkout master')
@@ -147,46 +146,76 @@ class Student:
             }
             print(putDB(data, self.url))
         print("Synced to " +  self.username)
-                
+
+
     #update API and Github, all  assignments / classes
     def update(self):
+        cdir = os.getcwd()
+        os.chdir(self.username)
         for c in self.classes:
-            data = getDB("http://127.0.0.1:8000/classes/" + str(c['id']))
-            os.chdir(self.username + "/" + data['name'])
-            command("git checkout -b " + data['name'])
-            command("git add " + data['name'])
+            print("UPDATING CLASS: " + str(c['name']))
+            data = getDB("http://127.0.0.1:8000/api/classes/" + str(c['name']))
+            # command("git checkout master")
+            command("git checkout " + data['name'])
+            command("git add .")
             command("git commit -m " + data['name'])
-            command("git push -u origin " + data['name'])
             command("git pull origin " + data['name'])
+            command("git push -u origin " + data['name'])
+            command("git checkout master")
+        os.chdir(cdir)
         for c in self.new:
-            self.addClass(str(c['id']))
+            print("ADDING CLASS: " + str(c['name']))
+            self.addClass(str(c['name']))
+        command("git checkout master")
 
     #class name format: <course-name>_<ion_user>
 
-
     #add  classes from 'new' field
     def addClass(self, cid):
-        if((cid in self.snew) == False):
-            if((cid in self.sclass) == True):
-                print("Already enrolled in this class.")
-            else:
-                print("Not added by teacher yet.")
+
+        data = getDB('http://127.0.0.1:8000/api/classes/'+ str(cid))
+        if((cid in self.snew) == False or (self.username in data['confirmed'])):
+            print("Already enrolled in this class.")
+            return None
+        if((cid in self.sclass) or (self.username in data['unconfirmed']) == False):
+            print("Not added by teacher yet.")
             return None
 
-        data = getDB('http://127.0.0.1:8000/classes/'+ str(cid))
+        #add class teacher as cocllaborator to student repo
+        print(os.getcwd())
         pwd= input("Enter Github password: ")
-        tgit = getDB("http://127.0.0.1:8000/teachers/" + data['teacher'] + "/")['git']
+        tgit = getDB("http://127.0.0.1:8000/api/teachers/" + data['teacher'] + "/")['git']
         url= "curl -i -u " + self.git + ":" + pwd + " -X PUT -d '' " + "'https://api.github.com/repos/" + self.git + "/" + self.username + "/collaborators/" + tgit + "'"
         print(url)
         os.system(url)
 
-        data['unconfirmed'] = data['unconfirmed'].replace("," + self.username, "")
-        data['unconfirmed'] = data['unconfirmed'].replace(self.username, "")
-        data['confirmed'] = data['confirmed'] + "," + self.username
-        if(data['confirmed'][0] == ','):
-            data['confirmed'] = data['confirmed'][1:]
-            print(data['confirmed'])
-        print(putDB(data, 'http://127.0.0.1:8000/classes/'+ str(cid) + "/"))
+        cdir = os.getcwd()
+        # path1 = self.username + "/" + self.username
+        # path2 = self.username
+        # if(os.path.isdir(path1)):
+        #     os.chdir(path1)
+        # else:
+        #     os.chdir(self.username)
+        #     command("git clone " + self.repo)
+        #     os.chdir(self.username)
+
+        #push to git, start at master
+        os.chdir(self.username)
+        command("git checkout master")
+        command("git branch " + data['name'])
+        command("git commit -m initial")
+        command("git push origin " + data['name'])
+        command("git checkout master")
+        #git clone --single-branch --branch <branchname> <remote-repo>
+        os.chdir(cdir)
+
+        # data['unconfirmed'] = data['unconfirmed'].replace("," + self.username, "")
+        # data['unconfirmed'] = data['unconfirmed'].replace(self.username, "")
+        # data['confirmed'] = data['confirmed'] + "," + self.username
+        # if(data['confirmed'][0] == ','):
+        #     data['confirmed'] = data['confirmed'][1:]
+        #     print(data['confirmed'])
+        # print(putDB(data, 'http://127.0.0.1:8000/api/classes/'+ str(cid) + "/"))
 
         #add teacher as collaborator 
         #curl -i -u "USER:PASSWORDD" -X PUT -d '' 'https://api.github.com/repos/USER/REPO/collaborators/COLLABORATOR'
@@ -194,40 +223,22 @@ class Student:
 
         self.classes.append(data)
         if(len(self.sclass)==0):
-            self.sclass = data['id']
+            self.sclass = data['name']
         else:
-            self.sclass = self.sclass + "," + str(data['id'])
+            self.sclass = self.sclass + "," + str(data['name'])
 
-        cdir = os.getcwd()
-        path1 = self.username + "/" + self.username
-        path2 = self.username
-        if(os.path.isdir(path1)):
-            os.chdir(path1)
-        else:
-            os.chdir(self.username)
-            command("git clone " + self.repo)
-            os.chdir(self.username)
-
-        command("git checkout -b " + data['name'])
-        command("touch welcome.txt")
-        command("git add welcome.txt")
-        command("git commit -m initial")
-        command("git push origin " + data['name'])
-        #git clone --single-branch --branch <branchname> <remote-repo>
-        os.chdir(cdir)
-        shutil.move(path1, self.username + "/" + data['name'])
         #upddate self.new
-        s=""
-        nar = ''
+        snew=""
+        new = []
         for i in range(len(self.new)):
-            if(self.new[i]['id'] == int(data['id'])):
+            if(self.new[i]['name'] == data['name']):
                 del self.new[i]
                 #recreate sclass field, using ids
                 for c in self.new:
-                    s = s + str(c['id']) + ","
-                    nar.append(c)
-                self.snew=s
-                self.new=nar
+                    snew = snew + str(c['name']) + ","
+                    new.append(getDB("http://127.0.0.1:8000/api/classes/" + str(cid)))
+                self.snew=snew
+                self.new=new
                 break
         
         #update teacher instance in db, classes field
@@ -287,8 +298,54 @@ class Student:
                 'grade':self.grade,
                 'completed':self.completed
             }
-            #print(putDB(data, "http://127.0.0.1:8000/students/" + self.username + "/"))
+            #print(putDB(data, "http://127.0.0.1:8000/api/students/" + self.username + "/"))
+    
+    def viewClass(self, courses):
+        self.update()
+        cdir = os.getcwd()
+        os.chdir(self.username)
+        for c in self.classes:
+            if c['name'] == courses:
+                command("git checkout " + courses)
+                print(os.listdir())
+                return
+        os.chdir(cdir)
+        print("Class not found")
+        return
+    
+    def exitCLI(self):
+        self.update()
+        command("git checkout master")
+        
+    def submit(self, course, assignment):
+        cdir = os.getcwd()
+        os.chdir(self.username)
+        print(os.getcwd())
+        command("git add .")
+        command("git commit -m update")
+        command('git checkout ' + course)
+        time.sleep(5)
+        ass = os.listdir()
+        inclass = False
+        for a in ass:
+            if a == assignment:
+                inclass = True
+                break
+        if(inclass == False):
+            print(assignment + " not an assignment of " + course)
+            command('git checkout master')
+            os.chdir(cdir)
+            return
+
+        command('touch ' + assignment + '/SUBMISSION')
+        command("git add .")
+        command("git commit -m submit")
+        command("git tag " + assignment + "-final")
+        command("git push -u origin " + course + " --tags")
+        command('git checkout master')
+        os.chdir(cdir)
 
 data = getStudent("2022rkhondak")
 s = Student(data)
-#s.update()
+# s.viewClass("English11_eharris1")
+s.exitCLI()

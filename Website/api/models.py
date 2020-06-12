@@ -8,10 +8,10 @@ class DefFiles(models.Model):
     teacher=models.CharField(max_length=100)
 
 class Assignment(models.Model):
-    name=models.CharField(max_length=100)
+    name=models.CharField(max_length=100, primary_key=True)
     due_date=models.DateTimeField()
     # files = models.ManyToManyField(DefFiles)
-    files=models.CharField(max_length=100)
+    files=models.CharField(max_length=100, default="", blank=True)
     path=models.CharField(max_length=100)
     classes=models.CharField(max_length=100)
     teacher=models.CharField(max_length=100)
@@ -19,7 +19,7 @@ class Assignment(models.Model):
         return '%s' % (self.name)
 
 class Classes(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(primary_key=True, max_length=100)
     repo=models.URLField(default="")
     path=models.CharField(max_length=100, default="")
     teacher=models.CharField(max_length=100, default="")
