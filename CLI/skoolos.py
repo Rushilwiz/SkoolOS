@@ -20,11 +20,12 @@ scope = ["read"]
 
 def main():
     print("")
-    print(" SSSSS   CCCCC  HH   HH  OOOOO   OOOOO  LL        OOOOO   SSSSS ")
-    print("SS      CC    C HH   HH OO   OO OO   OO LL       OO   OO SS     ")
-    print(" SSSSS  CC      HHHHHHH OO   OO OO   OO LL       OO   OO  SSSSS ")
-    print("     SS CC    C HH   HH OO   OO OO   OO LL       OO   OO      SS")
-    print(" SSSSS   CCCCC  HH   HH  OOOO0   OOOO0  LLLLLLL   OOOO0   SSSSS ")
+    print("░██████╗██╗░░██╗░█████╗░░█████╗░██╗░░░░░  ░█████╗░░██████╗")
+    print("██╔════╝██║░██╔╝██╔══██╗██╔══██╗██║░░░░░  ██╔══██╗██╔════╝")
+    print("╚█████╗░█████═╝░██║░░██║██║░░██║██║░░░░░  ██║░░██║╚█████╗░")
+    print("░╚═══██╗██╔═██╗░██║░░██║██║░░██║██║░░░░░  ██║░░██║░╚═══██╗")
+    print("██████╔╝██║░╚██╗╚█████╔╝╚█████╔╝███████╗  ╚█████╔╝██████╔╝")
+    print("╚═════╝░╚═╝░░╚═╝░╚════╝░░╚════╝░╚══════╝  ░╚════╝░╚═════╝░")
     print("")
 
     if not os.path.exists(".profile"):
@@ -53,15 +54,14 @@ def authenticate():
     template.close()
     index.close()
 
-    # server = Thread(target=create_server)
-    # server.daemon = True
-    # server.start()
+    server = Thread(target=create_server)
+    server.daemon = True
+    server.start()
 
     browser = webdriver.Chrome()
     browser.get("localhost:8000/")
 
     while "http://localhost:8000/?code" not in browser.current_url:
-        http.server.
         time.sleep(0.25)
 
     url = browser.current_url
@@ -89,11 +89,12 @@ def authenticate():
     first_name = profile['first_name']
     last_name = profile['last_name']
 
+    os.chdir("..")
     profileFile = open(".profile", "w")
-    profileFile.write(profile)
+    profileFile.write(profile.text())
     profileFile.close()
 
-    # server.stop
+    # sys.exit
 
 
 def create_server():

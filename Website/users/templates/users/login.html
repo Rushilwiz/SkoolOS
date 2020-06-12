@@ -1,0 +1,16 @@
+{% extends "users/base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+  <div class="login-page">
+    <div class="form">
+        <form class="login-form" method="POST">
+            {% csrf_token %}
+            {{ form | crispy }}
+            <button type="submit">login</button>
+        <p class="message">Not registered? <a href="#">Create an account with Ionreg</a></p>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
