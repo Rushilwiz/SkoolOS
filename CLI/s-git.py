@@ -12,7 +12,7 @@ import pyperclip
 
 #get teacher info from api
 def getStudent(ion_user):
-        URL = "http://127.0.0.1:8000/students/" + ion_user + "/"
+        URL = "http://127.0.0.1:8000/api/students/" + ion_user + "/"
         r = requests.get(url = URL, auth=('raffukhondaker','hackgroup1')) 
         if(r.status_code == 200):
             data = r.json() 
@@ -69,7 +69,7 @@ class Student:
         self.last_name=data['last_name']
         self.git=data['git']
         self.username=data['ion_user']
-        self.url= "http://127.0.0.1:8000/students/" + self.username + "/"
+        self.url= "http://127.0.0.1:8000/api/students/" + self.username + "/"
         self.email = data['email']
         self.grade = data['grade']
         self.student_id=data['student_id']
@@ -87,7 +87,7 @@ class Student:
             pass
         classes=[]
         for c in cid:
-            url = "http://127.0.0.1:8000/classes/" + str(c) + "/"
+            url = "http://127.0.0.1:8000/api/classes/" + str(c) + "/"
             classes.append(getDB(url))
         
         self.classes = classes
@@ -105,7 +105,7 @@ class Student:
             pass
         nclasses=[]
         for c in nid:
-            url = "http://127.0.0.1:8000/classes/" + str(c) + "/"
+            url = "http://127.0.0.1:8000/api/classes/" + str(c) + "/"
             nclasses.append(getDB(url))
         
         self.new = nclasses
@@ -154,8 +154,8 @@ class Student:
         os.chdir(self.username)
         for c in self.classes:
             print("UPDATING CLASS: " + str(c['name']))
-            data = getDB("http://127.0.0.1:8000/classes/" + str(c['name']))
-            command("git checkout master")
+            data = getDB("http://127.0.0.1:8000/api/classes/" + str(c['name']))
+            # command("git checkout master")
             command("git checkout " + data['name'])
             command("git add .")
             command("git commit -m " + data['name'])
@@ -173,7 +173,7 @@ class Student:
     #add  classes from 'new' field
     def addClass(self, cid):
 
-        data = getDB('http://127.0.0.1:8000/classes/'+ str(cid))
+        data = getDB('http://127.0.0.1:8000/api/classes/'+ str(cid))
         if((cid in self.snew) == False or (self.username in data['confirmed'])):
             print("Already enrolled in this class.")
             return None
@@ -184,7 +184,7 @@ class Student:
         #add class teacher as cocllaborator to student repo
         print(os.getcwd())
         pwd= input("Enter Github password: ")
-        tgit = getDB("http://127.0.0.1:8000/teachers/" + data['teacher'] + "/")['git']
+        tgit = getDB("http://127.0.0.1:8000/api/teachers/" + data['teacher'] + "/")['git']
         url= "curl -i -u " + self.git + ":" + pwd + " -X PUT -d '' " + "'https://api.github.com/repos/" + self.git + "/" + self.username + "/collaborators/" + tgit + "'"
         print(url)
         os.system(url)
@@ -215,7 +215,7 @@ class Student:
         # if(data['confirmed'][0] == ','):
         #     data['confirmed'] = data['confirmed'][1:]
         #     print(data['confirmed'])
-        # print(putDB(data, 'http://127.0.0.1:8000/classes/'+ str(cid) + "/"))
+        # print(putDB(data, 'http://127.0.0.1:8000/api/classes/'+ str(cid) + "/"))
 
         #add teacher as collaborator 
         #curl -i -u "USER:PASSWORDD" -X PUT -d '' 'https://api.github.com/repos/USER/REPO/collaborators/COLLABORATOR'
@@ -236,7 +236,7 @@ class Student:
                 #recreate sclass field, using ids
                 for c in self.new:
                     snew = snew + str(c['name']) + ","
-                    new.append(getDB("http://127.0.0.1:8000/classes/" + str(cid)))
+                    new.append(getDB("http://127.0.0.1:8000/api/classes/" + str(cid)))
                 self.snew=snew
                 self.new=new
                 break
@@ -298,9 +298,10 @@ class Student:
                 'grade':self.grade,
                 'completed':self.completed
             }
-            #print(putDB(data, "http://127.0.0.1:8000/students/" + self.username + "/"))
+            #print(putDB(data, "http://127.0.0.1:8000/api/students/" + self.username + "/"))
     
     def viewClass(self, courses):
+        self.update()
         cdir = os.getcwd()
         os.chdir(self.username)
         for c in self.classes:
@@ -311,6 +312,10 @@ class Student:
         os.chdir(cdir)
         print("Class not found")
         return
+    
+    def exitCLI(self):
+        self.update()
+        command("git checkout master")
         
     def submit(self, course, assignment):
         cdir = os.getcwd()
@@ -342,5 +347,5 @@ class Student:
 
 data = getStudent("2022rkhondak")
 s = Student(data)
-#s.viewClass("English11_eharris1")
-s.submit("English11_eharris1", "Entry1")
+# s.viewClass("English11_eharris1")
+s.exitCLI()

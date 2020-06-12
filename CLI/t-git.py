@@ -1,5 +1,5 @@
-import subprocess
 import os
+import subprocess
 import requests
 import webbrowser
 import pprint
@@ -14,7 +14,7 @@ from datetime import datetime
 
 #get teacher info from api
 def getTeacher(ion_user):
-        URL = "http://127.0.0.1:8000/teachers/" + ion_user + "/"
+        URL = "http://127.0.0.1:8000/api/teachers/" + ion_user + "/"
         r = requests.get(url = URL, auth=('raffukhondaker','hackgroup1')) 
         if(r.status_code == 200):
             data = r.json() 
@@ -70,7 +70,7 @@ class Teacher:
         self.last_name=data['last_name']
         self.git=data['git']
         self.username=data['ion_user']
-        self.url= "http://127.0.0.1:8000/teachers/" + self.username + "/"
+        self.url= "http://127.0.0.1:8000/api/teachers/" + self.username + "/"
         self.email = data['email']
         #classes in id form (Example: 4,5)
         
@@ -85,7 +85,7 @@ class Teacher:
             pass
         classes=[]
         for c in cid:
-            url = "http://127.0.0.1:8000/classes/" + str(c) + "/"
+            url = "http://127.0.0.1:8000/api/classes/" + str(c) + "/"
             classes.append(getDB(url))
         
         self.classes = classes
@@ -94,6 +94,10 @@ class Teacher:
             print("Synced to " +  self.username)
         else:
             os.makedirs(self.username + "/Students")
+
+        #2020-05-11 12:25:00
+
+        
 
     #class name format: <course-name>_<ion_user>
 
@@ -162,7 +166,7 @@ class Teacher:
                 "unconfirmed": ""
             }
             #make class instance in db
-            data = postDB(data, 'http://127.0.0.1:8000/classes/')
+            data = postDB(data, 'http://127.0.0.1:8000/api/classes/')
             #add to  instance
             #upate  self.classes
             self.classes.append(data)
@@ -193,7 +197,7 @@ class Teacher:
         #check if class exists
         path = self.username + "/" + cname
         isclass = False
-        acourses = getDB("http://127.0.0.1:8000/classes/")['results']
+        acourses = getDB("http://127.0.0.1:8000/api/classes/")['results']
         for c in acourses:
             if c['name'] == cname:
                 isclass=True
@@ -255,7 +259,7 @@ class Teacher:
                     'email':self.email
                 }
                 print(putDB(data, self.url))
-                delDB("http://127.0.0.1:8000/classes/" + cname + "/")
+                delDB("http://127.0.0.1:8000/api/classes/" + cname + "/")
                 break
         
         #remove locally
@@ -268,7 +272,7 @@ class Teacher:
 
 
     def isStudent(self, student):
-        r = requests.get(url = "http://127.0.0.1:8000/students/" + student + "/", auth=('raffukhondaker','hackgroup1')) 
+        r = requests.get(url = "http://127.0.0.1:8000/api/students/" + student + "/", auth=('raffukhondaker','hackgroup1')) 
         if(r.status_code != 200):
             return False
         return True
@@ -277,7 +281,7 @@ class Teacher:
         if(self.isStudent(sname) == False):
             print(sname + " does not exist.")
             return
-        course = getDB("http://127.0.0.1:8000/classes/" + cname)
+        course = getDB("http://127.0.0.1:8000/api/classes/" + cname)
         if(sname in course['unconfirmed']):
             print (sname + " already requested.")
             return
@@ -285,7 +289,7 @@ class Teacher:
             print (sname + " alredy enrolled.")
             return
         
-        student = getDB("http://127.0.0.1:8000/students/" + sname)
+        student = getDB("http://127.0.0.1:8000/api/students/" + sname)
         try:
             if(student['added_to']==""):
                 student['added_to']=course['name']
@@ -333,8 +337,8 @@ class Teacher:
             print(sname + " does not exist.")
             return
 
-        student = getDB("http://127.0.0.1:8000/students/" + sname)
-        course = getDB("http://127.0.0.1:8000/classes/" + cname)
+        student = getDB("http://127.0.0.1:8000/api/students/" + sname)
+        course = getDB("http://127.0.0.1:8000/api/classes/" + cname)
 
         if((student['ion_user'] in course['unconfirmed']) == False):
             print("Student has not been requested to join yet.")
@@ -383,6 +387,7 @@ class Teacher:
         }
         print(putDB(cinfo, course['url']))
 
+    #add local path to student directory, make new instance in api
     def addAssignment(self, path, course, due):
         parts = path.split("/")
         aname = parts[len(parts)-1]
@@ -398,15 +403,61 @@ class Teacher:
             if len(folder) == 0:
                 print("Assignment is completely empty, need a file.")
                 return
+        aname =  parts[len(parts)-1]
+        p1 = course.split("_")[0]
+        if(p1 in aname == False):
+            print(aname + "incorrectly formated: must be " + aname + "_" + p1 + ".")
+            return
+        try:
+            datetime.strptime(due, '%Y-%m-%d %H:%M:%S.%f')
+        except:
+            print("Due-date format is incorrect")
+            return
         
         ass = {
-            'name': parts[len(parts)-1],
+            'name': aname,
             'path':path,
             'classes':course,
             'teacher':self.username,
             'due_date':due
         }
-        course = getDB("http://127.0.0.1:8000/classes/" + course)
+        postDB(ass, 'http://127.0.0.1:8000/api/assignments/' + aname + "/")
+        course = getDB("http://127.0.0.1:8000/api/classes/" + course)
+        slist = os.listdir(os.getcwd() + "/" + self.username + "/Students/" + course['name'])
+        cdir = os.getcwd()
+        for st in slist:
+            if st in course['confirmed']:
+                spath =  os.path.join(os.getcwd() + "/" + self.username + "/Students/" + course['name'], st)
+                if(os.path.exists(spath + "/" + aname) == False):
+                    os.mkdir(spath + "/"  + aname)
+                    print(st)
+                    print(copy_tree(path, spath + "/" + aname))
+                    os.chdir(spath)
+                    command('git checkout ' + course['name'])
+                    command('git pull origin ' + course['name'])
+                    command('git add .')
+                    command('git commit -m Hello')
+                    command('git push -u origin ' + course['name'])
+                    os.chdir(cdir)
+                else:
+                    print(st + " already has assignment")
+    
+    #try to avoid
+    #copy modified assignments to student directories
+    def updateAssignment(self, path, course, due):
+        if(os.path.isdir(path) == False):
+            print(path + " is not an assignment.")
+            return
+        try:
+            if(due != None or due == ""):
+                datetime.strptime(due, '%Y-%m-%d %H:%M:%S.%f')
+        except:
+            print("Due-date format is incorrect")
+            return
+        input()
+        parts = path.split("/")
+        aname =  parts[len(parts)-1]
+        course = getDB("http://127.0.0.1:8000/api/classes/" + course)
         slist = os.listdir(os.getcwd() + "/" + self.username + "/Students/" + course['name'])
         cdir = os.getcwd()
         for st in slist:
@@ -426,8 +477,22 @@ class Teacher:
                 else:
                     print(st + " already has assignment")
 
+    #pull student's work, no modifications
+    def getStudents(self, course):
+        if((course in self.sclass) == False):
+            print(course + " not a class.")
+            return
+        path = self.username + "/Students/" + course 
+        slist = os.listdir(path)
+        cdir = os.getcwd()
+        for st in slist:
+            os.chdir(path + "/" + st)
+            command('git checkout ' + course)
+            command('git pull origin ' + course)
+            os.chdir(cdir)
+
     def getHistory(self, student, course):
-        course = getDB("http://127.0.0.1:8000/classes/" + course)
+        course = getDB("http://127.0.0.1:8000/api/classes/" + course)
         try:
             if((student in course['confirmed']) == False):
                 print("Student not in class")
@@ -502,10 +567,8 @@ class Teacher:
 
     def comment(self):
         print("heheheh")
-    
-    def updateAssignnment():
-        print()
+
 
 data = getTeacher("eharris1")
 t = Teacher(data)
-t.addAssignment("English11_eharris1", "Entry1", '2022rkhondak',"2020-05-11 12:25:00")
+t.getStudents("English11_eharris1")
