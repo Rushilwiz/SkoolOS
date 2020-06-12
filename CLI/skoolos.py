@@ -10,6 +10,7 @@ import http.server
 import socketserver
 from threading import Thread
 from werkzeug.urls import url_decode
+import pprint
 
 client_id = r'QeZPBSKqdvWFfBv1VYTSv9iFGz5T9pVJtNUjbEr6'
 client_secret = r'0Wl3hAIGY9SvYOqTOLUiLNYa4OlCgZYdno9ZbcgCT7RGQ8x2f1l2HzZHsQ7ijC74A0mrOhhCVeZugqAmOADHIv5fHxaa7GqFNtQr11HX9ySTw3DscKsphCVi5P71mlGY'
@@ -29,18 +30,28 @@ def main():
     print("")
 
     if not os.path.exists(".profile"):
+        print(76546789876545678765)
         authenticate()
         print(open(".profile", "r").read())
     else:
         print(open(".profile", "r").read())
 
-    while True:
-        pass
+    # while True:
+    #     pass
 
 
 def authenticate():
     oauth = OAuth2Session(client_id=client_id, redirect_uri=redirect_uri, scope=scope)
     authorization_url, state = oauth.authorization_url("https://ion.tjhsst.edu/oauth/authorize/")
+
+    cdir = os.getcwd()
+    #Linux: chromdriver-linux
+    #Macos: chromdriver-mac
+    #Windows: chromdriver.exe
+    path = os.path.join(cdir, "chromedriver-mac")
+    print(path)
+    browser = webdriver.Chrome(path)
+    browser = webdriver.Safari()
 
     web_dir = os.path.join(os.path.dirname(__file__), 'oauth')
     os.chdir(web_dir)
@@ -58,7 +69,6 @@ def authenticate():
     server.daemon = True
     server.start()
 
-    browser = webdriver.Chrome()
     browser.get("localhost:8000/")
 
     while "http://localhost:8000/?code" not in browser.current_url:
@@ -83,18 +93,20 @@ def authenticate():
 
     # And finally get the user's profile!
     profile = requests.get("https://ion.tjhsst.edu/api/profile", headers=headers).json()
-    print(profile)
+    
+    pprint.pprint(profile)
     username = profile['ion_username']
     email = profile['tj_email']
     first_name = profile['first_name']
     last_name = profile['last_name']
 
-    os.chdir("..")
+    os.chdir(cdir)
     profileFile = open(".profile", "w")
-    profileFile.write(profile.text())
+    #profileFile.write(profile.text())
+    profileFile.write(str(profile))
     profileFile.close()
 
-    # sys.exit
+    sys.exit
 
 
 def create_server():
