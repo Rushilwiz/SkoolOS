@@ -8,7 +8,7 @@ import shutil
 import time
 import pyperclip
 from distutils.dir_util import copy_tree
-
+from datetime import datetime 
 
 #git clone student directory ==> <student-id>/classes/assignments
 
@@ -213,11 +213,12 @@ class Teacher:
             f.close()
             #push to remote repo
             os.chdir(path)
-            for a in assignments:
-                os.mkdir(a)
-                f=open(a + "/instructions.txt", "w")
-                f.close()
-            os.chdir(cdir)
+            # for a in assignments:
+                
+            #     os.mkdir(a)
+            #     f=open(a + "/instructions.txt", "w")
+            #     f.close()
+            # os.chdir(cdir)
 
             data = self.addClass(path)
             return data
@@ -382,7 +383,7 @@ class Teacher:
         }
         print(putDB(cinfo, course['url']))
 
-    def addAssignment(self, path, course):
+    def addAssignment(self, path, course, due):
         parts = path.split("/")
         aname = parts[len(parts)-1]
         if(os.path.isdir(path) == 0 or len(parts) < 3) or aname in self.sclass:
@@ -397,6 +398,14 @@ class Teacher:
             if len(folder) == 0:
                 print("Assignment is completely empty, need a file.")
                 return
+        
+        ass = {
+            'name': parts[len(parts)-1],
+            'path':path,
+            'classes':course,
+            'teacher':self.username,
+            'due_date':due
+        }
         course = getDB("http://127.0.0.1:8000/classes/" + course)
         slist = os.listdir(os.getcwd() + "/" + self.username + "/Students/" + course['name'])
         cdir = os.getcwd()
@@ -426,11 +435,70 @@ class Teacher:
         except:
             print("class does not exist")
             return
+
+        cdir = os.getcwd()
         os.chdir(self.username + "/Students/" + course['name'] + "/" + student)
-        process = subprocess.Popen(['git', 'log', course['name']], stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+        process = subprocess.Popen(['git', 'log', '-30', course['name']], stdout=subprocess.PIPE,stderr=subprocess.PIPE)
         p=process.poll()
-        output = process.communicate()[0].decode('utf-8')
-        print(output)
+        output = process.communicate()[0].decode('utf-8').split('\n\n')
+        months = ['Jan', 'Feb', 'Mar', "Apr", "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"]
+        for i in range(len(output)):
+            if("Date" in output[i]):
+                c = output[i].split("\n")
+                for k in range(len(c)):
+                    temp = []
+                    if('commit' in c[k]):
+                        c[k] = c[k].replace('commit', '').strip()
+                    elif('Date:' in c[k]):
+                        c[k] = c[k].replace('Date:', '').strip()
+                date = c[2].split(" ")
+                times = date[3].split(":")
+                mon = -1
+                for m in range(len(months)):
+                    if date[1] == months[m]:
+                        mon = m
+                d1 = datetime(int(date[4]), mon, int(date[2]), int(times[0]), int(times[1]))
+                #datetime1 = datetime.strptime('07/11/2019 02:45PM', '%m/%d/%Y %I:%M%p')
+                output[i] = [c[0], d1]
+        os.chdir(cdir)
+        return output
+        
+        '''
+        assignment = {
+            'name': English11_eharris1,
+            'due_date': 2020-06-11 16:58:33.383124
+        }
+        '''
+        #check if assignment changed after due date
+    def afterSubmit(self, course, assignment, student):
+        '''
+        assignment = getDB()
+        '''
+        assignment = {
+            'name': assignment,
+            'due_date': "2020-04-11 16:58:33.383124",
+            'classes':course
+        }
+        log = self.getHistory(student, course)
+        assignment['due_date'] = datetime.strptime(assignment['due_date'], '%Y-%m-%d %H:%M:%S.%f')
+        late = False
+        cdir = os.getcwd()
+        os.chdir(self.username + "/Students/" + course + "/" + student)
+        for l in log:
+            process = subprocess.Popen(['git', 'show', l[0]], stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+            p=process.poll()
+            output = process.communicate()[0].decode('utf-8')
+            if(assignment['name'] in output):
+                print(l[1])
+                print(assignment['due_date'])
+                print("--------------")
+                if(l[1] > assignment['due_date']):
+                    print("LATE")
+                    os.chdir(cdir)
+                    return True
+        print("On time")
+        os.chdir(cdir)
+        return False
 
     def comment(self):
         print("heheheh")
@@ -440,4 +508,4 @@ class Teacher:
 
 data = getTeacher("eharris1")
 t = Teacher(data)
-t.getHistory("2022rkhondak", "English11_eharris1")
+t.addAssignment("English11_eharris1", "Entry1", '2022rkhondak',"2020-05-11 12:25:00")

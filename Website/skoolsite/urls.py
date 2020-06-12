@@ -15,8 +15,17 @@ router.register(r'files', views.DefFilesViewSet)
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.
 urlpatterns = [
-    path('', include(router.urls)),
+    path('api/', include(router.urls)),
     path('api-auth/', include('rest_framework.urls')),
     path('admin/', admin.site.urls),
 
 ]
+'''
+{
+    "name": "Entry1",
+    "due_date": "2020-05-11 12:25:00",
+    "path": "",
+    "classes": "",
+    "teacher": ""
+}
+'''
