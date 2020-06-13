@@ -5,13 +5,13 @@ import time
 import event_processor
 
 
-class SkoolOSDaemmon:
+class SkoolOSDaemon:
     """Constructor"""
     def __init__(self, work_dir):
         self.work_dir = work_dir
         self.start_time = None
         self.end_time = None
-    """Stores the pid of the program to be terminated externally"""
+        self.log_file = None
     def write_pid_file(self):
         pid = str(os.getpid())
         file_ = open('/tmp/skoolosdaemonpid', 'w')
@@ -19,12 +19,17 @@ class SkoolOSDaemmon:
         file_.close()
     def readable_time(self, input_time):
         return time.strftime("%A, %B %d, %Y %H:%M:%S", time.localtime(input_time))
-    def start_service(self):
-        start_time = time.time()
-        log_file = open('/tmp/skooloslog-' + start_time, 'w')
-        log_file.write("Started work: " + self.readable_time(start_time))
-        sys.stdout = log_file
+    def start(self):
+        self.start_time = time.time()
+        self.log_file = open('/tmp/skooloslogs/' + str(self.start_time), 'w')
+        self.log_file.write("Started work: \n" + self.readable_time(self.start_time))
+        sys.stdout = self.log_file
         event_processor.watch_dir(self.work_dir)
+    def stop(self):
+        self.end_time = time.time()
+        self.log_file.write("Stop time: \n" + self.readable_time(self.end_time))
+        self.log_file.write("Total work time: " + 
+                            time.strftime("%H:%M:%S", time.gmtime(self.end_time - self.start_time)))
 
 
 def Main():

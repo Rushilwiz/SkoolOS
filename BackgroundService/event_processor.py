@@ -29,10 +29,15 @@ def __method_format(method):
 
 def __process_generator(cls, method):
     def _method_name(self, event):
-        print("Method name: {} ()\n"
+        print("Event description: {}\n"
               "Path name: {}\n"
               "Event Name: {}\n"
-              "Timestamp: {}\n".format(__method_format(method), event.pathname, event.maskname, readable_time(time.time())))
+              "Timestamp: {}\n".format(__method_format(method),
+                                       event.pathname,
+                                       event.maskname,
+                                       readable_time(time.time())
+                                       )
+              )
     _method_name.__name__ = "process_{}".format(method)
     setattr(cls, _method_name.__name__, _method_name)
 
