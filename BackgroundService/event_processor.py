@@ -10,7 +10,7 @@ class EventProcessor(pyinotify.ProcessEvent):
     _methods = ["IN_ACCESS",
                 "IN_CREATE",
                 "IN_CLOSE_WRITE",
-                "IN_DELETE"
+                "IN_DELETE",
                 "IN_MOVED_TO",
                 "IN_MOVED_FROM",
                 ]
