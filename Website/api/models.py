@@ -20,11 +20,11 @@ class Assignment(models.Model):
 
 class Classes(models.Model):
     name = models.CharField(primary_key=True, max_length=100)
-    repo=models.URLField(default="")
+    repo=models.URLField(default="", blank=True)
     path=models.CharField(max_length=100, default="")
     teacher=models.CharField(max_length=100, default="")
-    assignments=models.CharField(max_length=100, default="")
-    default_file=models.CharField(max_length=100, default="")
+    assignments=models.TextField(default="", blank=True)
+    default_file=models.CharField(max_length=100, default="", blank=True)
     confirmed=models.TextField(default="", blank=True)
     unconfirmed=models.TextField(default="", blank=True)
 

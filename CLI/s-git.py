@@ -7,6 +7,7 @@ import json
 import shutil
 import time
 import pyperclip
+import datetime
 
 #git clone student directory ==> <student-id>/classes/assignments
 
@@ -147,11 +148,38 @@ class Student:
             print(putDB(data, self.url))
         print("Synced to " +  self.username)
 
+    def getClasses(self):
+        classes = self.classes
+        for c in classes:
+            print(c['name'])
+
+    def getAssignments(self, course, span):
+        span = datetime.timedelta(span, 0)
+        classes = self.classes
+        for c in classes:
+            print(c['name'])
+            alist = c['assignments'].split(",")
+            for a in alist:
+                ass = getDB("http://127.0.0.1:8000/api/assignments/" + a)
+                now = datetime.datetime.now()
+                try:
+                    due = ass['due_date'].replace("T", " ").replace("Z", "")
+                    due = datetime.datetime.strptime(due, '%Y-%m-%d %H:%M:%S.%f')
+                    diff = now - due
+                    zero = datetime.timedelta(0,0)
+                    #check due ddate is in span range is now past date (- timdelta)
+                    if(diff < span and diff > zero):
+                        print((now-due))
+
+                except Exception as e:
+                    print(e)
+                    pass
 
     #update API and Github, all  assignments / classes
     def update(self):
         cdir = os.getcwd()
         os.chdir(self.username)
+        command("git checkout master")
         for c in self.classes:
             print("UPDATING CLASS: " + str(c['name']))
             data = getDB("http://127.0.0.1:8000/api/classes/" + str(c['name']))
@@ -167,6 +195,19 @@ class Student:
             print("ADDING CLASS: " + str(c['name']))
             self.addClass(str(c['name']))
         command("git checkout master")
+    
+    #updates 1 class, does not switch to master
+    def updateClass(self, course):
+        if((course in self.sclass) == False):
+            print("Class not found")
+            return
+        cdir = os.getcwd()
+        os.chdir(self.username)
+        command("git checkout " + course)
+        command("git add .")
+        command("git commit -m " + course)
+        command("git pull origin " + course)
+        command("git push -u origin " + course)
 
     #class name format: <course-name>_<ion_user>
 
@@ -347,5 +388,8 @@ class Student:
 
 data = getStudent("2022rkhondak")
 s = Student(data)
-# s.viewClass("English11_eharris1")
+#s.viewClass("APLit_eharris1")
+#s.updateClass("APLit_eharris1")
+#s.update()
 s.exitCLI()
+
