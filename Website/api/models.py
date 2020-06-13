@@ -8,6 +8,8 @@ class DefFiles(models.Model):
     teacher=models.CharField(max_length=100)
 
 class Assignment(models.Model):
+    owner = models.ForeignKey('auth.User', related_name='assignments', on_delete=models.CASCADE)
+
     name=models.CharField(max_length=100, primary_key=True)
     due_date=models.DateTimeField()
     # files = models.ManyToManyField(DefFiles)
@@ -19,6 +21,8 @@ class Assignment(models.Model):
         return '%s' % (self.name)
 
 class Classes(models.Model):
+    owner = models.ForeignKey('auth.User', related_name='classes', on_delete=models.CASCADE)
+
     name = models.CharField(primary_key=True, max_length=100)
     repo=models.URLField(default="", blank=True)
     path=models.CharField(max_length=100, default="")
@@ -34,6 +38,8 @@ class Classes(models.Model):
         return super(Classes, self).save(*args, **kwargs)
 
 class Teacher(models.Model):
+    owner = models.ForeignKey('auth.User', related_name='teachers', on_delete=models.CASCADE)
+
     created = models.DateTimeField(auto_now_add=True)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
@@ -44,6 +50,8 @@ class Teacher(models.Model):
     email=models.CharField(max_length=100, default="", blank=True)
 
 class Student(models.Model):
+    owner = models.ForeignKey('auth.User', related_name='students', on_delete=models.CASCADE)
+
     created = models.DateTimeField(auto_now_add=True)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
