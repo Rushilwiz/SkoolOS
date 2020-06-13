@@ -1,6 +1,5 @@
 import sys
 from urllib.parse import urlparse
-
 import requests
 from requests_oauthlib import OAuth2Session
 from selenium import webdriver
@@ -11,6 +10,10 @@ import socketserver
 from threading import Thread
 from werkzeug.urls import url_decode
 import pprint
+from PyInquirer import prompt, print_json
+import json
+import os
+import argparse
 
 client_id = r'QeZPBSKqdvWFfBv1VYTSv9iFGz5T9pVJtNUjbEr6'
 client_secret = r'0Wl3hAIGY9SvYOqTOLUiLNYa4OlCgZYdno9ZbcgCT7RGQ8x2f1l2HzZHsQ7ijC74A0mrOhhCVeZugqAmOADHIv5fHxaa7GqFNtQr11HX9ySTw3DscKsphCVi5P71mlGY'
@@ -30,15 +33,13 @@ def main():
     print("")
 
     if not os.path.exists(".profile"):
-        print(76546789876545678765)
+        input("Welcome to SkoolOS. Press any key to create an account")
         authenticate()
-        print(open(".profile", "r").read())
     else:
         print(open(".profile", "r").read())
 
     # while True:
     #     pass
-
 
 def authenticate():
     oauth = OAuth2Session(client_id=client_id, redirect_uri=redirect_uri, scope=scope)

@@ -1,8 +1,14 @@
 from .models import Student, Teacher, Classes, Assignment, DefFiles
-from .serializers import StudentSerializer, TeacherSerializer, ClassesSerializer, AssignmentSerializer, DefFilesSerializer
+from .serializers import StudentSerializer, TeacherSerializer, ClassesSerializer, AssignmentSerializer, UserSerializer
 from rest_framework import generics, viewsets, permissions, response, status
 from django.http import Http404
 from rest_framework.views import APIView
+from django.contrib.auth.models import User
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
 
 class StudentViewSet(viewsets.ModelViewSet):
     """
@@ -39,10 +45,10 @@ class AssignmentViewSet(viewsets.ModelViewSet):
     serializer_class = AssignmentSerializer
     permissions_classes = [permissions.IsAuthenticatedOrReadOnly]
 
-class DefFilesViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows users to be viewed or edited.
-    """
-    queryset = DefFiles.objects.all()
-    serializer_class = DefFilesSerializer
-    permissions_classes = [permissions.IsAuthenticatedOrReadOnly]
+# class DefFilesViewSet(viewsets.ModelViewSet):
+#     """
+#     API endpoint that allows users to be viewed or edited.
+#     """
+#     queryset = DefFiles.objects.all()
+#     serializer_class = DefFilesSerializer
+#     permissions_classes = [permissions.IsAuthenticatedOrReadOnly]
