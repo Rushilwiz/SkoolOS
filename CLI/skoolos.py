@@ -49,11 +49,7 @@ def authenticate():
     #Linux: chromdriver-linux
     #Macos: chromdriver-mac
     #Windows: chromdriver.exe
-    #path = os.path.join(cdir, "chromedriver-linux")
-    #print(path)
-    #browser = webdriver.Chrome(path)
-    browser = webdriver.Chrome()
-    #browser = webdriver.Safari()
+
 
     web_dir = os.path.join(os.path.dirname(__file__), 'oauth')
     os.chdir(web_dir)
