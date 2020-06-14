@@ -63,7 +63,7 @@ def authenticate():
         path = os.path.join(os.getcwd(), 'chromedriver-mac')
 
     browser = webdriver.Chrome(path)
-    web_dir = os.path.join(os.path.dirname(__file__), 'oauth')
+    web_dir = os.path.join(os.getcwd(), 'CLI', 'oauth')
     print(web_dir)
     os.chdir(web_dir)
     if os.path.exists("index.html"):
@@ -110,25 +110,25 @@ def authenticate():
     # And finally get the user's profile!
     profile = requests.get("https://ion.tjhsst.edu/api/profile", headers=headers).json()
     
-    pprint.pprint(profile)
+    #pprint.pprint(profile)
     username = profile['ion_username']
     email = profile['tj_email']
     first_name = profile['first_name']
     last_name = profile['last_name']
-
+    password = input("Enter SkoolOS password: ")
+    profile = {
+        'username':username,
+        'email':email,
+        'first_name':first_name,
+        'last_name':last_name,
+        'password':password,
+    }
     os.chdir(cdir)
-    # key = Fernet.generate_key()
-    # file = open('key.key', 'wb')
-    # file.write(key) # The key is type bytes still
-    # file.close()
-    # p = str(profile).encode()
-    # f = Fernet(key)
-    # encrypted = f.encrypt(p)
 
-    # profileFile = open(".profile", "wb")
-    # #profileFile.write(profile.text())
-    # profileFile.write(encrypted)
-    # profileFile.close()
+    profileFile = open(".profile", "w")
+    #profileFile.write(profile.text())
+    profileFile.write(str(profile))
+    profileFile.close()
 
     sys.exit
 
