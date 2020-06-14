@@ -25,7 +25,7 @@ urlpatterns = [
     path('api-auth/', include('rest_framework.urls')),
     path('admin/', admin.site.urls),
     path('login/', auth_views.LoginView.as_view(template_name='users/login.html', authentication_form=LoginForm), name='login'),
-    path('register/', user_views.register, name='register'),
+    path('', user_views.register, name='register'),
     path('create_account/', user_views.create_account, name='create_account'),
     path('callback/', user_views.callback, name='callback'),
 ]
