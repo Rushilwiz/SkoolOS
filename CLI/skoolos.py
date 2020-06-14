@@ -18,7 +18,7 @@ from cryptography.fernet import Fernet
 
 client_id = r'QeZPBSKqdvWFfBv1VYTSv9iFGz5T9pVJtNUjbEr6'
 client_secret = r'0Wl3hAIGY9SvYOqTOLUiLNYa4OlCgZYdno9ZbcgCT7RGQ8x2f1l2HzZHsQ7ijC74A0mrOhhCVeZugqAmOADHIv5fHxaa7GqFNtQr11HX9ySTw3DscKsphCVi5P71mlGY'
-redirect_uri = 'http://localhost:8000/'
+redirect_uri = 'http://localhost:8000/callback/'
 token_url = 'https://ion.tjhsst.edu/oauth/token/'
 scope = ["read"]
 
@@ -50,10 +50,7 @@ def authenticate():
     #Linux: chromdriver-linux
     #Macos: chromdriver-mac
     #Windows: chromdriver.exe
-    path = os.path.join(cdir, "chromedriver-mac")
-    print(path)
-    browser = webdriver.Chrome(path)
-    #browser = webdriver.Safari()
+
 
     web_dir = os.path.join(os.path.dirname(__file__), 'oauth')
     os.chdir(web_dir)
@@ -72,14 +69,18 @@ def authenticate():
     server.start()
 
     browser.get("localhost:8000/")
-    print(1)
-    while "localhost:8000/callback/?code" not in browser.current_url:
+
+    while "http://localhost:8000/callback/?code" not in browser.current_url:
         time.sleep(0.25)
 
     url = browser.current_url
-    gets = url_decode(url.replace("localhost:8000/callback/?", ""))
+    gets = url_decode(url.replace("http://localhost:8000/callback/?", ""))
+    while "http://localhost:8000/callback/?code" not in browser.current_url:
+        time.sleep(0.25)
+
+    url = browser.current_url
+    gets = url_decode(url.replace("http://localhost:8000/callback/?", ""))
     code = gets.get("code")
-    print(2)
     if state == gets.get("state"):
         state = gets.get("state")
         print("states good")
