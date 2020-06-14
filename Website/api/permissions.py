@@ -13,7 +13,7 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
             return True
 
         # Write permissions are only allowed to the owner of the snippet.
-        return obj.owner == request.user
+        return obj.owner == request.user or request.user.is_superuser
 
 class isTeacher(permissions.BasePermission):
     #only teachers can make classes and assignmenst
@@ -22,4 +22,4 @@ class isTeacher(permissions.BasePermission):
             return True
 
         # Write permissions are only allowed to the owner of the snippet.
-        return obj.user.groups.filter(name__in=['teachers']).exists()
+        return request.user.groups.filter(name__in=['teachers']).exists() or request.user.is_superuser
