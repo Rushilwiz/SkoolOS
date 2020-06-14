@@ -7,7 +7,7 @@ def readable_time(input_time):
 
 
 class EventProcessor(pyinotify.ProcessEvent):
-    _methods = ["IN_ACCESS",
+    _methods = ["IN_OPEN",
                 "IN_CREATE",
                 "IN_CLOSE_WRITE",
                 "IN_DELETE",
@@ -18,7 +18,7 @@ class EventProcessor(pyinotify.ProcessEvent):
 
 def __method_format(method):
     return {
-        "IN_ACCESS":"Accessed a file",
+        "IN_OPEN":"Accessed a file",
         "IN_CREATE":"Created a file",
         "IN_CLOSE_WRITE":"Wrote to a file",
         "IN_DELETE":"Deleted a file",
@@ -51,14 +51,14 @@ def __process_generator(cls, method):
 EVENT_NOTIFIER = None
 
 
-def watch_dir(dir_to_watch):
+def watch_dir(dir_to_watch, daemonize=False):
     global EVENT_NOTIFIER
     for method in EventProcessor._methods:
         __process_generator(EventProcessor, method)
     watch_manager = pyinotify.WatchManager()
     EVENT_NOTIFIER = pyinotify.Notifier(watch_manager, EventProcessor())
     watch_manager.add_watch(dir_to_watch, pyinotify.ALL_EVENTS)
-    EVENT_NOTIFIER.loop()#daemonize=True)
+    EVENT_NOTIFIER.loop(daemonize=daemonize)
 
 
 def stop_watching():
