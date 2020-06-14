@@ -43,8 +43,6 @@ INSTALLED_APPS = [
     'api',
     'crispy_forms',
     'django_forms_bootstrap',
-
-
 ]
 
 REST_FRAMEWORK = {

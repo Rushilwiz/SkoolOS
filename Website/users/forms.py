@@ -14,6 +14,7 @@ class UserCreationForm(forms.ModelForm):
     first_name = forms.CharField(disabled=True)
     last_name = forms.CharField(disabled=True)
     isStudent = forms.BooleanField(widget = forms.HiddenInput())
+    git = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Git Username'}))
     password = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'Password'}))
     confirm_password = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'Confirm Password'}))
     token = forms.CharField(widget = forms.HiddenInput())
@@ -23,14 +24,9 @@ class UserCreationForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super(UserCreationForm, self).clean()
-        password = cleaned_data.get("password")
-        confirm_password = cleaned_data.get("confirm_password")
-
-        if password != confirm_password:
-            raise forms.ValidationError("Passwords do not match!")
 
         return cleaned_data
 
     class Meta:
         model = User
-        fields = ('username', 'email', 'first_name', 'last_name', 'password')
+        fields = ('username', 'email', 'first_name', 'last_name', 'git', 'password', 'confirm_password')
