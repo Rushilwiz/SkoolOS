@@ -40,8 +40,6 @@ class SkoolOSDaemon:
                             time.strftime("%H:%M:%S", time.gmtime(self.end_time - self.start_time)))
 
 
-
-
 logger = None
 
 def Main():
