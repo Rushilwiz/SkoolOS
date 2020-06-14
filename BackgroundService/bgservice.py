@@ -7,9 +7,8 @@ import event_processor
 
 class SkoolOSDaemon:
     """Constructor"""
-    def __init__(self, work_dir, daemonize):
+    def __init__(self, work_dir='/tmp'):
         self.work_dir = work_dir
-        self.daemonize = daemonize
         self.start_time = None
         self.end_time = None
         self.log_file = None
@@ -32,7 +31,7 @@ class SkoolOSDaemon:
         self.log_file = open('/tmp/skooloslogs/' + str(self.start_time), 'w')
         self.log_file.write("Start time: \n" + self.readable_time(self.start_time) + "\n\n")
         sys.stdout = self.log_file
-        event_processor.watch_dir(self.work_dir, self.daemonize)
+        event_processor.watch_dir(self.work_dir)
     def stop(self):
         event_processor.stop_watching()
         self.end_time = time.time()
@@ -49,7 +48,7 @@ def Main():
     def signal_handler(signum, frame):
         logger.stop()
     signal.signal(signal.SIGINT, signal_handler)
-    signal.signal(signal.SIGTERM, signal_handler)
+    # signal.signal(signal.SIGTERM, signal_handler)
     global logger
     logger = SkoolOSDaemon("/tmp")
     logger.start()

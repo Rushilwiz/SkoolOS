@@ -18,7 +18,7 @@ class EventProcessor(pyinotify.ProcessEvent):
 
 def __method_format(method):
     return {
-        "IN_OPEN":"Accessed a file",
+        "IN_OPEN":"Opened a file",
         "IN_CREATE":"Created a file",
         "IN_CLOSE_WRITE":"Wrote to a file",
         "IN_DELETE":"Deleted a file",
@@ -38,11 +38,11 @@ def __process_generator(cls, method):
                                      readable_time(time.time())
                                      )
         if "IN_DELETE" in description:
-            description += "Warning: Unexpected file deletion\n"
+            description += "WARNING: Unexpected file deletion\n"
         if "IN_MOVED_TO" in description:
-            description += "Warning: Unexpected file add to work\n"
+            description += "WARNING: Unexpected file add to work\n"
         if "IN_MOVED_FROM" in description:
-            description += "Warning: Unexpected file moved out of directory\n"
+            description += "WARNING: Unexpected file moved out of directory\n"
         print(description)
     _method_name.__name__ = "process_{}".format(method)
     setattr(cls, _method_name.__name__, _method_name)
@@ -51,14 +51,14 @@ def __process_generator(cls, method):
 EVENT_NOTIFIER = None
 
 
-def watch_dir(dir_to_watch, daemonize=False):
+def watch_dir(dir_to_watch):
     global EVENT_NOTIFIER
     for method in EventProcessor._methods:
         __process_generator(EventProcessor, method)
     watch_manager = pyinotify.WatchManager()
-    EVENT_NOTIFIER = pyinotify.Notifier(watch_manager, EventProcessor())
-    watch_manager.add_watch(dir_to_watch, pyinotify.ALL_EVENTS)
-    EVENT_NOTIFIER.loop(daemonize=daemonize)
+    EVENT_NOTIFIER = pyinotify.ThreadedNotifier(watch_manager, EventProcessor())
+    watch_manager.add_watch(dir_to_watch, pyinotify.ALL_EVENTS, rec=True)
+    EVENT_NOTIFIER.loop()
 
 
 def stop_watching():
