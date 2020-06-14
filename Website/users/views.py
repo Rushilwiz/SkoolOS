@@ -7,6 +7,8 @@ from requests_oauthlib import OAuth2Session
 from django.contrib import messages
 
 from .models import Token
+from api.models import Student, Teacher
+
 from .forms import UserCreationForm
 
 from django.contrib.auth import authenticate
@@ -125,5 +127,5 @@ def create_account (request):
 @login_required
 def logout(request):
     auth_logout(request)
-    messages.success(request, "You've been logged out! Have a good rest of your day!")
+    messages.success(request, "You've been logged out!")
     return redirect(request, "/login/")
