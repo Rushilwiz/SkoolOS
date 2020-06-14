@@ -7,6 +7,7 @@ from requests_oauthlib import OAuth2Session
 from django.contrib import messages
 
 from .models import Token
+from .forms import UserCreationForm
 
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as auth_login
@@ -53,7 +54,7 @@ def callback (request):
 
                 if User.objects.filter(username=username).count() != 0:
                     messages.success(request, "This user already exists!")
-                    return redirect('register')
+                    return redirect('/login/')
                 else:
                     token = Token(username = username, email = email, first_name = first_name, last_name = last_name, isStudent = isStudent)
                     token.save()
@@ -63,18 +64,66 @@ def callback (request):
 
 
         messages.warning(request, "Invalid Callback Response")
-        return redirect('register')
+        return redirect('/register/')
 
 
 def create_account (request):
+    if request.method == "POST":
+        print("POSTPOSTPOSTPOSTPOSTPOSTPOSTPOST")
+        form = UserCreationForm(request.POST)
+        print(form.is_valid())
+        print(request.POST)
+        cleaned_data = form.clean()
+        if cleaned_data.get('password') == cleaned_data.get('confirm_password'):
+            token = Token.objects.get(token=cleaned_data.get('token'))
+            username = token.username
+            email = token.email
+            first_name = token.first_name
+            last_name = token.last_name
+            isStudent = token.isStudent
+            password = cleaned_data.get('password')
+
+            user = User.objects.create_user(username=username,
+                                            email=email,
+                                            first_name=first_name,
+                                            last_name=last_name,
+                                            password=password)
+            user.save()
+            token.delete()
+            print (user)
+            messages.success(request, "Your SkoolOS account has successfully been created")
+            return redirect(f'/login/?username={username}')
+        else:
+            print(form.errors)
+            Token.objects.get(token=request.GET.get('token')).delete()
+            messages.warning(request, "Passwords did not match!")
+            return redirect('/register/')
+
     if request.method == "GET" and Token.objects.filter(token=request.GET.get('token')).count() == 1:
+        print("GETGETGETGETGETGET")
         token = Token.objects.get(token=request.GET.get('token'))
         username = token.username
         email = token.email
         first_name = token.first_name
         last_name = token.last_name
         isStudent = token.isStudent
+        initial = {
+            'username': username,
+            'email': email,
+            'first_name': first_name,
+            'last_name': last_name,
+            'isStudent': isStudent,
+            'token': token.token,
+        }
+        form  = UserCreationForm(initial=initial)
+        return render(request, 'users/create_account.html', {'form': form})
 
-        
-    else:
-        return redirect('/register/')
+    messages.warning(request, "Invalid token")
+    return redirect('/register/')
+
+
+@login_required
+def logout(request):
+    auth_logout(request)
+    messages.success(request, "You've been logged out! Have a good rest of your day!")
+    return redirect(request, "/login/")

@@ -1,16 +1,38 @@
 {% extends "users/base.html" %}
-{% load crispy_forms_tags %}
+{% load bootstrap_tags %}
 
 {% block content %}
   <div class="login-page">
     <div class="form">
         <form class="login-form" method="POST">
             {% csrf_token %}
-            {{ form | crispy }}
+            {% if messages %}
+              {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                  {{ message }}
+                </div>
+              {% endfor %}
+            {% endif %}
+            {% if form.errors %}
+                {% for field in form %}
+                    {% for error in field.errors %}
+                        <div class="alert alert-danger">
+                            <strong>{{ error|escape }}</strong>
+                        </div>
+                    {% endfor %}
+                {% endfor %}
+                {% for error in form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        <strong>{{ error|escape }}</strong>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            {% for field in form %}
+              {{ field }}
+            {% endfor %}
             <button type="submit">login</button>
         <p class="message">Not registered? <a href="{% url 'register' %}">Create an account with Ion</a></p>
       </form>
     </div>
   </div>
-</div>
 {% endblock %}

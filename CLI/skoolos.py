@@ -52,7 +52,7 @@ def authenticate():
     path = os.path.join(cdir, "chromedriver-mac")
     print(path)
     browser = webdriver.Chrome(path)
-    browser = webdriver.Safari()
+    #browser = webdriver.Safari()
 
     web_dir = os.path.join(os.path.dirname(__file__), 'oauth')
     os.chdir(web_dir)

@@ -1,131 +1,89 @@
-# class StudentList(APIView):
-#     """
-#     List all snippets, or create a new snippet.
-#     """
-#     def get(self, request, format=None):
-#         snippets = Student.objects.all()
-#         serializer = StudentSerializer(snippets, many=True)
-#         return response.Response(serializer.data)
+from .models import Student, Teacher, Classes, Assignment, DefFiles
+from .serializers import StudentSerializer, TeacherSerializer, ClassesSerializer, AssignmentSerializer, UserSerializer
+from rest_framework import generics, viewsets, permissions, response, status
+from django.http import Http404
+from rest_framework.views import APIView
+from django.contrib.auth.models import User
+from .permissions import isTeacher, IsOwnerOrReadOnly
+from django.shortcuts import render, redirect
+from rest_framework.parsers import JSONParser 
+from django.http.response import JsonResponse
+from rest_framework.response import Response
+from rest_framework import mixins
 
-#     def post(self, request, format=None):
-#         serializer = StudentSerializer(data=request.data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return response.Response(serializer.data, status=status.HTTP_201_CREATED)
-#         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-# class StudentDetail(APIView):
-#     """
-#     Retrieve, update or delete a snippet instance.
-#     """
-#     def get_object(self, pk):
-#         try:
-#             return Student.objects.get(pk=pk)
-#         except Student.DoesNotExist:
-#             raise Http404
+class StudentList(generics.ListCreateAPIView):
+    queryset = Student.objects.all()
+    serializer_class = StudentSerializer
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
 
-#     def get(self, request, pk, format=None):
-#         snippet = self.get_object(pk)
-#         serializer = StudentSerializer(snippet)
-#         return response.Response(serializer.data)
+class StudentDetail(generics.RetrieveAPIView):
+    queryset = Student.objects.all()
+    serializer_class = StudentSerializer
+    permissions_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
 
-#     def put(self, request, pk, format=None):
-#         snippet = self.get_object(pk)
-#         serializer = StudentSerializer(snippet, data=request.data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return response.Response(serializer.data)
-#         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class TeacherList(generics.ListCreateAPIView):
+    queryset = Teacher.objects.all()
+    serializer_class = TeacherSerializer
+    def perform_create(self, serializer):
+        if(self.request.user.groups.filter(name__in=['teachers']).exists() or self.request.user.is_superuser):
+            serializer.save(owner=self.request.user)
+        else:
+            print("UNAUTHORIZED POST")
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-#     def delete(self, request, pk, format=None):
-#         snippet = self.get_object(pk)
-#         snippet.delete()
-#         return response.Response(status=status.HTTP_204_NO_CONTENT)
+class TeacherDetail(generics.RetrieveAPIView):
+    queryset = Teacher.objects.all()
+    serializer_class = TeacherSerializer
+    permissions_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
 
-# class TeacherList(APIView):
-#     """
-#     List all snippets, or create a new snippet.
-#     """
-#     def get(self, request, format=None):
-#         snippets = Teacher.objects.all()
-#         serializer = TeacherSerializer(snippets, many=True)
-#         return response.Response(serializer.data)
-
-#     def post(self, request, format=None):
-#         serializer = TeacherSerializer(data=request.data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return response.Response(serializer.data, status=status.HTTP_201_CREATED)
-#         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-# class TeacherDetail(APIView):
-#     """
-#     Retrieve, update or delete a snippet instance.
-#     """
-#     def get_object(self, pk):
-#         try:
-#             return Teacher.objects.get(pk=pk)
-#         except Teacher.DoesNotExist:
-#             raise Http404
-
-#     def get(self, request, pk, format=None):
-#         snippet = self.get_object(pk)
-#         serializer = TeacherSerializer(snippet)
-#         return response.Response(serializer.data)
-
-#     def put(self, request, pk, format=None):
-#         snippet = self.get_object(pk)
-#         serializer = TeacherSerializer(snippet, data=request.data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return response.Response(serializer.data)
-#         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-#     def delete(self, request, pk, format=None):
-#         snippet = self.get_object(pk)
-#         snippet.delete()
-#         return response.Response(status=status.HTTP_204_NO_CONTENT)
     
-# class ClassesList(APIView):
-#     """
-#     List all snippets, or create a new snippet.
-#     """
-#     def get(self, request, format=None):
-#         snippets = Classes.objects.all()
-#         serializer = ClassesSerializer(snippets, many=True)
-#         return response.Response(serializer.data)
+class ClassesList(generics.ListCreateAPIView):
+    queryset = Classes.objects.all()
+    serializer_class = ClassesSerializer
+    #permissions_classes = [isTeacher]
+    def perform_create(self, serializer):
+        if(self.request.user.groups.filter(name__in=['teachers']).exists() or self.request.user.is_superuser):
+            serializer.save(owner=self.request.user)
+        else:
+            print("UNAUTHORIZED POST")
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-#     def post(self, request, format=None):
-#         serializer = ClassesSerializer(data=request.data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return response.Response(serializer.data, status=status.HTTP_201_CREATED)
-#         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+# class ClassesDetail(generics.RetrieveAPIView):
+#     queryset = Classes.objects.all()
+#     serializer_class = ClassesSerializer
+#     # permissions_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
 
-# class ClassesDetail(APIView):
-#     """
-#     Retrieve, update or delete a snippet instance.
-#     """
-#     def get_object(self, pk):
-#         try:
-#             return Classes.objects.get(pk=pk)
-#         except Classes.DoesNotExist:
-#             raise Http404
+class ClassesDetail(mixins.RetrieveModelMixin,
+                    mixins.UpdateModelMixin,
+                    mixins.DestroyModelMixin,
+                    generics.GenericAPIView):
+    queryset = Classes.objects.all()
+    serializer_class = ClassesSerializer
 
-#     def get(self, request, pk, format=None):
-#         snippet = self.get_object(pk)
-#         serializer = ClassesSerializer(snippet)
-#         return response.Response(serializer.data)
+    def get(self, request, *args, **kwargs):
+        return self.retrieve(request, *args, **kwargs)
 
-#     def put(self, request, pk, format=None):
-#         snippet = self.get_object(pk)
-#         serializer = ClassesSerializer(snippet, data=request.data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return response.Response(serializer.data)
-#         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def put(self, request, *args, **kwargs):
+        print(self.owner)
+        if(request.user == self.owner):
+            return self.update(request, *args, **kwargs)
 
-#     def delete(self, request, pk, format=None):
-#         snippet = self.get_object(pk)
-#         snippet.delete()
-#         return response.Response(status=status.HTTP_204_NO_CONTENT)
+    def delete(self, request, *args, **kwargs):
+        return self.destroy(request, *args, **kwargs)
+
+class AssignmentList(generics.ListCreateAPIView):
+    queryset = Assignment.objects.all()
+    serializer_class = AssignmentSerializer
+    def perform_create(self, serializer):
+        if(self.request.user.groups.filter(name__in=['teachers']).exists() or self.request.user.is_superuser):
+            serializer.save(owner=self.request.user)
+        else:
+            print("UNAUTHORIZED POST")
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class AssignmentDetail(generics.RetrieveAPIView):
+    queryset = Assignment.objects.all()
+    serializer_class = AssignmentSerializer
+    permissions_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]

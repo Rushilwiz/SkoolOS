@@ -64,9 +64,6 @@ class Student(models.Model):
     classes=models.CharField(max_length=100, default="", blank=True)
     added_to=models.CharField(max_length=100, default="", blank=True)
     completed=models.TextField(default="", blank=True)
-    
+
     def save(self, *args, **kwargs):
         return super(Student, self).save(*args, **kwargs)
-
-
-

@@ -1,0 +1,22 @@
+{% extends "users/base.html" %}
+{% load bootstrap_tags %}
+
+{% block content %}
+  <div class="login-page">
+    <div class="form">
+      <form class="login-form" method="POST">
+        {% csrf_token %}
+        {% for field in form %}
+          <div class="fieldWrapper">
+              {{ field.errors }}
+              {{ field }}
+              {% if field.help_text %}
+              <p class="help">{{ field.help_text|safe }}</p>
+              {% endif %}
+          </div>
+        {% endfor %}
+        <button type="submit">create</button>
+      </form>
+    </div>
+  </div>
+{% endblock %}
