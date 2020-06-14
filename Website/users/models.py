@@ -9,7 +9,8 @@ class Token(models.Model):
     email = models.TextField()
     first_name = models.TextField()
     last_name = models.TextField()
-    isStudent = models.BooleanField()
+    grade = models.IntegerField(default=9)
+    isStudent = models.BooleanField(default=True)
     token = models.CharField(max_length=255)
 
     def save(self, *args, **kwargs):

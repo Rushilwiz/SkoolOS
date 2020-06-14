@@ -659,8 +659,8 @@ t = Teacher(data)
 #ar = ['2022rkhondak','2022inafi','2023rumareti']
 #extra = t.reqAddStudentList(ar, "APLit_eharris1")
 #print(extra)
-t.getStudents('2022rkhondak')
-t.getChanges('2022rkhondak','APLit_eharris1', 10)
+# t.getStudents('2022rkhondak')
+# t.getChanges('2022rkhondak','APLit_eharris1', 10)
 
 '''
 TO-DO

@@ -16,6 +16,7 @@ from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+import os
 
 # Create your views here.
 # Thanks Django, what would I do without this comment
@@ -53,12 +54,13 @@ def callback (request):
                 first_name = profile['first_name']
                 last_name = profile['last_name']
                 isStudent = profile['is_student']
+                grade = profile['grade']['number']
 
                 if User.objects.filter(username=username).count() != 0:
                     messages.success(request, "This user already exists!")
                     return redirect('/login/')
                 else:
-                    token = Token(username = username, email = email, first_name = first_name, last_name = last_name, isStudent = isStudent)
+                    token = Token(username = username, email = email, first_name = first_name, last_name = last_name, isStudent = isStudent, grade=grade)
                     token.save()
                     tokenHash = token.token
                     print(f'/create_account/?token={tokenHash}')
@@ -83,7 +85,11 @@ def create_account (request):
             first_name = token.first_name
             last_name = token.last_name
             isStudent = token.isStudent
+            grade = token.grade
+            git = cleaned_data.get('git')
             password = cleaned_data.get('password')
+
+
 
             user = User.objects.create_user(username=username,
                                             email=email,
@@ -92,6 +98,14 @@ def create_account (request):
                                             password=password)
             user.save()
             token.delete()
+
+            if isStudent:
+                profile = Student(user=user, git=git, grade=grade)
+            else:
+                profile = Teacher(user=user, git=git)
+
+            profile.save()
+
             print (user)
             messages.success(request, "Your SkoolOS account has successfully been created")
             return redirect(f'/login/?username={username}')
@@ -109,11 +123,14 @@ def create_account (request):
         first_name = token.first_name
         last_name = token.last_name
         isStudent = token.isStudent
+        grade = token.grade
+
         initial = {
             'username': username,
             'email': email,
             'first_name': first_name,
             'last_name': last_name,
+            'grade': grade,
             'isStudent': isStudent,
             'token': token.token,
         }
@@ -128,4 +145,4 @@ def create_account (request):
 def logout(request):
     auth_logout(request)
     messages.success(request, "You've been logged out!")
-    return redirect(request, "/login/")
+    return redirect(request, "/login")
