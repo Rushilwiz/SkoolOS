@@ -1,7 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import AuthenticationForm
-from django.db.models import Q
 
 
 class LoginForm(AuthenticationForm):
@@ -10,10 +9,10 @@ class LoginForm(AuthenticationForm):
 
 class UserCreationForm(forms.ModelForm):
 
-    username = forms.CharField()
-    email = forms.EmailField()
-    first_name = forms.CharField()
-    last_name = forms.CharField()
+    username = forms.CharField(disabled=True)
+    email = forms.EmailField(disabled=True)
+    first_name = forms.CharField(disabled=True)
+    last_name = forms.CharField(disabled=True)
     isStudent = forms.BooleanField(widget = forms.HiddenInput())
     password = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'Password'}))
     confirm_password = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'Confirm Password'}))
@@ -31,7 +30,7 @@ class UserCreationForm(forms.ModelForm):
             raise forms.ValidationError("Passwords do not match!")
 
         return cleaned_data
-        
+
     class Meta:
         model = User
         fields = ('username', 'email', 'first_name', 'last_name', 'password')

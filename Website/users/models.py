@@ -18,4 +18,4 @@ class Token(models.Model):
         return super(Token, self).save(*args, **kwargs)
 
     def __str__(self):
-        return self.token;
+        return f"{self.username}'s Token";
