@@ -99,6 +99,10 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+input:disabled {
+  background: #d9d9d9;
+}
+
 .errorlist {
 
 }
