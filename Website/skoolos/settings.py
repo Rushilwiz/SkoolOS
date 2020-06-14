@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'api',
     'crispy_forms',
+    'django_forms_bootstrap',
 
 
 ]
