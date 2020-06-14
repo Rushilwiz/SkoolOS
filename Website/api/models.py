@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 class DefFiles(models.Model):
     name=models.CharField(max_length=100)
@@ -21,7 +22,7 @@ class Assignment(models.Model):
         return '%s' % (self.name)
 
 class Classes(models.Model):
-    owner = models.ForeignKey('auth.User', related_name='classes', on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
 
     name = models.CharField(primary_key=True, max_length=100)
     repo=models.URLField(default="", blank=True)
@@ -50,14 +51,8 @@ class Teacher(models.Model):
     email=models.CharField(max_length=100, default="", blank=True)
 
 class Student(models.Model):
-    owner = models.ForeignKey('auth.User', related_name='students', on_delete=models.CASCADE)
-
-    created = models.DateTimeField(auto_now_add=True)
-    first_name = models.CharField(max_length=100)
-    last_name = models.CharField(max_length=100)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     student_id = models.IntegerField()
-    ion_user=models.CharField(primary_key=True, max_length=100)
-    email=models.CharField(max_length=100, default="", blank=True)
     grade = models.IntegerField()
     git=models.CharField(max_length=100)
     repo=models.URLField(default="", blank=True)

@@ -246,6 +246,9 @@ Control.ca-bundle
 Control.system-ca-bundle 
 GitHub.sublime-settings 
 
+#SkoolOS
+*.profile
+
 # Visual Studio Code # 
 .vscode/* 
 !.vscode/settings.json 
