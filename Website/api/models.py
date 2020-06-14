@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 class DefFiles(models.Model):
     name=models.CharField(max_length=100)
@@ -8,6 +9,8 @@ class DefFiles(models.Model):
     teacher=models.CharField(max_length=100)
 
 class Assignment(models.Model):
+    owner = models.ForeignKey('auth.User', related_name='assignments', on_delete=models.CASCADE)
+
     name=models.CharField(max_length=100, primary_key=True)
     due_date=models.DateTimeField()
     # files = models.ManyToManyField(DefFiles)
@@ -19,6 +22,8 @@ class Assignment(models.Model):
         return '%s' % (self.name)
 
 class Classes(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+
     name = models.CharField(primary_key=True, max_length=100)
     repo=models.URLField(default="", blank=True)
     path=models.CharField(max_length=100, default="")
@@ -34,31 +39,26 @@ class Classes(models.Model):
         return super(Classes, self).save(*args, **kwargs)
 
 class Teacher(models.Model):
-    created = models.DateTimeField(auto_now_add=True)
-    first_name = models.CharField(max_length=100)
-    last_name = models.CharField(max_length=100)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     # classes = models.ManyToManyField(Classes, default="")
     classes=models.CharField(max_length=100, default="", blank=True)
     ion_user=models.CharField(primary_key=True, max_length=100)
     git=models.CharField(max_length=100)
-    email=models.CharField(max_length=100, default="", blank=True)
+
+    def save(self, *args, **kwargs):
+        super(Teacher, self).save(*args, **kwargs)
 
 class Student(models.Model):
-    created = models.DateTimeField(auto_now_add=True)
-    first_name = models.CharField(max_length=100)
-    last_name = models.CharField(max_length=100)
-    student_id = models.IntegerField()
-    ion_user=models.CharField(primary_key=True, max_length=100)
-    email=models.CharField(max_length=100, default="", blank=True)
-    grade = models.IntegerField()
-    git=models.CharField(max_length=100)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    grade = models.IntegerField(default=0, blank=True)
+    git=models.CharField(default="", max_length=100, blank=True)
     repo=models.URLField(default="", blank=True)
     classes=models.CharField(max_length=100, default="", blank=True)
     added_to=models.CharField(max_length=100, default="", blank=True)
     completed=models.TextField(default="", blank=True)
-    
+
     def save(self, *args, **kwargs):
-        return super(Student, self).save(*args, **kwargs)
+        super(Student, self).save(*args, **kwargs)
 
-
-
+    def __str__(self):
+        return f"{self.user.username}'s Profile"
