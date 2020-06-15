@@ -13,7 +13,6 @@ class Student(models.Model):
     classes=models.CharField(max_length=100, default="", blank=True)
     added_to=models.CharField(max_length=100, default="", blank=True)
     completed=models.TextField(default="", blank=True)
-    ion_user=models.CharField(primary_key=True, max_length=100)
 
     def save(self, *args, **kwargs):
         super(Student, self).save(*args, **kwargs)
