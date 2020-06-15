@@ -386,10 +386,17 @@ class Student:
         command('git checkout master')
         os.chdir(cdir)
 
-data = getStudent("2022rkhondak")
-s = Student(data)
-#s.viewClass("APLit_eharris1")
-#s.updateClass("APLit_eharris1")
-#s.update()
-s.exitCLI()
+# data = getStudent("2022rkhondak")
+# s = Student(data)
+# #s.viewClass("APLit_eharris1")
+# #s.updateClass("APLit_eharris1")
+# #s.update()
+# s.exitCLI()
 
+def main():
+    print("noooo")
+    pass
+
+if __name__ == "__main__":
+   # stuff only to run when not called via 'import' here
+   main()

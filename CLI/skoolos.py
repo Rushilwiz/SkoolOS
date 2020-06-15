@@ -37,7 +37,14 @@ def main():
         input("Welcome to SkoolOS. Press any key to create an account")
         authenticate()
     else:
-        print(open(".profile", "r").read())
+        file = open('key.key', 'rb')
+        key = file.read() # The key will be type bytes
+        file.close()
+        f = Fernet(key)
+        file = open('.profile', 'rb')
+        p = file.read() # The key will be type bytes
+        file.close()
+
 
     # while True:
     #     pass
@@ -50,9 +57,14 @@ def authenticate():
     #Linux: chromdriver-linux
     #Macos: chromdriver-mac
     #Windows: chromdriver.exe
+    if('CLI' in os.getcwd()):
+        path = os.path.join(os.getcwd(), '../','chromedriver-mac')
+    else:
+        path = os.path.join(os.getcwd(), 'chromedriver-mac')
 
-
+    browser = webdriver.Chrome(path)
     web_dir = os.path.join(os.path.dirname(__file__), 'oauth')
+    print(web_dir)
     os.chdir(web_dir)
     if os.path.exists("index.html"):
         os.remove("index.html")
@@ -86,13 +98,13 @@ def authenticate():
         print("states good")
     browser.quit()
 
-    print(code)
+    #print(code)
     print(state)
 
     payload = {'grant_type': 'authorization_code', 'code': code, 'redirect_uri': redirect_uri, 'client_id': client_id,
                'client_secret': client_secret, 'csrfmiddlewaretoken': state}
     token = requests.post("https://ion.tjhsst.edu/oauth/token/", data=payload).json()
-    print(token)
+    #print(token)
     headers = {'Authorization': f"Bearer {token['access_token']}"}
 
     # And finally get the user's profile!
@@ -105,14 +117,18 @@ def authenticate():
     last_name = profile['last_name']
 
     os.chdir(cdir)
-    profileFile = open(".profile", "w")
-    #profileFile.write(profile.text())
-    key = Fernet.generate_key()
-    file = open('key.key', 'wb')
-    file.write(key) # The key is type bytes still
-    file.close()
-    profileFile.write(str(profile))
-    profileFile.close()
+    # key = Fernet.generate_key()
+    # file = open('key.key', 'wb')
+    # file.write(key) # The key is type bytes still
+    # file.close()
+    # p = str(profile).encode()
+    # f = Fernet(key)
+    # encrypted = f.encrypt(p)
+
+    # profileFile = open(".profile", "wb")
+    # #profileFile.write(profile.text())
+    # profileFile.write(encrypted)
+    # profileFile.close()
 
     sys.exit
 

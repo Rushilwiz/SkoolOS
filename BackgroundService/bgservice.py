@@ -1,58 +1,102 @@
-import os
-import sys
-import signal
 import time
-import event_processor
+import sys
+import os
+import pyinotify
 
 
-class SkoolOSDaemon:
-    """Constructor"""
-    def __init__(self, work_dir='/tmp'):
-        self.work_dir = work_dir
-        self.start_time = None
-        self.end_time = None
-        self.log_file = None
-    def __write_pid_file(self):
-        try:
-            dirName = "/tmp/skooloslogs"
-            # Create log Directory
-            os.mkdir(dirName)
-        except FileExistsError:
-            pass
-        pid = str(os.getpid())
-        file_ = open('/tmp/skoolosdaemonpid', 'w')
-        file_.write(pid)
-        file_.close()
-    def readable_time(self, input_time):
-        return time.strftime("%A, %B %d, %Y %H:%M:%S", time.localtime(input_time))
-    def start(self):
-        self.__write_pid_file()
-        self.start_time = time.time()
-        self.log_file = open('/tmp/skooloslogs/' + str(self.start_time), 'w')
-        self.log_file.write("Start time: \n" + self.readable_time(self.start_time) + "\n\n")
-        sys.stdout = self.log_file
-        event_processor.watch_dir(self.work_dir)
-    def stop(self):
-        event_processor.stop_watching()
-        self.end_time = time.time()
-        self.log_file.write("Stop time: \n" + self.readable_time(self.end_time))
-        self.log_file.write("Total work time: " + 
-                            time.strftime("%H:%M:%S", time.gmtime(self.end_time - self.start_time)))
+class EventHandler(pyinotify.ProcessEvent):
+    _methods = [
+        "IN_CREATE",
+        "IN_CLOSE_WRITE",
+        "IN_DELETE",
+        "IN_MOVED_TO",
+        "IN_MOVED_FROM",
+        "IN_OPEN",
+    ]
+
+    def process_IN_CREATE(self, event):
+        description = \
+            "Event: Created file\n" \
+            "Event Path: {}\n" \
+            "Timestamp: {}\n".format(
+                event.pathname,
+                time.strftime("%A, %B %d, %Y %H:%M:%S", time.localtime())
+                )
+        print(description)
+
+    def process_IN_CLOSE_WRITE(self, event):
+        description = \
+            "Event: Wrote to a file\n" \
+            "Event Path: {}\n" \
+            "Timestamp: {}\n".format(
+                event.pathname,
+                time.strftime("%A, %B %d, %Y %H:%M:%S", time.localtime())
+                )
+        print(description)
+
+    def process_IN_DELETE(self, event):
+        description = \
+            "Event: Deleted file\n" \
+            "Event Path: {}\n" \
+            "Timestamp: {}\n".format(
+                event.pathname,
+                time.strftime("%A, %B %d, %Y %H:%M:%S", time.localtime())
+                )
+        print(description)
+
+    def process_IN_MOVED_TO(self, event):
+        description = \
+            "Event: Moved a file in\n" \
+            "Event Path: {}\n" \
+            "Timestamp: {}\n".format(
+                event.pathname,
+                time.strftime("%A, %B %d, %Y %H:%M:%S", time.localtime())
+                )
+        print(description)
+
+    def process_IN_MOVED_FROM(self, event):
+        description = \
+            "Event: Moved a file out\n" \
+            "Event Path: {}\n" \
+            "Timestamp: {}\n".format(
+                event.pathname,
+                time.strftime("%A, %B %d, %Y %H:%M:%S", time.localtime())
+                )
+        print(description)
+
+    def process_IN_OPEN(self, event):
+        description = \
+            "Event: Opened file\n" \
+            "Event Path: {}\n" \
+            "Timestamp: {}\n".format(
+                event.pathname,
+                time.strftime("%A, %B %d, %Y %H:%M:%S", time.localtime())
+                )
+        print(description)
 
 
+NOTIFIER = None
 
 
-logger = None
+def watch_dir(watched_dir="/tmp", logdir="/tmp/skooloslogs"):
+    if not os.path.exists(logdir):
+        os.makedirs(logdir)
+    logfile = open(
+        logdir + "skoolos_" + time.strftime("%m%d%Y-%H%M%S", time.localtime()),
+        'w')
+    sys.stdout = logfile
+    print("Start time: " +
+          time.strftime("%A, %B %d, %Y %H:%M:%S", time.localtime()) + "\n\n")
+    global NOTIFIER
+    wm = pyinotify.WatchManager()
+    mask = pyinotify.IN_CREATE | pyinotify.IN_CLOSE_WRITE | pyinotify.IN_DELETE | \
+        pyinotify.IN_MOVED_TO | pyinotify.IN_MOVED_FROM | pyinotify.IN_OPEN
+    NOTIFIER = pyinotify.ThreadedNotifier(wm, EventHandler())
+    NOTIFIER.start()
+    wm.add_watch(watched_dir, mask, rec=True)
 
-def Main():
-    def signal_handler(signum, frame):
-        logger.stop()
-    signal.signal(signal.SIGINT, signal_handler)
-    # signal.signal(signal.SIGTERM, signal_handler)
-    global logger
-    logger = SkoolOSDaemon("/tmp")
-    logger.start()
 
-
-if __name__ == "__main__":
-    Main()
+def stop_watching():
+    NOTIFIER.stop()
+    print("End time: " +
+          time.strftime("%A, %B %d, %Y %H:%M:%S", time.localtime()) + "\n\n")
