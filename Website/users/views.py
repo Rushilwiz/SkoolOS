@@ -100,9 +100,9 @@ def create_account (request):
             token.delete()
 
             if isStudent:
-                profile = Student(user=user, git=git, grade=grade)
+                profile = Student(owner=user, git=git, grade=grade, ion_user=username)
             else:
-                profile = Teacher(user=user, git=git)
+                profile = Teacher(owner=user, git=git, ion_user=username)
 
             profile.save()
 
@@ -145,4 +145,4 @@ def create_account (request):
 def logout(request):
     auth_logout(request)
     messages.success(request, "You've been logged out!")
-    return redirect(request, "/login")
+    return redirect("/login")

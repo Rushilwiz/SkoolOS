@@ -9,7 +9,7 @@ router = routers.DefaultRouter()
 router.register(r'students', api_views.StudentViewSet)
 router.register(r'teachers', api_views.TeacherViewSet)
 router.register(r'assignments', api_views.AssignmentViewSet)
-router.register(r'classes', api_views.ClassesViewSet)
+router.register(r'classes', api_views.ClassViewSet)
 # router.register(r'files', api_views.DefFilesViewSet)
 router.register(r'users', api_views.UserViewSet)
 
