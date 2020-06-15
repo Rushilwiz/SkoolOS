@@ -76,14 +76,15 @@ class EventHandler(pyinotify.ProcessEvent):
 
 
 NOTIFIER = None
+STDOUT = sys.stdout
 
 
 def watch_dir(watched_dir="/tmp", logdir="/tmp/skooloslogs"):
     if not os.path.exists(logdir):
         os.makedirs(logdir)
     logfile = open(
-        logdir + "skoolos_" + time.strftime("%m%d%Y-%H%M%S", time.localtime()),
-        'w')
+        logdir + "/skoolos_" +
+        time.strftime("%m%d%Y-%H%M%S", time.localtime()), 'w')
     sys.stdout = logfile
     print("Start time: " +
           time.strftime("%A, %B %d, %Y %H:%M:%S", time.localtime()) + "\n\n")
@@ -99,4 +100,6 @@ def watch_dir(watched_dir="/tmp", logdir="/tmp/skooloslogs"):
 def stop_watching():
     NOTIFIER.stop()
     print("End time: " +
-          time.strftime("%A, %B %d, %Y %H:%M:%S", time.localtime()) + "\n\n")
+          time.strftime("%A, %B %d, %Y %H:%M:%S", time.localtime()))
+    sys.stdout = STDOUT
+    print("Done watching.\n")

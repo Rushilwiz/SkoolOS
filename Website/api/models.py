@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 
 class Student(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    ion_user = models.CharField(max_length=100)
     grade = models.IntegerField(default=0, blank=True)
     git=models.CharField(default="", max_length=100, blank=True)
     repo=models.URLField(default="", blank=True)
@@ -49,6 +50,15 @@ class Teacher(models.Model):
     def save(self, *args, **kwargs):
         super(Teacher, self).save(*args, **kwargs)
 
+class Student(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    ion_user=models.CharField(primary_key=True, max_length=100)
+    grade = models.IntegerField(default=0, blank=True)
+    git=models.CharField(default="", max_length=100, blank=True)
+    repo=models.URLField(default="", blank=True)
+    classes=models.CharField(max_length=100, default="", blank=True)
+    added_to=models.CharField(max_length=100, default="", blank=True)
+    completed=models.TextField(default="", blank=True)
 
 
 

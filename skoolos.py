@@ -35,50 +35,100 @@ def main():
     print("")
 
     if not os.path.exists(".profile"):
-        # try:
-        #     URL = "http://127.0.0.1:8000/api/"
-        #     r = requests.get(url = URL)
-        #     print("Stop any processes running on http://127.0.0.1:8000/ before continuing")
-        # except:
-        #     pass
+        try:
+            URL = "http://127.0.0.1:8000/api/"
+            r = requests.get(url = URL)
+        except:
+            print("Stop any processes running on http://127.0.0.1:8000/ before continuing")
+            sys.exit(0)
+
         input("Welcome to SkoolOS. Press any key to create an account")
         #webbrowser.open("http://127.0.0.1:8000/login", new=2)
         authenticate()
-    # else:
-    #     try:
-    #         URL = "http://127.0.0.1:8000/api/"
-    #         f = open('.profile','r')
-    #         data = json.loads(f.read())
-    #         f.close()
-    #         PWD = data['password']
-    #         USER = data['username']
-    #         r = requests.get(url = URL, auth=(USER,PWD)) 
-    #     except:
-    #         print("Incorrect password.")
-    #         sys.exit(0)
-    #     if(data['is_student']):
-    #         studentCLI()
-    #     else:
-    #         teacherCLI()
+    else:
+        f = open('.profile','r')
+        data = json.loads(f.read())
+        f.close()
+        PWD = data['password']
+        USER = data['username']
+        print(data['username'])
+        if(data['is_student']):
+            studentCLI(USER, PWD)
+        else:
+            teacherCLI(USER, PWD)
         
 
 
     # while True:
     #     pass
-def studentCLI():
+def studentCLI(user, password):
     from CLI import student
-    data = getStudent(USER)
-    print(data)
+    data = getUser(user, password)
     student = student.Student(data)
-    print(student)
+    choices = ['1) View Class','2) Exit SkoolOS']
+    questions = [
+    {
+        'type': 'list',
+        'name': 'choice',
+        'choices':choices,
+        'message': 'Select class: ',
+    },
+    ]
+    choice = prompt(questions)
+    choice = int(choice['choice'].split(")")[0])
+    if(choice == 1):
+        carray = student.sclass.split(",")
+        if(len(carray) == 1 and carray[0] == ""):
+            print("No classes")
+            return
+        courses = [
+        {
+            'type': 'list',
+            'name': 'course',
+            'choices':carray,
+            'message': 'Select class: ',
+        },
+        ]
+        course = prompt(courses)
+    if(choice == 2):
+        student.exitCLI()
+        
 
-def teacherCLI():
-    from CLI.teacher import Teacher
-    print("fail")
+def teacherCLI(user, password):
+    from CLI import teacher
+    data = getUser(user, password)
+    teacher = teacher.Teacher(data)
+    choices = ['1) View Class','2) Exit SkoolOS']
+    questions = [
+    {
+        'type': 'list',
+        'name': 'choice',
+        'choices':choices,
+        'message': 'Select class: ',
+    },
+    ]
+    choice = prompt(questions)
+    choice = int(choice['choice'].split(")")[0])
+    if(choice == 1):
+        carray = student.sclass.split(",")
+        if(len(carray) == 1 and carray[0] == ""):
+            print("No classes")
+            return
+        courses = [
+        {
+            'type': 'list',
+            'name': 'course',
+            'choices':carray,
+            'message': 'Select class: ',
+        },
+        ]
+        course = prompt(courses)
+    if(choice == 2):
+        student.exitCLI()
 
-def getStudent(ion_user):
+def getUser(ion_user, password):
         URL = "http://127.0.0.1:8000/api/students/" + ion_user + "/"
-        r = requests.get(url = URL, auth=('raffukhondaker','hackgroup1')) 
+        r = requests.get(url = URL, auth=(ion_user,password)) 
         if(r.status_code == 200):
             data = r.json() 
             return data
@@ -210,55 +260,40 @@ def authenticate():
         pwd = data['pwd']
         user = data['username']
         print(r.status_code)
-    r = requests.get(url = "http://localhost:8000/students/" + user + "/", auth=(user,pwd)) 
+    r = requests.get(url = "http://localhost:8000/api/students/" + user + "/", auth=(user,pwd)) 
     is_student = False
     if(r.status_code == 200):
         is_student = True
         print("Welcome, student " + user)
+        r = requests.get(url = "http://localhost:8000/api/students/" + user + "/", auth=(user,pwd))
+        profile = r.json()
+        username = profile['ion_user']
+        grade = profile['grade']
+        profile = {
+            'username':username,
+            'grade':grade,
+            'is_student':is_student,
+            'password':pwd,
+        }
+        profileFile = open(".profile", "w")
+        profileFile.write(json.dumps(profile))
+        profileFile.close()
+
     else:
         print("Welcome, teacher " + user)
-
-    #print(code)
-    print(state)
-
-    payload = {'grant_type': 'authorization_code', 'code': code, 'redirect_uri': redirect_uri, 'client_id': client_id,
-               'client_secret': client_secret, 'csrfmiddlewaretoken': state}
-    token = requests.post("https://ion.tjhsst.edu/oauth/token/", data=payload).json()
-    #print(token)
-    headers = {'Authorization': f"Bearer {token['access_token']}"}
-
-    # And finally get the user's profile!
-    profile = requests.get("https://ion.tjhsst.edu/api/profile", headers=headers).json()
-    
-    #pprint.pprint(profile)
-    username = profile['ion_username']
-    email = profile['tj_email']
-    first_name = profile['first_name']
-    last_name = profile['last_name']
-    is_student = profile['is_student']
-    password = ""
-    #password creation
-
-    profile = {
-        'username':username,
-        'email':email,
-        'first_name':first_name,
-        'last_name':last_name,
-        'is_student':is_student,
-        'password':password,
-    }
-    os.chdir(cdir)
-
-    profileFile = open(".profile", "w")
-    profileFile.write(json.dumps(profile))
-    profileFile.close()
-
-    #try to make password
-    password = makePass()
-    profile['password'] = password
-    profileFile = open(".profile", "w")
-    profileFile.write(json.dumps(profile))
-    profileFile.close()
+        r = requests.get(url = "http://localhost:8000/api/teachers/" + user + "/", auth=(user,pwd))
+        profile = r.json()
+        username = profile['ion_user']
+        grade = profile['grade']
+        profile = {
+            'username':username,
+            'grade':grade,
+            'is_student':is_student,
+            'password':pwd,
+        }
+        profileFile = open(".profile", "w")
+        profileFile.write(json.dumps(profile))
+        profileFile.close()
 
     sys.exit
 

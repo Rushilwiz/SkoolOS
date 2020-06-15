@@ -100,11 +100,9 @@ def create_account (request):
 
 
             if isStudent:
-                profile = Student(user=user, git=git, grade=grade)
+                profile = Student(user=user, git=git, grade=grade, ion_user=username)
             else:
-                profile = Teacher(user=user, username=username, git=git)
 
-            token.delete()
 
             profile.save()
 
