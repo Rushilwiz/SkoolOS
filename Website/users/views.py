@@ -97,12 +97,14 @@ def create_account (request):
                                             last_name=last_name,
                                             password=password)
             user.save()
-            token.delete()
+
 
             if isStudent:
                 profile = Student(user=user, git=git, grade=grade)
             else:
-                profile = Teacher(user=user, git=git)
+                profile = Teacher(user=user, username=username, git=git)
+
+            token.delete()
 
             profile.save()
 
