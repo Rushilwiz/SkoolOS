@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+import secrets
 
 
 
@@ -21,9 +22,10 @@ class Student(models.Model):
 
 class Class(models.Model):
     name = models.CharField(primary_key=True, max_length=100)
+    id = models.CharField(max_length=8, blank=True, null=True)
     description = models.CharField(default="Class Description", max_length=500)
     repo=models.URLField(default="", blank=True)
-    path=models.CharField(max_length=100, default="")
+    path=models.CharField(blank=True, max_length=100, default="")
     assignments=models.TextField(default="", blank=True)
     default_file=models.CharField(max_length=100, default="", blank=True)
     confirmed=models.ManyToManyField(Student, blank=True, related_name='confirmed')
@@ -32,6 +34,12 @@ class Class(models.Model):
     # assignments = models.ManyToManyField(Assignment, default="")
     # default_file = models.ManyToManyField(DefFiles)
     def save(self, *args, **kwargs):
+        id = self.id
+        if not id:
+            id = secrets.token_urlsafe()[:8].lower()
+        while Class.objects.filter(id=id).exclude(pk=self.pk).exists():
+            id = sercrets.token_urlsafe()[:8].lower()
+        self.id = id
         return super(Class, self).save(*args, **kwargs)
 
     def __str__(self):
@@ -55,7 +63,6 @@ class Teacher(models.Model):
 
 class Assignment(models.Model):
     owner = models.ForeignKey('auth.User', related_name='assignments', on_delete=models.CASCADE)
-
     name=models.CharField(max_length=100, primary_key=True)
     due_date=models.DateTimeField()
     # files = models.ManyToManyField(DefFiles)
