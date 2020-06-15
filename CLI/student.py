@@ -43,6 +43,11 @@ def putDB(data, url):
     print("PUT:" + str(r.status_code))
     return(r.json())
 
+def patchDB(data, url):
+    r = requests.patch(url = url, data=data, auth=('raffukhondaker','hackgroup1'))
+    print("PATH:" + str(r.status_code))
+    return(r.json())
+
 def delDB(url):
     r = requests.delete(url = url, auth=('raffukhondaker','hackgroup1'))
     print("DELETE:" + str(r.status_code))
@@ -129,17 +134,9 @@ class Student:
             os.chdir(cdir)
             self.repo = 'https://github.com/' + self.git + '/' + self.username + '.git'
             data={
-                'user':self.user,
-                'git':self.git,
-                'ion_user':self.username,
-                'added_to':self.snew,
-                'url':self.url,
-                'classes':self.sclass,
-                'grade':self.grade,
-                'completed':self.completed,
                 'repo':self.repo
             }
-            print(putDB(data, self.url))
+            print(patchDB(data, self.url))
         print("Synced to " +  self.username)
 
     def getClasses(self):
@@ -279,17 +276,10 @@ class Student:
         #update teacher instance in db, classes field
         data={
             'user':self.user,
-            'git':self.git,
-            'ion_user':self.username,
-            'student_id':self.student_id,
             'added_to':self.snew,
-            'url':self.url,
-            'classes':self.sclass,
-            'grade':self.grade,
-            'completed':self.completed
         }
         print(self.url)
-        print(putDB(data, self.url))
+        print(patchDB(data, self.url))
         return data
     
     def submit(self, path):

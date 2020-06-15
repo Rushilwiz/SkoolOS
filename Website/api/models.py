@@ -11,6 +11,7 @@ class Student(models.Model):
     classes=models.CharField(max_length=100, default="", blank=True)
     added_to=models.CharField(max_length=100, default="", blank=True)
     completed=models.TextField(default="", blank=True)
+    ion_user=models.CharField(primary_key=True, max_length=100)
 
     def save(self, *args, **kwargs):
         super(Student, self).save(*args, **kwargs)
@@ -40,7 +41,7 @@ class Teacher(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     classes=models.ManyToManyField(Class, blank=True, related_name='classes')
     git=models.CharField(max_length=100, default="", blank=True)
-
+    ion_user=models.CharField(primary_key=True, max_length=100)
 
     def __str__(self):
         return f"{self.user.username}'s Profile"
@@ -48,15 +49,15 @@ class Teacher(models.Model):
     def save(self, *args, **kwargs):
         super(Teacher, self).save(*args, **kwargs)
 
-class Student(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    ion_user=models.CharField(primary_key=True, max_length=100)
-    grade = models.IntegerField(default=0, blank=True)
-    git=models.CharField(default="", max_length=100, blank=True)
-    repo=models.URLField(default="", blank=True)
-    classes=models.CharField(max_length=100, default="", blank=True)
-    added_to=models.CharField(max_length=100, default="", blank=True)
-    completed=models.TextField(default="", blank=True)
+# class Student(models.Model):
+#     user = models.OneToOneField(User, on_delete=models.CASCADE)
+#     ion_user=models.CharField(primary_key=True, max_length=100)
+#     grade = models.IntegerField(default=0, blank=True)
+#     git=models.CharField(default="", max_length=100, blank=True)
+#     repo=models.URLField(default="", blank=True)
+#     classes=models.CharField(max_length=100, default="", blank=True)
+#     added_to=models.CharField(max_length=100, default="", blank=True)
+#     completed=models.TextField(default="", blank=True)
 
 
 
