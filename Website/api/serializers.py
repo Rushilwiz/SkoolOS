@@ -45,8 +45,8 @@ class StudentSerializer(serializers.HyperlinkedModelSerializer):
 
 class TeacherSerializer(serializers.ModelSerializer):
     # Class = ClassSerializer(many=True, read_only=True,allow_null=True)
-    owner = serializers.ReadOnlyField(source='owner.username')
+    #owner = serializers.ReadOnlyField(source='owner.username')
     class Meta:
         model = Teacher
         # fields = ['url','first_name', 'last_name','git','ion_user', 'email','Class','owner']
-        fields = ['first_name', 'last_name','git','ion_user', 'email','Class','owner']
+        fields = ['git','ion_user','classes','user']

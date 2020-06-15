@@ -8,6 +8,7 @@ from .permissions import isTeacher, IsOwnerOrReadOnly
 from django.shortcuts import render, redirect
 from rest_framework.parsers import JSONParser 
 from rest_framework.response import Response
+from django.contrib.auth.models import Group
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -23,6 +24,8 @@ class StudentViewSet(viewsets.ModelViewSet):
     queryset = Student.objects.all()
     serializer_class = StudentSerializer
     permission_Class = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
+    g, created = Group.objects.get_or_create(name='teachers')
+
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
