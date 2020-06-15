@@ -2,7 +2,7 @@ from django.contrib import admin
 from .models import (
     DefFiles,
     Assignment,
-    Classes,
+    Class,
     Teacher,
     Student
 )
@@ -13,4 +13,4 @@ admin.site.register(Teacher)
 admin.site.register(Student)
 admin.site.register(DefFiles)
 admin.site.register(Assignment)
-admin.site.register(Classes)
+admin.site.register(Class)

@@ -144,4 +144,4 @@ def create_account (request):
 def logout(request):
     auth_logout(request)
     messages.success(request, "You've been logged out!")
-    return redirect(request, "/login")
+    return redirect("/login")
