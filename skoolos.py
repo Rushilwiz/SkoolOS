@@ -12,6 +12,7 @@ from werkzeug.urls import url_decode
 import pprint
 from PyInquirer import prompt, print_json
 import json
+import datetime
 import os
 import argparse
 import webbrowser
@@ -84,7 +85,7 @@ def studentCLI(user, password):
         student.exitCLI()
     else:
         student.viewClass(course)
-        
+        student.getAssignments(course,  datetime.datetime.now())
 
 def teacherCLI(user, password):
     from CLI import teacher
@@ -166,6 +167,10 @@ def getUser(ion_user, password):
         else:
             return None
             print(r.status_code) 
+def patchDB(data, url):
+    r = requests.patch(url = url, data=data, auth=('raffukhondaker','hackgroup1'))
+    print("PATH:" + str(r.status_code))
+    return(r.json())
 
 def getDB(url):
     r = requests.get(url = url, auth=('raffukhondaker','hackgroup1')) 

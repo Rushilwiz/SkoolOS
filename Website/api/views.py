@@ -1,5 +1,5 @@
 from .models import Student, Teacher, Class, Assignment, DefFiles
-from .serializers import StudentSerializer, TeacherSerializer, ClassesSerializer, AssignmentSerializer, UserSerializer
+from .serializers import StudentSerializer, TeacherSerializer, ClassSerializer, AssignmentSerializer, UserSerializer
 from rest_framework import generics, viewsets, permissions, response, status
 from django.http import Http404
 from rest_framework.views import APIView
@@ -43,7 +43,7 @@ class ClassViewSet(viewsets.ModelViewSet):
     API endpoint that allows users to be viewed or edited.
     """
     queryset = Class.objects.all()
-    serializer_class = ClassesSerializer
+    serializer_class = ClassSerializer
     permission_Class = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
 
     # def perform_create(self, serializer):

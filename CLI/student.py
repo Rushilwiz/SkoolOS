@@ -160,7 +160,7 @@ class Student:
                     zero = datetime.timedelta(0,0)
                     #check due ddate is in span range is now past date (- timdelta)
                     if(diff < span and diff > zero):
-                        print((now-due))
+                        print(a + " due in:" + str(now-due))
 
                 except Exception as e:
                     print(e)
