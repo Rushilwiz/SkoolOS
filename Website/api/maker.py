@@ -1,3 +1,7 @@
+from django.contrib.auth.models import Group
+
+g, created = Group.objects.get_or_create(name='teachers')
+
 # from datetime import datetime
 #
 # f1 = DefFiles(

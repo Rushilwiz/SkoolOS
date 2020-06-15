@@ -12,6 +12,7 @@ from werkzeug.urls import url_decode
 import pprint
 from PyInquirer import prompt, print_json
 import json
+import datetime
 import os
 import argparse
 import webbrowser
@@ -65,66 +66,91 @@ def studentCLI(user, password):
     from CLI import student
     data = getUser(user, password)
     student = student.Student(data)
-    choices = ['1) View Class','2) Exit SkoolOS']
-    questions = [
+    carray = student.sclass.split(",")
+    if(len(carray) == 1 and carray[0] == ""):
+        print("No classes")
+        return
+        
+    carray.append("Exit SkoolOS")
+    courses = [
     {
         'type': 'list',
-        'name': 'choice',
-        'choices':choices,
+        'name': 'course',
+        'choices':carray,
         'message': 'Select class: ',
     },
     ]
-    choice = prompt(questions)
-    choice = int(choice['choice'].split(")")[0])
-    if(choice == 1):
-        carray = student.sclass.split(",")
-        if(len(carray) == 1 and carray[0] == ""):
-            print("No classes")
-            return
-        courses = [
-        {
-            'type': 'list',
-            'name': 'course',
-            'choices':carray,
-            'message': 'Select class: ',
-        },
-        ]
-        course = prompt(courses)
-    if(choice == 2):
+    course = prompt(courses)
+    if course == "Exit SkoolOS":
         student.exitCLI()
-        
+    else:
+        student.viewClass(course)
+        student.getAssignments(course,  datetime.datetime.now())
 
 def teacherCLI(user, password):
     from CLI import teacher
     data = getUser(user, password)
     teacher = teacher.Teacher(data)
-    choices = ['1) View Class','2) Exit SkoolOS']
-    questions = [
+    # 1. make a class
+    # 2. add studeents to an existing class
+    # 3. Get progress logs on a student
+    # 2. make an assignment for a class
+    # 3. view student submissions for an assignment
+    carray = teacher.sclass.split(",")
+    carray.remove("")
+    carray.append("Exit SkoolOS")
+    carray.append("Make New Class")
+    courses = [
     {
         'type': 'list',
-        'name': 'choice',
-        'choices':choices,
+        'name': 'course',
+        'choices':carray,
         'message': 'Select class: ',
     },
     ]
-    choice = prompt(questions)
-    choice = int(choice['choice'].split(")")[0])
-    if(choice == 1):
-        carray = student.sclass.split(",")
-        if(len(carray) == 1 and carray[0] == ""):
-            print("No classes")
-            return
-        courses = [
+    course = prompt(courses)
+    if course == "Exit SkoolOS":
+        teacher.exitCLI()
+    if course == "Make New Class":
+        questions = [
+        {
+            'type': 'input',
+            'name': 'cname',
+            'message': 'Class Name: ',
+        },
+        ]
+        cname = prompt(questions)
+        teacher.makeClass(cname)
+        soption = ["1) Add individual student", "2) Add list of students through path", "3) Exit"]
+        questions = [
+        {
+            'type': 'list',
+            'choices':soption,
+            'name': 'students',
+            'message': 'Add list of students (input path): ',
+        },        
+        ]
+        choice = prompt(questions).split(")")
+        if("1" == choice):
+            s = input("Student name: ")
+            teacher.addStudent(s, cname)
+        if("2" == choice):
+            p = input("Relativee Path: ")
+            if(os.path.exists(p)):
+                print(p + " does not exist.")
+
+    else:
+        print("Class: " + cname)
+        options = ['1) Add student', "2) Add assignment", "3) View student information"]
+        questions = [
         {
             'type': 'list',
             'name': 'course',
-            'choices':carray,
-            'message': 'Select class: ',
+            'choices':options,
+            'message': 'Select option: ',
         },
         ]
-        course = prompt(courses)
-    if(choice == 2):
-        student.exitCLI()
+        option = prompt(questions)
 
 def getUser(ion_user, password):
         URL = "http://127.0.0.1:8000/api/students/" + ion_user + "/"
@@ -141,6 +167,10 @@ def getUser(ion_user, password):
         else:
             return None
             print(r.status_code) 
+def patchDB(data, url):
+    r = requests.patch(url = url, data=data, auth=('raffukhondaker','hackgroup1'))
+    print("PATH:" + str(r.status_code))
+    return(r.json())
 
 def getDB(url):
     r = requests.get(url = url, auth=('raffukhondaker','hackgroup1')) 

@@ -8,7 +8,7 @@ from .permissions import isTeacher, IsOwnerOrReadOnly
 from django.shortcuts import render, redirect
 from rest_framework.parsers import JSONParser 
 from rest_framework.response import Response
-
+from django.contrib.auth.models import Group
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -24,9 +24,11 @@ class StudentViewSet(viewsets.ModelViewSet):
     queryset = Student.objects.all()
     serializer_class = StudentSerializer
     permission_Class = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
+    g, created = Group.objects.get_or_create(name='teachers')
+
 
     def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
+        serializer.save(user=self.request.user)
 
 class TeacherViewSet(viewsets.ModelViewSet):
     """
@@ -37,7 +39,7 @@ class TeacherViewSet(viewsets.ModelViewSet):
     permission_Class = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
 
     def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
+        serializer.save(user=self.request.user)
 
 class ClassViewSet(viewsets.ModelViewSet):
     """
@@ -47,12 +49,12 @@ class ClassViewSet(viewsets.ModelViewSet):
     serializer_class = ClassSerializer
     permission_Class = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
 
-    def perform_create(self, serializer):
-        if(self.request.user.groups.filter(name__in=['teachers']).exists() or self.request.user.is_superuser):
-            serializer.save(owner=self.request.user)
-        else:
-            print("UNAUTHORIZED POST")
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    # def perform_create(self, serializer):
+    #     if(self.request.user.groups.filter(name__in=['teachers']).exists() or self.request.user.is_superuser):
+    #         serializer.save(owner=self.request.user)
+    #     else:
+    #         print("UNAUTHORIZED POST")
+    #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class AssignmentViewSet(viewsets.ModelViewSet):
