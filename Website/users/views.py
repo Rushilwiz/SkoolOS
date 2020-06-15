@@ -102,10 +102,10 @@ def create_account (request):
             if isStudent:
                 profile = Student(user=user, git=git, grade=grade, ion_user=username)
             else:
-
+                profile = Teacher(user=user, git=git, ion_user=usernam)
 
             profile.save()
-
+            token.delete()
             print (user)
             messages.success(request, "Your SkoolOS account has successfully been created")
             return redirect(f'/login/?username={username}')
