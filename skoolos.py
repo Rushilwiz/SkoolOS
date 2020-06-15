@@ -14,6 +14,7 @@ from PyInquirer import prompt, print_json
 import json
 import os
 import argparse
+import webbrowser
 
 client_id = r'QeZPBSKqdvWFfBv1VYTSv9iFGz5T9pVJtNUjbEr6'
 client_secret = r'0Wl3hAIGY9SvYOqTOLUiLNYa4OlCgZYdno9ZbcgCT7RGQ8x2f1l2HzZHsQ7ijC74A0mrOhhCVeZugqAmOADHIv5fHxaa7GqFNtQr11HX9ySTw3DscKsphCVi5P71mlGY'
@@ -34,31 +35,31 @@ def main():
     print("")
 
     if not os.path.exists(".profile"):
-        try:
-            URL = "http://127.0.0.1:8000/api/"
-            r = requests.get(url = URL, auth=('raffukhondaker','hackgroup1'))
-            print("End service at http://127.0.0.1:8000/ before continuing.")
-            sys.exit(0)
-        except:
-            pass
+        # try:
+        #     URL = "http://127.0.0.1:8000/api/"
+        #     r = requests.get(url = URL)
+        #     print("Stop any processes running on http://127.0.0.1:8000/ before continuing")
+        # except:
+        #     pass
         input("Welcome to SkoolOS. Press any key to create an account")
+        #webbrowser.open("http://127.0.0.1:8000/login", new=2)
         authenticate()
-    else:
-        try:
-            URL = "http://127.0.0.1:8000/api/"
-            r = requests.get(url = URL, auth=('raffukhondaker','hackgroup1')) 
-        except:
-            print("Start Django server first")
-            sys.exit(0)
-        f = open('.profile','r')
-        data = json.loads(f.read())
-        f.close()
-        PWD = data['password']
-        USER = data['username']
-        if(data['is_student']):
-            studentCLI()
-        else:
-            teacherCLI()
+    # else:
+    #     try:
+    #         URL = "http://127.0.0.1:8000/api/"
+    #         f = open('.profile','r')
+    #         data = json.loads(f.read())
+    #         f.close()
+    #         PWD = data['password']
+    #         USER = data['username']
+    #         r = requests.get(url = URL, auth=(USER,PWD)) 
+    #     except:
+    #         print("Incorrect password.")
+    #         sys.exit(0)
+    #     if(data['is_student']):
+    #         studentCLI()
+    #     else:
+    #         teacherCLI()
         
 
 
@@ -152,40 +153,70 @@ def authenticate():
         path = os.path.join(os.getcwd(), 'chromedriver-mac')
 
     browser = webdriver.Chrome(path)
-    web_dir = os.path.join(os.getcwd(), 'CLI', 'oauth')
-    print(web_dir)
-    os.chdir(web_dir)
-    if os.path.exists("index.html"):
-        os.remove("index.html")
+    # web_dir = os.path.join(os.getcwd(), 'CLI', 'oauth')
+    # print(web_dir)
+    # os.chdir(web_dir)
+    # if os.path.exists("index.html"):
+    #     os.remove("index.html")
 
-    template = open("template.html", "r")
-    index = open("index.html", "w")
-    for line in template:
-        index.write(line.replace('AUTH_URL', authorization_url))
-    template.close()
-    index.close()
+    # template = open("template.html", "r")
+    # index = open("index.html", "w")
+    # for line in template:
+    #     index.write(line.replace('AUTH_URL', authorization_url))
+    # template.close()
+    # index.close()
 
-    server = Thread(target=create_server)
-    server.daemon = True
-    server.start()
+    # server = Thread(target=create_server)
+    # server.daemon = True
+    # server.start()
 
-    browser.get("localhost:8000/")
+    browser.get("localhost:8000/login")
 
-    while "http://localhost:8000/callback/?code" not in browser.current_url:
+    # while "http://localhost:8000/callback/?code" not in browser.current_url:
+    #     time.sleep(0.25)
+
+    url = browser.current_url
+    gets = url_decode(url.replace("http://localhost:8000/login/?", ""))
+    while "http://localhost:8000/login/?username=" not in browser.current_url and (not browser.current_url == "http://localhost:8000/"): #http://localhost:8000/
         time.sleep(0.25)
 
     url = browser.current_url
-    gets = url_decode(url.replace("http://localhost:8000/callback/?", ""))
-    while "http://localhost:8000/callback/?code" not in browser.current_url:
-        time.sleep(0.25)
-
-    url = browser.current_url
-    gets = url_decode(url.replace("http://localhost:8000/callback/?", ""))
-    code = gets.get("code")
-    if state == gets.get("state"):
-        state = gets.get("state")
-        print("states good")
+    gets = url_decode(url.replace("http://localhost:8000/login/?username=", ""))
+    # code = gets.get("code")
+    # if state == gets.get("state"):
+    #     state = gets.get("state")
+    #     print("states good")
     browser.quit()
+    questions = [
+    {
+        'type': 'input',
+        'name': 'username',
+        'message': 'Enter SkoolOS Username (Same as ION Username): ',
+    },
+    {
+        'type': 'password',
+        'name': 'pwd',
+        'message': 'Enter SkoolOS Password (NOT ION PASSWORD): ',
+    },
+    ]
+    data =prompt(questions) 
+    pwd = data['pwd']
+    user = data['username']
+    r = requests.get(url = "http://localhost:8000/api/", auth=(user,pwd)) 
+    while(r.status_code != 200):
+        print("INCORRECT LOGIN CREDENTIALS")
+        r = requests.get(url = "http://localhost:8000/api/", auth=(user,pwd)) 
+        data =prompt(questions) 
+        pwd = data['pwd']
+        user = data['username']
+        print(r.status_code)
+    r = requests.get(url = "http://localhost:8000/students/" + user + "/", auth=(user,pwd)) 
+    is_student = False
+    if(r.status_code == 200):
+        is_student = True
+        print("Welcome, student " + user)
+    else:
+        print("Welcome, teacher " + user)
 
     #print(code)
     print(state)
