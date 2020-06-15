@@ -55,7 +55,7 @@ def main():
         if(data['is_student']):
             studentCLI(USER, PWD)
         else:
-            teacherCLI()
+            teacherCLI(USER, PWD)
         
 
 
@@ -63,7 +63,7 @@ def main():
     #     pass
 def studentCLI(user, password):
     from CLI import student
-    data = getStudent(user, password)
+    data = getUser(user, password)
     student = student.Student(data)
     choices = ['1) View Class','2) Exit SkoolOS']
     questions = [
@@ -92,12 +92,41 @@ def studentCLI(user, password):
         course = prompt(courses)
     if(choice == 2):
         student.exitCLI()
+        
 
-def teacherCLI():
-    from CLI.teacher import Teacher
-    print("fail")
+def teacherCLI(user, password):
+    from CLI import teacher
+    data = getUser(user, password)
+    teacher = teacher.Teacher(data)
+    choices = ['1) View Class','2) Exit SkoolOS']
+    questions = [
+    {
+        'type': 'list',
+        'name': 'choice',
+        'choices':choices,
+        'message': 'Select class: ',
+    },
+    ]
+    choice = prompt(questions)
+    choice = int(choice['choice'].split(")")[0])
+    if(choice == 1):
+        carray = student.sclass.split(",")
+        if(len(carray) == 1 and carray[0] == ""):
+            print("No classes")
+            return
+        courses = [
+        {
+            'type': 'list',
+            'name': 'course',
+            'choices':carray,
+            'message': 'Select class: ',
+        },
+        ]
+        course = prompt(courses)
+    if(choice == 2):
+        student.exitCLI()
 
-def getStudent(ion_user, password):
+def getUser(ion_user, password):
         URL = "http://127.0.0.1:8000/api/students/" + ion_user + "/"
         r = requests.get(url = URL, auth=(ion_user,password)) 
         if(r.status_code == 200):

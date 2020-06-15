@@ -66,8 +66,6 @@ class Teacher:
     def __init__(self, data):
         # teacher info already  stored in API
         # intitialze fields after GET request
-        self.first_name=data['first_name']
-        self.last_name=data['last_name']
         self.git=data['git']
         self.username=data['ion_user']
         self.url= "http://127.0.0.1:8000/api/teachers/" + self.username + "/"
@@ -177,13 +175,10 @@ class Teacher:
             
             #update teacher instance in db, classes field
             teacher={
-                'first_name':self.first_name,
-                'last_name':self.last_name,
                 'git':self.git,
                 'ion_user':self.username,
                 'url':self.url,
                 'classes':self.sclass,
-                'email':self.email
             }
             putDB(teacher, self.url)
 
@@ -250,13 +245,10 @@ class Teacher:
                 s = s[:-1]
                 print(s)
                 data={
-                    'first_name':self.first_name,
-                    'last_name':self.last_name,
                     'git':self.git,
                     'ion_user':self.username,
                     'url':self.url,
                     'classes':s,
-                    'email':self.email
                 }
                 print(putDB(data, self.url))
                 delDB("http://127.0.0.1:8000/api/classes/" + cname + "/")
@@ -300,14 +292,10 @@ class Teacher:
             return False
         print(student['added_to'])
         s={
-            'first_name':student["first_name"],
-            'last_name':student["last_name"],
             'git':student["git"],
             'ion_user':student["ion_user"],
-            'student_id':student["student_id"],
             'added_to':student['added_to'],
             'classes':student["classes"],
-            'email':student["email"],
             'grade':student["grade"],
             'completed':student["completed"],
             'repo':student["repo"]
