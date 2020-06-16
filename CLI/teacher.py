@@ -592,10 +592,10 @@ class Teacher:
         print("heheheh")
 
 
-data = getTeacher("eharris1")
-t = Teacher(data)
+# data = getTeacher("eharris1")
+# t = Teacher(data)
 #t.makeClass("APLit_eharris1")
-t.updateAssignment("eharris1/APLit_eharris1/BookReport", "APLit_eharris1", '2020-08-11 16:58:33.383124')
+# t.updateAssignment("eharris1/APLit_eharris1/BookReport", "APLit_eharris1", '2020-08-11 16:58:33.383124')
 #ar = ['2022rkhondak','2022inafi','2023rumareti']
 #extra = t.reqAddStudentList(ar, "APLit_eharris1")
 #print(extra)

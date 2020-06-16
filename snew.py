@@ -83,18 +83,23 @@ class Students:
 # }
 
 # c = Class.objects.get(name='Math5')
-data = requests.get(url = "http://localhost:8000/api/classes/Math5", auth=('raffukhondaker','hackgroup1')).json()
+# data = requests.get(url = "http://localhost:8000/api/classes/Math5", auth=('raffukhondaker','hackgroup1')).json()
 
-r = requests.post(url = "http://localhost:8000/api/classes/", data={'name':'English11', 'teacher':'eharris1', 'owner':2}, auth=('raffukhondaker','hackgroup1')) 
+# r = requests.post(url = "http://localhost:8000/api/classes/", data={'name':'English11', 'teacher':'eharris1', 'owner':2}, auth=('raffukhondaker','hackgroup1')) 
 
-print("POST:" + str(r.json()))
+# print("POST:" + str(r.json()))
+# # print(r.json())
+# # print(c.name)
+# # c = {
+# #     'classes':c
+# # }
+# # print(c)
+# r = requests.patch(url = "http://localhost:8000/api/teachers/eharris1/", data={'classes':['English11']}, auth=('raffukhondaker','hackgroup1')) 
 # print(r.json())
-# print(c.name)
-# c = {
-#     'classes':c
-# }
-# print(c)
-r = requests.patch(url = "http://localhost:8000/api/teachers/eharris1/", data={'classes':['English11']}, auth=('raffukhondaker','hackgroup1')) 
-print(r.json())
+import bgservice.bgservice as bg
+
+bg.watch_dir('2022rkhondak', 'eharris1')
+time.sleep(60)
+bg.stop_watching()
 
 

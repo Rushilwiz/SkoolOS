@@ -149,7 +149,7 @@ class Student:
         classes = self.classes
         for c in classes:
             print(c['name'])
-            alist = c['assignments'].split(",")
+            alist = c['assignments']
             for a in alist:
                 ass = getDB("http://127.0.0.1:8000/api/assignments/" + a)
                 now = datetime.datetime.now()
@@ -369,12 +369,12 @@ class Student:
         command('git checkout master')
         os.chdir(cdir)
 
-data = getStudent("2022rkhondak")
-s = Student(data)
-s.viewClass("APLit_eharris1")
-#s.addClass("APLit_eharris1")
-# #s.update()
-s.exitCLI()
+# data = getStudent("2022rkhondak")
+# s = Student(data)
+# s.viewClass("APLit_eharris1")
+# #s.addClass("APLit_eharris1")
+# # #s.update()
+# s.exitCLI()
 
 def main():
     pass
