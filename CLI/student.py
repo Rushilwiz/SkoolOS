@@ -336,6 +336,7 @@ class Student:
             if c['name'] == courses:
                 command("git checkout " + courses)
                 print(os.listdir())
+                os.chdir(cdir)
                 return
         os.chdir(cdir)
         print("Class not found")

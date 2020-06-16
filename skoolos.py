@@ -86,10 +86,19 @@ def studentCLI(user, password):
     data = getUser(user, password, 'student')
     student = student.Student(data)
     student.update()
+    EXIT = False
+    while(not EXIT):
+        course = chooseClassStudent(student)
+        EXIT = classOptionsStudent(student, course)
+
+
+################################################ STUDENT METHODS
+#return class
+def  chooseClassStudent(student):
     carray = student.sclass.split(",")
     if(len(carray) == 1 and carray[0] == ""):
+        carray.remove("")
         print("No classes")
-        return
         
     carray.append("Exit SkoolOS")
     courses = [
@@ -102,14 +111,35 @@ def studentCLI(user, password):
     ]
     course = prompt(courses)['course']
     print(course)
-    if course == "Exit SkoolOS":
+    return course
+
+def classOptionsStudent(student, course):
+    student.viewClass(course)
+    student.getAssignments(course,  100)
+    choices = ["Save","Back","Exit SkoolOS"]
+    options = [
+    {
+        'type': 'list',
+        'name': 'option',
+        'choices':choices,
+        'message': 'Select: ',
+    },
+    ]
+    option = prompt(options)['option']
+    if(option == "Save"):
+        student.update()
+        print("Saved!")
+        classOptionsStudent(student, course)
+    if(option == "Back"):
         student.exitCLI()
-    else:
-        student.viewClass(course)
-        student.getAssignments(course,  100)
+        #dont exit cli
+        return False
+    if(option == "Exit SkoolOS"):
+        student.exitCLI()
+        #exit cli
+        return True
 
-################################################ STUDENT METHODS
-
+        
 ################################################ TEACHER METHODS
 
 def teacherCLI(user, password):
