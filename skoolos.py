@@ -62,7 +62,6 @@ def main():
             teacherCLI(USER, PWD)
         
 
-
     # while True:
     #     pass
 def studentCLI(user, password):
@@ -212,7 +211,6 @@ def teacherCLI(user, password):
                         #print("Assignments: " + n)
                         b = False
                 if(not os.path.isdir(teacher.username + "/" + course + "/" + n)):
-                    nlist.remove(n)
                     b = False
                 if(b):
                     tlist.append(n)
@@ -231,6 +229,11 @@ def teacherCLI(user, password):
             },        
             ]
             ass = prompt(questions)['assignment']
+            apath = teacher.username + "/" + course + "/" + ass
+            due = input("Enter due date (Example: 2020-08-11 16:58): ")
+            due = due +  ":00.000000"
+            due = due.strip()
+            teacher.addAssignment(apath, course, due)
 
 
 def getUser(ion_user, password, utype):
