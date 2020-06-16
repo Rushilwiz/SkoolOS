@@ -92,16 +92,17 @@ def watch_dir(watched_dir="/tmp", logdir="/tmp/skooloslogs"):
     logfile = open(
         logdir + "/skoolos_" +
         time.strftime("%m%d%Y-%H%M%S", time.localtime()), 'w')
-    sys.stdout = logfile
     START_TIME = time.time()
-    print("Start time: " +
-          time.strftime("%A, %B %d, %Y %H:%M:%S", time.localtime()) + "\n\n")
     wm = pyinotify.WatchManager()
     mask = pyinotify.IN_CREATE | pyinotify.IN_CLOSE_WRITE | pyinotify.IN_DELETE | \
         pyinotify.IN_MOVED_TO | pyinotify.IN_MOVED_FROM | pyinotify.IN_OPEN
     NOTIFIER = pyinotify.ThreadedNotifier(wm, EventHandler())
     NOTIFIER.start()
+    sys.stdout = open("/dev/null", 'w')
     wm.add_watch(watched_dir, mask, rec=True)
+    sys.stdout = logfile
+    print("Start time: " +
+          time.strftime("%A, %B %d, %Y %H:%M:%S", time.localtime()) + "\n")
 
 
 def stop_watching():
@@ -111,6 +112,7 @@ def stop_watching():
           time.strftime("%A, %B %d, %Y %H:%M:%S", time.localtime()))
     print("\nTotal work time: " +
           time.strftime("%H:%M:%S", time.gmtime(now - START_TIME)))
+    print("\n" + checker.shell_check())
     suspicious_files = checker.file_check(DIR)
     if suspicious_files != []:
         print(
