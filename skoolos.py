@@ -78,9 +78,8 @@ def main():
         else:
             teacherCLI(USER, PWD)
         
+################################################ STUDENT METHODS
 
-    # while True:
-    #     pass
 def studentCLI(user, password):
     from CLI import student
     data = getUser(user, password, 'student')
@@ -91,8 +90,6 @@ def studentCLI(user, password):
         course = chooseClassStudent(student)
         EXIT = classOptionsStudent(student, course)
 
-
-################################################ STUDENT METHODS
 #return class
 def  chooseClassStudent(student):
     carray = student.sclass.split(",")
@@ -141,6 +138,22 @@ def classOptionsStudent(student, course):
 
         
 ################################################ TEACHER METHODS
+def chooseGeneralTeacher(teacher):
+    carray = []
+    for c in teacher.classes:
+        carray.append(c)
+    carray.append("Make New Class")
+    carray.append("Exit SkoolOS")
+    courses = [
+    {
+        'type': 'list',
+        'name': 'course',
+        'choices':carray,
+        'message': 'Select class: ',
+    },
+    ]
+    course = prompt(courses)['course']
+    return course
 
 def teacherCLI(user, password):
     from CLI import teacher
@@ -306,6 +319,8 @@ def teacherCLI(user, password):
                     due = input("Enter due date (Example: 2020-08-11 16:58): ")
                     due = due +  ":33.383124"
             teacher.addAssignment(apath, course, due)
+
+######################################################################
 
 
 def getUser(ion_user, password, utype):

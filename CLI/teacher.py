@@ -595,9 +595,6 @@ class Teacher:
         os.chdir(cdir)
         return False
 
-    def comment(self):
-        print("heheheh")
-
 
 # data = getTeacher("eharris1")
 # t = Teacher(data)
