@@ -34,7 +34,7 @@ class ClassSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Class
         # fields = ['url','name', 'repo','path', "teacher",'assignments',"default_file", 'confirmed', 'unconfirmed','owner']
-        fields = ['name', 'repo','path','assignments',"default_file", 'confirmed', 'unconfirmed']
+        fields = ['name', 'repo','path','assignments',"teacher","default_file", 'confirmed', 'unconfirmed','owner']
 
 class StudentSerializer(serializers.HyperlinkedModelSerializer):
     # Class = ClassSerializer(many=True, read_only=True,allow_null=True)
@@ -44,7 +44,7 @@ class StudentSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['url','grade', 'ion_user','git','user','classes','added_to','completed', 'repo']
 
 class TeacherSerializer(serializers.ModelSerializer):
-    # Class = ClassSerializer(many=True, read_only=True,allow_null=True)
+    #classes = ClassSerializer(many=True, read_only=True,allow_null=True)
     #owner = serializers.ReadOnlyField(source='owner.username')
     class Meta:
         model = Teacher

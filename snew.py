@@ -84,16 +84,17 @@ class Students:
 
 # c = Class.objects.get(name='Math5')
 data = requests.get(url = "http://localhost:8000/api/classes/Math5", auth=('raffukhondaker','hackgroup1')).json()
-c = Class(
-    name="data['name']"
-)
-# print("POST:" + str(r.status_code))
+
+r = requests.post(url = "http://localhost:8000/api/classes/", data={'name':'English11', 'teacher':'eharris1', 'owner':2}, auth=('raffukhondaker','hackgroup1')) 
+
+print("POST:" + str(r.status_code))
 # print(r.json())
-c = {
-    'classes':"http://localhost:8000/api/classes/Math5/"
-}
+# print(c.name)
+# c = {
+#     'classes':c
+# }
 # print(c)
-r = requests.patch(url = "http://localhost:8000/api/teachers/2/", data=c, auth=('raffukhondaker','hackgroup1')) 
+r = requests.patch(url = "http://localhost:8000/api/teachers/eharris1/", data={'classes':['English11']}, auth=('raffukhondaker','hackgroup1')) 
 print(r.json())
 
 

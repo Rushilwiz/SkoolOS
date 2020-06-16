@@ -24,8 +24,6 @@ class StudentViewSet(viewsets.ModelViewSet):
     queryset = Student.objects.all()
     serializer_class = StudentSerializer
     permission_Class = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
-    g, created = Group.objects.get_or_create(name='teachers')
-
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)

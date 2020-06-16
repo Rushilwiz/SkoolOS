@@ -9,7 +9,18 @@ import time
 import pyperclip
 from distutils.dir_util import copy_tree
 from datetime import datetime 
+from django.conf import settings
+import django
 
+from Website.config.settings import DATABASES, INSTALLED_APPS
+INSTALLED_APPS.remove('users.apps.UsersConfig')
+INSTALLED_APPS.remove('api')
+INSTALLED_APPS.remove('skoolos.apps.SkoolosConfig')
+INSTALLED_APPS.append('Website.api')
+settings.configure(DATABASES=DATABASES, INSTALLED_APPS=INSTALLED_APPS)
+django.setup()
+
+from Website.api.models import *
 #git clone student directory ==> <student-id>/classes/assignments
 
 #get teacher info from api
@@ -32,6 +43,10 @@ def getTeacher(ion_user):
 def getDB(url):
     r = requests.get(url = url, auth=('raffukhondaker','hackgroup1')) 
     print("GET:" + str(r.status_code))
+    return(r.json())
+def patchDB(data, url):
+    r = requests.patch(url = url, data=data, auth=('raffukhondaker','hackgroup1'))
+    print("PATH:" + str(r.status_code))
     return(r.json())
 
 def postDB(data, url):
@@ -69,25 +84,10 @@ class Teacher:
         self.git=data['git']
         self.username=data['ion_user']
         self.url= "http://127.0.0.1:8000/api/teachers/" + self.username + "/"
-        self.email = data['email']
         #classes in id form (Example: 4,5)
         
-        cid=data['classes'].split(",")
-        try:
-            cid.remove('')
-        except:
-            pass
-        try:
-            cid.remove("")
-        except:
-            pass
-        classes=[]
-        for c in cid:
-            url = "http://127.0.0.1:8000/api/classes/" + str(c) + "/"
-            classes.append(getDB(url))
-        
-        self.classes = classes
-        self.sclass=str(data['classes'])
+        #array
+        self.classes=data['classes']
         if(os.path.isdir(self.username + "/Students")):
             print("Synced to " +  self.username)
         else:
@@ -168,6 +168,7 @@ class Teacher:
             #add to  instance
             #upate  self.classes
             self.classes.append(data)
+            patchDB(data, self.url)
             if(len(self.sclass)==0):
                 self.sclass = data['name']
             else:

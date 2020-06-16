@@ -20,12 +20,27 @@ class Student(models.Model):
     def __str__(self):
         return f"{self.user.username}'s Profile"
 
+class Assignment(models.Model):
+    owner = models.ForeignKey('auth.User', related_name='assignments', on_delete=models.CASCADE)
+
+    name=models.CharField(max_length=100, primary_key=True)
+    due_date=models.DateTimeField()
+    # files = models.ManyToManyField(DefFiles)
+    files=models.CharField(max_length=100, default="", blank=True)
+    path=models.CharField(max_length=100)
+    classes=models.CharField(max_length=100)
+    teacher=models.CharField(max_length=100)
+    def __str__(self):
+        return '%s' % (self.name)
+
 class Class(models.Model):
+    owner = models.ForeignKey('auth.User', related_name='classes', on_delete=models.CASCADE)
+    teacher = models.CharField(max_length=100)
     name = models.CharField(primary_key=True, max_length=100)
     description = models.CharField(default="Class Description", max_length=500)
     repo=models.URLField(default="", blank=True)
     path=models.CharField(max_length=100, default="")
-    assignments=models.TextField(default="", blank=True)
+    assignments=models.ManyToManyField(Assignment, blank=True)
     default_file=models.CharField(max_length=100, default="", blank=True)
     confirmed=models.ManyToManyField(Student, blank=True, related_name='confirmed')
     unconfirmed=models.ManyToManyField(Student, blank=True, related_name='unconfirmed')
@@ -59,22 +74,6 @@ class Teacher(models.Model):
 #     classes=models.CharField(max_length=100, default="", blank=True)
 #     added_to=models.CharField(max_length=100, default="", blank=True)
 #     completed=models.TextField(default="", blank=True)
-
-
-
-
-class Assignment(models.Model):
-    owner = models.ForeignKey('auth.User', related_name='assignments', on_delete=models.CASCADE)
-
-    name=models.CharField(max_length=100, primary_key=True)
-    due_date=models.DateTimeField()
-    # files = models.ManyToManyField(DefFiles)
-    files=models.CharField(max_length=100, default="", blank=True)
-    path=models.CharField(max_length=100)
-    classes=models.CharField(max_length=100)
-    teacher=models.CharField(max_length=100)
-    def __str__(self):
-        return '%s' % (self.name)
 
 
 class DefFiles(models.Model):
