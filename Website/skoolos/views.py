@@ -1,7 +1,8 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from django.views.generic import ListView
 
-from api.models import Student, Teacher
+from api.models import Student, Teacher, Class, Assignment
 
 # Create your views here.
 
@@ -24,3 +25,7 @@ def home (request):
 @login_required()
 def profile (request):
     pass
+
+def classDetail (request, id):
+    classObj = Class.objects.get(id=id)
+    return redirect('/')
