@@ -35,7 +35,7 @@ def main():
     print("╚═════╝░╚═╝░░╚═╝░╚════╝░░╚════╝░╚══════╝  ░╚════╝░╚═════╝░")
     print("")
 
-    if not os.path.exists(".profile"):
+    if not (os.path.exists(".sprofile") or os.path.exists(".tprofile")):
         try:
             URL = "http://127.0.0.1:8000/api/"
             r = requests.get(url = URL)
@@ -47,7 +47,10 @@ def main():
         #webbrowser.open("http://127.0.0.1:8000/login", new=2)
         authenticate()
     else:
-        f = open('.profile','r')
+        try:
+            f = open('.tprofile','r')
+        except:
+            f = open('.sprofile','r')
         data = json.loads(f.read())
         f.close()
         PWD = data['password']
@@ -64,7 +67,7 @@ def main():
     #     pass
 def studentCLI(user, password):
     from CLI import student
-    data = getUser(user, password)
+    data = getUser(user, password, 'student')
     student = student.Student(data)
     carray = student.sclass.split(",")
     if(len(carray) == 1 and carray[0] == ""):
@@ -80,24 +83,25 @@ def studentCLI(user, password):
         'message': 'Select class: ',
     },
     ]
-    course = prompt(courses)
+    course = prompt(courses)['course']
+    print(course)
     if course == "Exit SkoolOS":
         student.exitCLI()
     else:
         student.viewClass(course)
-        student.getAssignments(course,  datetime.datetime.now())
+        student.getAssignments(course,  100)
 
 def teacherCLI(user, password):
     from CLI import teacher
-    data = getUser(user, password)
+    data = getUser(user, password, 'teacher')
+    print(data)
     teacher = teacher.Teacher(data)
     # 1. make a class
     # 2. add studeents to an existing class
     # 3. Get progress logs on a student
     # 2. make an assignment for a class
     # 3. view student submissions for an assignment
-    carray = teacher.sclass.split(",")
-    carray.remove("")
+    carray = teacher.classes
     carray.append("Exit SkoolOS")
     carray.append("Make New Class")
     courses = [
@@ -108,7 +112,7 @@ def teacherCLI(user, password):
         'message': 'Select class: ',
     },
     ]
-    course = prompt(courses)
+    course = prompt(courses)['course']
     if course == "Exit SkoolOS":
         teacher.exitCLI()
     if course == "Make New Class":
@@ -119,7 +123,7 @@ def teacherCLI(user, password):
             'message': 'Class Name: ',
         },
         ]
-        cname = prompt(questions)
+        cname = prompt(questions)['cname']
         teacher.makeClass(cname)
         soption = ["1) Add individual student", "2) Add list of students through path", "3) Exit"]
         questions = [
@@ -130,7 +134,7 @@ def teacherCLI(user, password):
             'message': 'Add list of students (input path): ',
         },        
         ]
-        choice = prompt(questions).split(")")
+        choice = prompt(questions)['students'].split(")")[0]
         if("1" == choice):
             s = input("Student name: ")
             teacher.addStudent(s, cname)
@@ -140,8 +144,11 @@ def teacherCLI(user, password):
                 print(p + " does not exist.")
 
     else:
-        print("Class: " + cname)
-        options = ['1) Add student', "2) Add assignment", "3) View student information"]
+        print("Class: " + course)
+        unconf = getDB("http://localhost:8000/api/classes/" + course)['unconfirmed']
+        for s in unconf:
+            teacher.addStudent()
+        options = ['1) Request Student', "2) Add assignment", "3) View student information"]
         questions = [
         {
             'type': 'list',
@@ -150,23 +157,102 @@ def teacherCLI(user, password):
             'message': 'Select option: ',
         },
         ]
-        option = prompt(questions)
+        option = prompt(questions)['course'].split(")")[0]
+        if(option == '1'):
+            soption = ["1) Add individual student", "2) Add list of students through path", "3) Exit"]
+            questions = [
+            {
+                'type': 'list',
+                'choices':soption,
+                'name': 'students',
+                'message': 'Add list of students (input path): ',
+            },        
+            ]
+            schoice = prompt(questions)['students'].split(")")[0]
+            if(schoice == '1'):
+                questions = [
+                {
+                    'type': 'input',
+                    'name': 'student',
+                    'message': 'Student Name: ',
+                },
+                ]
+                s = prompt(questions)['student']
+                teacher.reqStudent(s, course)
+            if(schoice == '2'):
+                questions = [
+                {
+                    'type': 'input',
+                    'name': 'path',
+                    'message': 'Path: ',
+                },
+                ]
+                path = prompt(questions)['path']
+                while(not os.path.exists(path)):
+                    if(path == 'N'):
+                        sys.exit(0)
+                    print(path + " is not a valid path")
+                    path = input("Enter file path ('N' to exit): ")
+                f = open(path, 'r')
+                students = f.read().splitlines()
+                teacher.reqAddStudentList(students, course)
+            else:
+                sys.exit()
+        if(option == '2'):
+            nlist = os.listdir(teacher.username + "/" + course)
+            alist = getDB("http://localhost:8000/api/classes/" + course)['assignments']
+            print(nlist)
+            tlist = []
+            b = True
+            for n in nlist:
+                b = True
+                print(teacher.username + "/" + course + "/" + n)
+                for a  in alist:
+                    if(n in a or n == a):
+                        #print("Assignments: " + n)
+                        b = False
+                if(not os.path.isdir(teacher.username + "/" + course + "/" + n)):
+                    nlist.remove(n)
+                    b = False
+                if(b):
+                    tlist.append(n)
 
-def getUser(ion_user, password):
-        URL = "http://127.0.0.1:8000/api/students/" + ion_user + "/"
+
+            nlist = tlist
+            if(len(nlist) == 0):
+                print("No new assignments found")
+                sys.exit(0)
+            questions = [
+            {
+                'type': 'list',
+                'choices':nlist,
+                'name': 'assignment',
+                'message': 'Select new assignment: ',
+            },        
+            ]
+            ass = prompt(questions)['assignment']
+
+
+def getUser(ion_user, password, utype):
+        if('student' in utype):
+            URL = "http://127.0.0.1:8000/api/students/" + ion_user + "/"
+        else:
+            URL = "http://127.0.0.1:8000/api/teachers/" + ion_user + "/"
         r = requests.get(url = URL, auth=(ion_user,password)) 
+        print(r.json())
         if(r.status_code == 200):
             data = r.json() 
+            print(200)
             return data
         elif(r.status_code == 404):
-            return None
             print("Make new account!")
+            return None
         elif(r.status_code == 403):
-            return None
             print("Invalid username/password")
-        else:
             return None
+        else:
             print(r.status_code) 
+            return None
 def patchDB(data, url):
     r = requests.patch(url = url, data=data, auth=('raffukhondaker','hackgroup1'))
     print("PATH:" + str(r.status_code))
@@ -289,7 +375,7 @@ def authenticate():
             'is_student':is_student,
             'password':pwd,
         }
-        profileFile = open(".profile", "w")
+        profileFile = open(".sprofile", "w")
         profileFile.write(json.dumps(profile))
         profileFile.close()
 
@@ -298,14 +384,12 @@ def authenticate():
         r = requests.get(url = "http://localhost:8000/api/teachers/" + user + "/", auth=(user,pwd))
         profile = r.json()
         username = profile['ion_user']
-        grade = profile['grade']
         profile = {
             'username':username,
-            'grade':grade,
             'is_student':is_student,
             'password':pwd,
         }
-        profileFile = open(".profile", "w")
+        profileFile = open(".tprofile", "w")
         profileFile.write(json.dumps(profile))
         profileFile.close()
 
