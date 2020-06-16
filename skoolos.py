@@ -121,7 +121,7 @@ def  chooseClassStudent(student):
 def classOptionsStudent(student, course):
     student.viewClass(course)
     student.getAssignments(course,  100)
-    choices = ["Save","Back","Exit SkoolOS"]
+    choices = ["Save","Submit assignment","Back","Exit SkoolOS"]
     options = [
     {
         'type': 'list',
@@ -143,6 +143,33 @@ def classOptionsStudent(student, course):
         student.exitCLI()
         #exit cli
         return True
+    if(option == "Submit assignment"):
+        assignments = os.listdir(student.username)
+        tlist = []
+        b = True
+        for a in assignments:
+            oname = a + "_" + course            
+            a = student.username + "/" + a
+            if(os.path.isdir(a) and not "." in a and not oname in student.completed):
+                tlist.append(a)
+        assignments = tlist
+        assignments.append("Back")
+        print(assignments)
+            
+        options = [
+        {
+            'type': 'list',
+            'name': 'submit',
+            'choices':assignments,
+            'message': 'Select: ',
+        },
+        ]
+        ass = prompt(options)['submit']
+        if(ass == "Back"):
+            return False
+        else:
+            student.submit(course, ass)
+            return False
 
         
 #################################################################################################### TEACHER METHODS
@@ -166,6 +193,8 @@ def teacherCLI(user, password):
             EXIT = makeClassTeacher(teacher)
         #selected a class
         else:
+            #Pull confirmed students directory
+            teacher.getStudents(course)
             option = classOptionsTeacher(teacher, course)
             if(option == '1'):
                 EXIT = addStudentsTeacher(teacher, course)
@@ -362,13 +391,30 @@ def viewStudentsTeacher(teacher, course):
     for s in unconf:
         print(s)
     student = input("View student (Enter student's ion username): ")
-    while((not student in str(data['confirmed'])) or (not student in str(data['unconfirmed']))):
+    while((not student in str(data['confirmed'])) and (not student in str(data['unconfirmed']))):
         print("Student not affiliated with class")
         student = input("View student ('N' to exit): ")
         if student == 'N':
-            return True
-    print(getDB(teacher.username, teacher.password, "http://127.0.0.1:8000/api/students/" + student + "/"))
+            return False
+    sinfo = getDB(teacher.username, teacher.password, "http://127.0.0.1:8000/api/students/" + student + "/")
+    pprint.pprint(sinfo)
+    print("Confirmed: " + str(student in str(data['confirmed'])))
+    if(student in str(data['confirmed'])):
+        path = teacher.username + "/Students/" + course + "/" + student
+        print(student + "'s work: " + path)
+        fin = sinfo['completed'].split(",")
+        alist = []
+        for f in fin:
+            if(course in f):
+                late = teacher.afterSubmit(course, f, student)
+                if(late):
+                    s = f.split("_")[0] + " (LATE)"
+                else:
+                    s = f.split("_")[0]
+                alist.append(s)
+        print("Has submitted: " + str(alist))
 
+    #put log stuff
 
 
 ############################################################################################################################################

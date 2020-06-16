@@ -112,6 +112,7 @@ class Student:
         self.completed = data['completed']
         self.user = data['user']
         self.password = password
+        self.completed = data['completed']
         # classes in id form (Example: 4,5)
         # storing  actual classes
         cid = data['classes'].split(",")
@@ -385,12 +386,13 @@ class Student:
         command("git add .")
         command("git commit -m update")
         command('git checkout ' + course)
-        time.sleep(5)
         ass = os.listdir()
+        oname = ''
         inclass = False
         for a in ass:
-            if a == assignment:
+            if a in assignment:
                 inclass = True
+                oname = a + "_" + course
                 break
         if (inclass == False):
             print(assignment + " not an assignment of " + course)
@@ -404,6 +406,11 @@ class Student:
         command("git tag " + assignment + "-final")
         command("git push -u origin " + course + " --tags")
         command('git checkout master')
+        self.completed = oname + "," + self.completed
+        data = {
+            'completed': self.completed
+        }
+        patchDB(self.username, self.password, data, self.url)
         os.chdir(cdir)
 
 
