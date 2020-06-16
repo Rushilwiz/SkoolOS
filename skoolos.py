@@ -440,30 +440,70 @@ def getUser(ion_user, password, utype):
 
 
 def patchDB(USER, PWD, url, data):
+    """
+    Sends a PATCH request to url
+    :param USER: username
+    :param PWD: password
+    :param url: URL for request
+    :param data: data to request
+    :return: json request response
+    """
     r = requests.patch(url=url, data=data, auth=(USER, PWD))
     print("PATH:" + str(r.status_code))
     return r.json()
 
 
 def getDB(USER, PWD, url):
+    """
+    Sends a GET request to url
+    :param USER: username
+    :param PWD: password
+    :param url: URL for request
+    :param data: data to request
+    :return: json request response
+    """
     r = requests.get(url=url, auth=(USER, PWD))
     print("GET:" + str(r.status_code))
     return r.json()
 
 
 def postDB(USER, PWD, url, data):
+    """
+    Sends a POST request to url
+    :param USER: username
+    :param PWD: password
+    :param url: URL for request
+    :param data: data to request
+    :return: json request response
+    """
     r = requests.post(url=url, data=data, auth=(USER, PWD))
     print("POST:" + str(r.status_code))
     return r.json()
 
 
 def putDB(USER, PWD, url, data):
+    """
+    Sends a PUT request to url
+    :param USER: username
+    :param PWD: password
+    :param url: URL for request
+    :param data: data to request
+    :return: json request response
+    """
     r = requests.put(url=url, data=data, auth=(USER, PWD))
     print("PUT:" + str(r.status_code))
     return r.json()
 
 
 def delDB(USER, PWD, url):
+    """
+    Sends a DELETE request to url
+    :param USER: username
+    :param PWD: password
+    :param url: URL for request
+    :param data: data to request
+    :return: json request response
+    """
     r = requests.delete(url=url, auth=(USER, PWD))
     print("DELETE:" + str(r.status_code))
     return None
