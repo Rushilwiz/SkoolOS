@@ -14,52 +14,89 @@ import datetime
 
 # get teacher info from api
 def getStudent(ion_user):
+    """
+    Get's student information from the api
+    :param ion_user: a student
+    :return: student information or error
+    """
     URL = "http://127.0.0.1:8000/api/students/" + ion_user + "/"
     r = requests.get(url=URL, auth=('raffukhondaker', 'hackgroup1'))
-    if (r.status_code == 200):
+    if r.status_code == 200:
         data = r.json()
         return data
-    elif (r.status_code == 404):
+    elif r.status_code == 404:
         return None
         print("Make new account!")
-    elif (r.status_code == 403):
+    elif r.status_code == 403:
         return None
         print("Invalid username/password")
     else:
         return None
         print(r.status_code)
 
-#makes a GET request to given url, returns dict
+
+# makes a GET request to given url, returns dict
 def getDB(url):
+    """
+    Sends a GET request to the URL
+    :param url: URL for request
+    """
     r = requests.get(url=url, auth=('raffukhondaker', 'hackgroup1'))
     print("GET:" + str(r.status_code))
-    return (r.json())
+    return r.json()
 
-#makes a PATCH (updates instance) request to given url, returns dict
+
+# makes a PATCH (updates instance) request to given url, returns dict
 def patchDB(data, url):
-    r = requests.patch(url = url, data=data, auth=('raffukhondaker','hackgroup1'))
+    """
+    Sends a PATCH request to the URL
+    :param data:
+    :param url: URL for request
+    """
+    r = requests.patch(url=url, data=data, auth=('raffukhondaker', 'hackgroup1'))
     print("PATCH:" + str(r.status_code))
-    return(r.json())
+    return r.json()
 
-#makes a POST (makes new instance) request to given url, returns dict
+
+# makes a POST (makes new instance) request to given url, returns dict
 def postDB(data, url):
+    """
+    Sends a POST request to the URL
+    :param data:
+    :param url: URL for request
+    """
     r = requests.post(url=url, data=data, auth=('raffukhondaker', 'hackgroup1'))
     print("POST:" + str(r.status_code))
-    return (r.json())
+    return r.json()
 
-#makes a PUT (overwrites instance) request to given url, returns dict
+
+# makes a PUT (overwrites instance) request to given url, returns dict
 def putDB(data, url):
+    """
+    Sends a PUT request to the URL
+    :param data:
+    :param url: URL for request
+    """
     r = requests.put(url=url, data=data, auth=('raffukhondaker', 'hackgroup1'))
     print("PUT:" + str(r.status_code))
-    return (r.json())
+    return r.json()
 
-#makes a DELETE (delete instance) request to given url, returns dict
+
+# makes a DELETE (delete instance) request to given url, returns dict
 def delDB(url):
+    """
+    Sends a DELETE request to the URL
+    :param url: URL for request
+    """
     r = requests.delete(url=url, auth=('raffukhondaker', 'hackgroup1'))
     print("DELETE:" + str(r.status_code))
 
 
 def command(command):
+    """
+    Runs a shell command
+    :param command: shell command
+    """
     ar = []
     command = command.split(" ")
     for c in command:
@@ -78,6 +115,10 @@ class Student:
     def __init__(self, data):
         # teacher info already  stored in API
         # intitialze fields after GET request
+        """
+        Initializes a Student with data from the api
+        :param data: api data
+        """
         self.git = data['git']
         self.username = data['ion_user']
         self.url = "http://127.0.0.1:8000/api/students/" + self.username + "/"
@@ -122,8 +163,8 @@ class Student:
         self.snew = str(data['added_to'])
         self.repo = data['repo']
 
-        if (os.path.isdir(self.username) == False):
-            if (self.repo == ""):
+        if os.path.isdir(self.username) == False:
+            if self.repo == "":
                 user = self.git
                 pwd = input("Enter Github password: ")
                 # curl -i -u USER:PASSWORD -d '{"name":"REPO"}' https://api.github.com/user/repos
@@ -147,11 +188,18 @@ class Student:
         print("Synced to " + self.username)
 
     def getClasses(self):
+        """
+        Gets a lists of classes the student is enrolled in
+        """
         classes = self.classes
         for c in classes:
             print(c['name'])
 
-    def getAssignments(self, course, span):
+    def getAssignments(self, span):
+        """
+        Gets a list of assignments the student has
+        :param span: time span to check
+        """
         span = datetime.timedelta(span, 0)
         classes = self.classes
         for c in classes:
@@ -166,7 +214,7 @@ class Student:
                     diff = now - due
                     zero = datetime.timedelta(0, 0)
                     # check due ddate is in span range is now past date (- timdelta)
-                    if (diff < span and diff > zero):
+                    if diff < span and diff > zero:
                         print(a + " due in:" + str(now - due))
 
                 except Exception as e:
@@ -175,6 +223,9 @@ class Student:
 
     # update API and Github, all  assignments / classes
     def update(self):
+        """
+        Updates the api, github, and all assignments and classes with new information
+        """
         cdir = os.getcwd()
         os.chdir(self.username)
         command("git checkout master")
@@ -197,7 +248,11 @@ class Student:
 
     # updates 1 class, does not switch to master
     def updateClass(self, course):
-        if ((course in self.sclass) == False):
+        """
+        Updates a class with new information
+        :param course: class name in the format <course-name>_<ion_user>
+        """
+        if (course in self.sclass) == False:
             print("Class not found")
             return
         cdir = os.getcwd()
@@ -212,16 +267,20 @@ class Student:
 
     # add  classes from 'new' field
     def addClass(self, cid):
-
+        """
+        Add student to a class
+        :param cid: the id number of the class
+        :return: data from the class, None if an error occures
+        """
         data = getDB('http://127.0.0.1:8000/api/classes/' + str(cid))
-        if ((cid in self.snew) == False or (self.username in data['confirmed'])):
+        if not (cid in self.snew) or (self.username in data['confirmed']):
             print("Already enrolled in this class.")
             return None
-        if ((cid in self.sclass) or (self.username in data['unconfirmed']) == False):
+        if (cid in self.sclass) or not (self.username in data['unconfirmed']):
             print("Not added by teacher yet.")
             return None
 
-        # add class teacher as cocllaborator to student repo
+        # add class teacher as collaborator to student repo
         print(os.getcwd())
         pwd = input("Enter Github password: ")
         tgit = getDB("http://127.0.0.1:8000/api/teachers/" + data['teacher'] + "/")['git']
@@ -241,7 +300,7 @@ class Student:
         #     os.chdir(self.username)
 
         # push to git, start at master
-        #os.chdir(self.username)
+        # os.chdir(self.username)
         command("git checkout master")
         command("git branch " + data['name'])
         command("git commit -m initial")
@@ -263,7 +322,7 @@ class Student:
         user = self.git
 
         self.classes.append(data)
-        if (len(self.sclass) == 0):
+        if len(self.sclass) == 0:
             self.sclass = data['name']
         else:
             self.sclass = self.sclass + "," + str(data['name'])
@@ -272,7 +331,7 @@ class Student:
         snew = ""
         new = []
         for i in range(len(self.new)):
-            if (self.new[i]['name'] == data['name']):
+            if self.new[i]['name'] == data['name']:
                 del self.new[i]
                 # recreate sclass field, using ids
                 for c in self.new:
@@ -292,46 +351,12 @@ class Student:
         print(patchDB(data, self.url))
         return data
 
-    def submit(self, path):
-        # 2022rkhondak/English11_eharris1/Essay1
-        # check if valid assignment
-        parts = path.split("/")
-        if (len(parts) != 3):
-            print("Assignment path too short")
-            return
-        isclass = False
-        for c in self.classes:
-            if (c['name'] == parts[1]):
-                isclass == True
-                break
-        if (parts[0] != self.username and isclass and os.path.isdir(path) == False):
-            print("Not valid assignment")
-            return
-        if ((parts[1] + "/" + parts[2]) in self.completed):
-            print(parts[2] + " already submited. ")
-            # return
-        resp = input("Are you sure you want to submit? You cannot do this again.(y/N) ")
-        if (resp == 'y'):
-            os.chdir(self.username + "/" + parts[1])
-            command("git add .")
-            command("git commit -m submit")
-            command("git tag " + parts[1] + "-final")
-            command("git push -u origin " + self.username + " --tags")
-            self.completed = self.completed + "," + parts[1] + "/" + parts[2]
-            data = {
-                'user': self.user,
-                'git': self.git,
-                'ion_user': self.username,
-                'student_id': self.student_id,
-                'added_to': self.snew,
-                'url': self.url,
-                'classes': self.sclass,
-                'grade': self.grade,
-                'completed': self.completed
-            }
-            # print(putDB(data, "http://127.0.0.1:8000/api/students/" + self.username + "/"))
-
     def viewClass(self, courses):
+        """
+        Sets the current git branch to view each class in courses
+        :param courses: a list of classes
+        :return:
+        """
         self.update()
         cdir = os.getcwd()
         os.chdir(self.username)
@@ -346,11 +371,20 @@ class Student:
         return
 
     def exitCLI(self):
+        """
+        Exits the cli
+        """
         print(os.getcwd())
         self.update()
         command("git checkout master")
 
     def submit(self, course, assignment):
+        """
+        Submits an assignment
+        :param course: the class the assignment belongs to
+        :param assignment: the assignment
+        :return:
+        """
         cdir = os.getcwd()
         os.chdir(self.username)
         print(os.getcwd())
@@ -364,7 +398,7 @@ class Student:
             if a == assignment:
                 inclass = True
                 break
-        if (inclass == False):
+        if inclass == False:
             print(assignment + " not an assignment of " + course)
             command('git checkout master')
             os.chdir(cdir)

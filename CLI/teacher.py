@@ -87,7 +87,7 @@ def putDB(data, url):
     Sends a PUT request to the URL
     :param data:
     :param url: URL for request
-   """
+    """
     r = requests.put(url=url, data=data, auth=('raffukhondaker', 'hackgroup1'))
     print("PUT:" + str(r.status_code))
     return r.json()
