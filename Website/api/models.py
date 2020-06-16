@@ -21,7 +21,7 @@ class Student(models.Model):
         return f"{self.user.username}'s Profile"
 
 class Assignment(models.Model):
-    owner = models.ForeignKey('auth.User', related_name='assignments', on_delete=models.CASCADE)
+    owner = models.ForeignKey('auth.User', related_name='aowner', on_delete=models.CASCADE)
 
     name=models.CharField(max_length=100, primary_key=True)
     due_date=models.DateTimeField()
@@ -34,7 +34,7 @@ class Assignment(models.Model):
         return '%s' % (self.name)
 
 class Class(models.Model):
-    owner = models.ForeignKey('auth.User', related_name='classes', on_delete=models.CASCADE)
+    owner = models.ForeignKey('auth.User', related_name='cowner', on_delete=models.CASCADE)
     teacher = models.CharField(max_length=100)
     name = models.CharField(primary_key=True, max_length=100)
     id = models.CharField(max_length=8, blank=True, null=True)
@@ -53,7 +53,7 @@ class Class(models.Model):
         if not id:
             id = secrets.token_urlsafe()[:8].lower()
         while Class.objects.filter(id=id).exclude(pk=self.pk).exists():
-            id = sercrets.token_urlsafe()[:8].lower()
+            id = secrets.token_urlsafe()[:8].lower()
         self.id = id
         return super(Class, self).save(*args, **kwargs)
 
