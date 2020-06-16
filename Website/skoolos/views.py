@@ -143,8 +143,15 @@ def createClassHelper(request):
         if classForm.is_valid():
             cleaned_data = classForm.clean()
             print(cleaned_data)
-            classForm.save(username=teacher.user.username)
+            newClass = classForm.save(commit=False)
+            newClass.owner = request.user
+            newClass.teacher = request.user.username
+            newClass.name = cleaned_data['subject'].replace(' ', '')[:8].lower() + str(cleaned_data['period']) + "_" + teacher.user.username.lower()
+            newClass.save()
+            classObj = classForm.save_m2m()
             messages.success(request, cleaned_data['subject'].capitalize() + " has been created!")
+            print (newClass)
+            teacher.classes.add(newClass)
             return redirect('home')
     else:
         classForm = ClassCreationForm()
@@ -157,7 +164,3 @@ def createClassHelper(request):
     }
 
     return render(request, "skoolos/createClass.html", context)
-
-@login_required()
-def createAssignment (request):
-    pass

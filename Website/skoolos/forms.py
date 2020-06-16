@@ -53,20 +53,6 @@ class ClassCreationForm (forms.ModelForm):
             # a list of primary key for the selected data.
             initial['unconfirmed'] = [t.pk for t in kwargs['instance'].unconfirmed.all()]
 
-    # Overriding save allows us to process the value of 'unconfirmed' field
-    def save(self, username=""):
-        cleaned_data = self.cleaned_data
-        print(self)
-
-        # Get the unsave Class instance
-        instance = forms.ModelForm.save(self)
-        instance.unconfirmed.clear()
-        instance.unconfirmed.add(*cleaned_data['unconfirmed'])
-        instance.name = cleaned_data['subject'] + str(cleaned_data['period']) + "_" + username
-        print("Class name: " + instance.name)
-
-        return instance
-
     class Meta:
         model = Class
         fields = ['subject', 'period', 'description', 'unconfirmed']
