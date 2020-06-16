@@ -87,7 +87,7 @@ data = requests.get(url = "http://localhost:8000/api/classes/Math5", auth=('raff
 
 r = requests.post(url = "http://localhost:8000/api/classes/", data={'name':'English11', 'teacher':'eharris1', 'owner':2}, auth=('raffukhondaker','hackgroup1')) 
 
-print("POST:" + str(r.status_code))
+print("POST:" + str(r.json()))
 # print(r.json())
 # print(c.name)
 # c = {
