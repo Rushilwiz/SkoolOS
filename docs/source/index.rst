@@ -5,16 +5,24 @@
 
 Welcome to SkoolOS's documentation!
 ===================================
+*this project was made possible by raffu's macbook pro*
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
+Support
+-------
+If you need support, please call somebody that's not healthy
 
+Index
+=====
 
-Indices and tables
-==================
+.. toctree::
+   :maxdepth: 2
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+   license
+   install
+   webapp
+   background_service
+   cli

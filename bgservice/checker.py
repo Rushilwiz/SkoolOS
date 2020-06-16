@@ -75,19 +75,22 @@ def shell_check():
     zsh_history = [
         line.strip() for line in open(os.path.expanduser("~/.histfile"), 'r')
     ]
-    report = "Suspicios commands found:\n"
+    suspicious_commands = []
     for i in bash_history + zsh_history:
         if "git" in i:
-            report += i + "\n"
-    if report != "Suspicios commands found:\n":
-        return report
+            suspicious_commands.append(i)
+    if suspicious_commands != []:
+        return str(
+            len(suspicious_commands)
+        ) + " suspicious commands found:\n" + "\n".join(suspicious_commands)
     return "Nothing suspicious found in bash or zsh history."
 
 
 def verify_file(file_):
     for ext in file_whitelist:
-        if file_[len(file_) - len(ext):] == ext:
-            return True
+        if len(file_) > len(ext):
+            if file_[len(file_) - len(ext):] == ext:
+                return True
     return False
 
 
