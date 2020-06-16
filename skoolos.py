@@ -230,7 +230,9 @@ def teacherCLI(user, password):
             ]
             ass = prompt(questions)['assignment']
             apath = teacher.username + "/" + course + "/" + ass
-            
+            due = input("Enter due date (Example: 2020-08-11 16:58): ")
+            due = due +  ":00.000000"
+            due = due.strip()
             teacher.addAssignment(apath, course, due)
 
 
@@ -315,9 +317,9 @@ def authenticate():
     #Macos: chromdriver-mac
     #Windows: chromdriver.exe
     if('CLI' in os.getcwd()):
-        path = os.path.join(os.getcwd(), '../','chromedriver/chromedriver-mac')
+        path = os.path.join(os.getcwd(), '../','chromedriver-mac')
     else:
-        path = os.path.join(os.getcwd(), 'chromedriver/chromedriver-mac')
+        path = os.path.join(os.getcwd(), 'chromedriver-mac')
 
     browser = webdriver.Chrome(path)
 
