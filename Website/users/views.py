@@ -8,6 +8,7 @@ from django.contrib import messages
 
 from .models import Token
 from api.models import Student, Teacher
+from django.contrib.auth.models import Group
 
 from .forms import UserCreationForm
 
@@ -97,15 +98,18 @@ def create_account (request):
                                             last_name=last_name,
                                             password=password)
             user.save()
-            token.delete()
+            g, created = Group.objects.get_or_create(name='teachers')
 
             if isStudent:
-                profile = Student(user=user, git=git, grade=grade)
+                profile = Student(user=user, git=git, grade=grade, ion_user=username)
             else:
-                profile = Teacher(user=user, git=git)
+                profile = Teacher(user=user, git=git, ion_user=username)
+                group = Group.objects.get(name='teachers')
+                user.groups.add(group)
+
 
             profile.save()
-
+            token.delete()
             print (user)
             messages.success(request, "Your SkoolOS account has successfully been created")
             return redirect(f'/login/?username={username}')
@@ -145,4 +149,4 @@ def create_account (request):
 def logout(request):
     auth_logout(request)
     messages.success(request, "You've been logged out!")
-    return redirect(request, "/login")
+    return redirect("/login")

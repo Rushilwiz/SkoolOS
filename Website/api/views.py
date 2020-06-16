@@ -1,5 +1,5 @@
-from .models import Student, Teacher, Classes, Assignment, DefFiles
-from .serializers import StudentSerializer, TeacherSerializer, ClassesSerializer, AssignmentSerializer, UserSerializer
+from .models import Student, Teacher, Class, Assignment, DefFiles
+from .serializers import StudentSerializer, TeacherSerializer, ClassSerializer, AssignmentSerializer, UserSerializer
 from rest_framework import generics, viewsets, permissions, response, status
 from django.http import Http404
 from rest_framework.views import APIView
@@ -8,13 +8,13 @@ from .permissions import isTeacher, IsOwnerOrReadOnly
 from django.shortcuts import render, redirect
 from rest_framework.parsers import JSONParser 
 from rest_framework.response import Response
-
+from django.contrib.auth.models import Group
 
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_Class = [permissions.IsAuthenticated]
 
 
 class StudentViewSet(viewsets.ModelViewSet):
@@ -23,10 +23,10 @@ class StudentViewSet(viewsets.ModelViewSet):
     """
     queryset = Student.objects.all()
     serializer_class = StudentSerializer
-    permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
+    permission_Class = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
 
     def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
+        serializer.save(user=self.request.user)
 
 class TeacherViewSet(viewsets.ModelViewSet):
     """
@@ -34,25 +34,25 @@ class TeacherViewSet(viewsets.ModelViewSet):
     """
     queryset = Teacher.objects.all()
     serializer_class = TeacherSerializer
-    permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
+    permission_Class = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
 
     def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
+        serializer.save(user=self.request.user)
 
-class ClassesViewSet(viewsets.ModelViewSet):
+class ClassViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
     """
-    queryset = Classes.objects.all()
-    serializer_class = ClassesSerializer
-    permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
+    queryset = Class.objects.all()
+    serializer_class = ClassSerializer
+    permission_Class = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
 
-    def perform_create(self, serializer):
-        if(self.request.user.groups.filter(name__in=['teachers']).exists() or self.request.user.is_superuser):
-            serializer.save(owner=self.request.user)
-        else:
-            print("UNAUTHORIZED POST")
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    # def perform_create(self, serializer):
+    #     if(self.request.user.groups.filter(name__in=['teachers']).exists() or self.request.user.is_superuser):
+    #         serializer.save(owner=self.request.user)
+    #     else:
+    #         print("UNAUTHORIZED POST")
+    #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class AssignmentViewSet(viewsets.ModelViewSet):
@@ -61,7 +61,7 @@ class AssignmentViewSet(viewsets.ModelViewSet):
     """
     queryset = Assignment.objects.all()
     serializer_class = AssignmentSerializer
-    permission_classes = [permissions.IsAuthenticated, isTeacher, IsOwnerOrReadOnly]
+    permission_Class = [permissions.IsAuthenticated, isTeacher, IsOwnerOrReadOnly]
 
     def perform_create(self, serializer):
         if(self.request.user.groups.filter(name__in=['teachers']).exists() or self.request.user.is_superuser):
@@ -76,4 +76,4 @@ class AssignmentViewSet(viewsets.ModelViewSet):
 #     """
 #     queryset = DefFiles.objects.all()
 #     serializer_class = DefFilesSerializer
-#     permissions_classes = [permissions.IsAuthenticatedOrReadOnly]
+#     permissions_Class = [permissions.IsAuthenticatedOrReadOnly]

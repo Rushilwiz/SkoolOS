@@ -43,6 +43,11 @@ def putDB(data, url):
     print("PUT:" + str(r.status_code))
     return(r.json())
 
+def patchDB(data, url):
+    r = requests.patch(url = url, data=data, auth=('raffukhondaker','hackgroup1'))
+    print("PATH:" + str(r.status_code))
+    return(r.json())
+
 def delDB(url):
     r = requests.delete(url = url, auth=('raffukhondaker','hackgroup1'))
     print("DELETE:" + str(r.status_code))
@@ -66,15 +71,12 @@ class Student:
     def __init__(self, data):
         # teacher info already  stored in API
         # intitialze fields after GET request
-        self.first_name=data['first_name']
-        self.last_name=data['last_name']
         self.git=data['git']
         self.username=data['ion_user']
         self.url= "http://127.0.0.1:8000/api/students/" + self.username + "/"
-        self.email = data['email']
         self.grade = data['grade']
-        self.student_id=data['student_id']
         self.completed  = data['completed']
+        self.user =  data['user']
         #classes in id form (Example: 4,5)
         #storing  actual classes
         cid=data['classes'].split(",")
@@ -132,20 +134,9 @@ class Student:
             os.chdir(cdir)
             self.repo = 'https://github.com/' + self.git + '/' + self.username + '.git'
             data={
-                'first_name':self.first_name,
-                'last_name':self.last_name,
-                'git':self.git,
-                'ion_user':self.username,
-                'student_id':self.student_id,
-                'added_to':self.snew,
-                'url':self.url,
-                'classes':self.sclass,
-                'email':self.email,
-                'grade':self.grade,
-                'completed':self.completed,
                 'repo':self.repo
             }
-            print(putDB(data, self.url))
+            print(patchDB(data, self.url))
         print("Synced to " +  self.username)
 
     def getClasses(self):
@@ -169,7 +160,7 @@ class Student:
                     zero = datetime.timedelta(0,0)
                     #check due ddate is in span range is now past date (- timdelta)
                     if(diff < span and diff > zero):
-                        print((now-due))
+                        print(a + " due in:" + str(now-due))
 
                 except Exception as e:
                     print(e)
@@ -284,20 +275,11 @@ class Student:
         
         #update teacher instance in db, classes field
         data={
-            'first_name':self.first_name,
-            'last_name':self.last_name,
-            'git':self.git,
-            'ion_user':self.username,
-            'student_id':self.student_id,
+            'user':self.user,
             'added_to':self.snew,
-            'url':self.url,
-            'classes':self.sclass,
-            'email':self.email,
-            'grade':self.grade,
-            'completed':self.completed
         }
         print(self.url)
-        print(putDB(data, self.url))
+        print(patchDB(data, self.url))
         return data
     
     def submit(self, path):
@@ -327,15 +309,13 @@ class Student:
             command("git push -u origin " + self.username + " --tags")
             self.completed = self.completed + "," + parts[1] + "/" + parts[2]
             data={
-                'first_name':self.first_name,
-                'last_name':self.last_name,
+                'user':self.user,
                 'git':self.git,
                 'ion_user':self.username,
                 'student_id':self.student_id,
                 'added_to':self.snew,
                 'url':self.url,
                 'classes':self.sclass,
-                'email':self.email,
                 'grade':self.grade,
                 'completed':self.completed
             }

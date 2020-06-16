@@ -1,3 +1,7 @@
+from django.contrib.auth.models import Group
+
+g, created = Group.objects.get_or_create(name='teachers')
+
 # from datetime import datetime
 #
 # f1 = DefFiles(
@@ -30,7 +34,7 @@
 #
 # ####################################
 #
-# from api.models import Assignment, Student, Classes, Teacher, DefFiles
+# from api.models import Assignment, Student, Class, Teacher, DefFiles
 # from datetime import datetime
 #
 # f1 = DefFiles(
@@ -76,8 +80,8 @@
 # A3.files.add(f4)
 # A3.save()
 #
-# #classes
-# math = Classes(
+# #Class
+# math = Class(
 #     name='Math5',
 #
 # )
@@ -86,7 +90,7 @@
 # math.assignments.add(A2)
 # math.save()
 #
-# english = Classes(
+# english = Class(
 #     name='English',
 # )
 # english.save()
@@ -104,8 +108,8 @@
 #     repo="https://github.com/therealraffi/2022rkhondak.git",
 # )
 # raffu.save()
-# raffu.classes.add(math)
-# raffu.classes.add(english)
+# raffu.Class.add(math)
+# raffu.Class.add(english)
 # raffu.save()
 #
 # #teachers
@@ -115,7 +119,7 @@
 #     ion_user="eharris1"
 # )
 # ng.save()
-# ng.classes.add(math)
+# ng.Class.add(math)
 # ng.save()
 #
 # chao = Teacher(
@@ -124,5 +128,5 @@
 #     ion_user="AKBailey"
 # )
 # chao.save()
-# chao.classes.add(english)
+# chao.Class.add(english)
 # chao.save()
