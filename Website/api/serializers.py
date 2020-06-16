@@ -25,18 +25,18 @@ class AssignmentSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Assignment
         # fields = ['url','name', 'due_date', 'path' , "Class","teacher",'owner']
-        fields = ['name', 'due_date', 'path' , "Class","teacher",'owner']
+        fields = ['name', 'due_date', 'path' ,"teacher",'owner']
 
-class ClassSerializer(serializers.HyperlinkedModelSerializer):
+class ClassSerializer(serializers.ModelSerializer):
     # assignments = AssignmentSerializer(many=True, read_only=True,allow_null=True)
     # default_file=DefFilesSerializer(many=True, read_only=True,allow_null=True)
     #owner = serializers.ReadOnlyField(source='owner.username')
     class Meta:
         model = Class
         # fields = ['url','name', 'repo','path', "teacher",'assignments',"default_file", 'confirmed', 'unconfirmed','owner']
-        fields = ['name', 'repo','path','assignments',"default_file", 'confirmed', 'unconfirmed']
+        fields = ['name', 'repo','path','assignments',"teacher","default_file", 'confirmed', 'unconfirmed','owner']
 
-class StudentSerializer(serializers.HyperlinkedModelSerializer):
+class StudentSerializer(serializers.ModelSerializer):
     # Class = ClassSerializer(many=True, read_only=True,allow_null=True)
     class Meta:
         model = Student
@@ -44,7 +44,7 @@ class StudentSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['url','grade', 'ion_user','git','user','classes','added_to','completed', 'repo']
 
 class TeacherSerializer(serializers.ModelSerializer):
-    # Class = ClassSerializer(many=True, read_only=True,allow_null=True)
+    #classes = ClassSerializer(many=True, read_only=True,allow_null=True)
     #owner = serializers.ReadOnlyField(source='owner.username')
     class Meta:
         model = Teacher

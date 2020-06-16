@@ -40,7 +40,7 @@ def main():
             URL = "http://127.0.0.1:8000/api/"
             r = requests.get(url = URL)
         except:
-            print("Stop any processes running on http://127.0.0.1:8000/ before continuing")
+            print("Run Django server on http://127.0.0.1:8000/ before continuing")
             sys.exit(0)
 
         input("Welcome to SkoolOS. Press any key to create an account")
