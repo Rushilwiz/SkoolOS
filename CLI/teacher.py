@@ -332,24 +332,23 @@ class Teacher:
         command('git push -u origin ' + cname)
         os.chdir(cdir)
 
-        if(course['confirmed']==""):
+        if(course['confirmed']==[]):
             course['confirmed']=student['ion_user']
         else:
-            course['confirmed']=course['confirmed']+ "," + student['ion_user']
+            course['confirmed'].append(student['ion_user'])
 
         #only 1 pereson on confirmeed
-        if(("," in course['unconfirmed']) == False):
-            course['unconfirmed']=""
+        if(len(course['unconfirmed']) == 1):
+            course['unconfirmed']=[]
         #mutiple
         else:
-            course['unconfirmed']= course['unconfirmed'].replace("," + student['ion_user'], "")
-            course['unconfirmed']= course['unconfirmed'].replace(student['ion_user']+",", "")
+            course['unconfirmed'].remove(student['ion_user'])
 
         cinfo = {
             "confirmed": course["confirmed"],
             "unconfirmed": course['unconfirmed']
         }
-        print(patchDB(cinfo, "http://localhost:8000/api/classes/" + course['name'] + "/"))
+        print(putDB(course, "http://localhost:8000/api/classes/" + course['name'] + "/"))
         return True
 
     #goes through list of studennts, tries to add, then request, return unconfirmed students
@@ -436,15 +435,12 @@ class Teacher:
                 'due_date':due
             }
             postDB(ass, 'http://127.0.0.1:8000/api/assignments/')
-            if(course['assignments'] == ""):
-                course['assignments'] = ass
-            else:
-                course['assignments'] = course['assignments'].append(ass)
+            course['assignments'].append(aname)
                 
             cinfo = {
                 "assignments": course['assignments'],
             }
-            patchDB(cinfo, "http://127.0.0.1:8000/api/classes/" + course['name'] + "/")
+            print(patchDB(cinfo, "http://127.0.0.1:8000/api/classes/" + course['name'] + "/"))
             return True
         else:
             print("Assignment already addedd")
@@ -606,7 +602,7 @@ t = Teacher(data)
 #ar = ['2022rkhondak','2022inafi','2023rumareti']
 #extra = t.reqAddStudentList(ar, "APLit_eharris1")
 #print(extra)
-t.reqStudent('2022rkhondak', 'APLit_eharris1')
+#t.addStudent('2022rkhondak', 'APLit_eharris1')
 # t.getChanges('2022rkhondak','APLit_eharris1', 10)
 
 '''
