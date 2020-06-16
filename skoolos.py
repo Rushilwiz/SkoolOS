@@ -89,7 +89,7 @@ def main():
 def studentCLI(user, password):
     from CLI import student
     data = getUser(user, password, 'student')
-    student = student.Student(data)
+    student = student.Student(data, password)
     student.update()
     EXIT = False
     while(not EXIT):
@@ -150,7 +150,7 @@ def teacherCLI(user, password):
     from CLI import teacher
     data = getUser(user, password, 'teacher')
     print(data)
-    teacher = teacher.Teacher(data)
+    teacher = teacher.Teacher(data, password)
     EXIT = False
     # 1. make a class
     # 2. add studeents to an existing class
@@ -230,9 +230,9 @@ def makeClassTeacher(teacher):
         teacher.reqAddStudentList(students, cname)
         return False
 
-def classOptionsTeacher(teacher, course, password):
+def classOptionsTeacher(teacher, course):
     print("Class: " + course)
-    unconf = getDB("http://localhost:8000/api/classes/" + course)['unconfirmed']
+    unconf = getDB(teacher.username, teacher.password, "http://localhost:8000/api/classes/" + course)['unconfirmed']
     for s in unconf:
         teacher.addStudent(s, course)
     options = ['1) Request Student', "2) Add assignment", "3) View student information", "4) Exit"]
@@ -292,7 +292,7 @@ def addStudentsTeacher(teacher, course):
 
 def addAssignmentTeacher(teacher, course):
     nlist = os.listdir(teacher.username + "/" + course)
-    alist = getDB(teacher.username, "http://localhost:8000/api/classes/" + course)['assignments']
+    alist = getDB(teacher.username, teacher.password, "http://localhost:8000/api/classes/" + course)['assignments']
     print(nlist)
     tlist = []
     b = True
@@ -341,7 +341,7 @@ def addAssignmentTeacher(teacher, course):
     return False
 
 def viewStudentsTeacher(teacher, course):
-    data = getDB("http://127.0.0.1:8000/api/classes/" + course)
+    data = getDB(teacher.username, teacher.password, "http://127.0.0.1:8000/api/classes/" + course)
     students = data["confirmed"]
     unconf = data['unconfirmed']
     print("Studented in class: ")
@@ -356,7 +356,7 @@ def viewStudentsTeacher(teacher, course):
         student = input("View student ('N' to exit): ")
         if student == 'N':
             return True
-    print(getDB("http://127.0.0.1:8000/api/students/" + student + "/"))
+    print(getDB(teacher.username, teacher.password, "http://127.0.0.1:8000/api/students/" + student + "/"))
 
 
 
@@ -365,9 +365,9 @@ def viewStudentsTeacher(teacher, course):
 
 def getUser(ion_user, password, utype):
         if('student' in utype):
-            URL = "http://127.0.0.1:8000/api/students/" + USER + "/"
+            URL = "http://127.0.0.1:8000/api/students/" + ion_user + "/"
         else:
-            URL = "http://127.0.0.1:8000/api/teachers/" + USER + "/"
+            URL = "http://127.0.0.1:8000/api/teachers/" + ion_user + "/"
         print(URL)
         r = requests.get(url = URL, auth=(ion_user,password)) 
         print(r.json())
@@ -386,7 +386,7 @@ def getUser(ion_user, password, utype):
             return None
 
 def patchDB(USER, PWD, url, data):
-    r = requests.patch(url = url, data=data, auth=('raffukhondaker','hackgroup1'))
+    r = requests.patch(url = url, data=data, auth=(USER,PWD))
     print("PATH:" + str(r.status_code))
     return(r.json())
 
