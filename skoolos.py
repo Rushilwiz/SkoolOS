@@ -155,170 +155,221 @@ def chooseGeneralTeacher(teacher):
     course = prompt(courses)['course']
     return course
 
+def makeClassTeacher(teacher):
+    questions = [
+    {
+        'type': 'input',
+        'name': 'cname',
+        'message': 'Class Name (Must be: <subject>_<ion_user>): ',
+    },
+    ]
+    cname = prompt(questions)['cname']
+    print(cname)
+    teacher.makeClass(cname)
+    soption = ["1) Add individual student", "2) Add list of students through path", "3) Exit"]
+    questions = [
+    {
+        'type': 'list',
+        'choices':soption,
+        'name': 'students',
+        'message': 'Add Students): ',
+    },        
+    ]
+    choice = prompt(questions)['students'].split(")")[0]
+    if("1" == choice):
+        s = input("Student name: ")
+        teacher.addStudent(s, cname)
+    if("2" == choice):
+        print("File must be .txt and have 1 student username per line")
+        path = input("Relative Path: ")
+        while(not os.path.exists(path)):
+            if(path == 'N'):
+                return True
+            print(path + " is not a valid path")
+            path = input("Enter file path ('N' to exit): ")
+        f = open(path, 'r')
+        students = f.read().splitlines()
+        teacher.reqAddStudentList(students, cname)
+        return False
+
+def classOptionsTeacher(teacher, course):
+    print("Class: " + course)
+    unconf = getDB("http://localhost:8000/api/classes/" + course)['unconfirmed']
+    for s in unconf:
+        teacher.addStudent(s, course)
+    options = ['1) Request Student', "2) Add assignment", "3) View student information", "4) Exit"]
+    questions = [
+    {
+        'type': 'list',
+        'name': 'course',
+        'choices':options,
+        'message': 'Select option: ',
+    },
+    ]
+    option = prompt(questions)['course'].split(")")[0]
+    return option
+
+def addStudentsTeacher(teacher, course):
+    soption = ["1) Add individual student", "2) Add list of students through path", "3) Exit"]
+    questions = [
+    {
+        'type': 'list',
+        'choices':soption,
+        'name': 'students',
+        'message': 'Add list of students (input path): ',
+    },        
+    ]
+    schoice = prompt(questions)['students'].split(")")[0]
+    if(schoice == '1'):
+        questions = [
+        {
+            'type': 'input',
+            'name': 'student',
+            'message': 'Student Name: ',
+        },
+        ]
+        s = prompt(questions)['student']
+        teacher.reqStudent(s, course)
+        return False
+    if(schoice == '2'):
+        questions = [
+        {
+            'type': 'input',
+            'name': 'path',
+            'message': 'Path: ',
+        },
+        ]
+        path = prompt(questions)['path']
+        while(not os.path.exists(path)):
+            if(path == 'N'):
+                sys.exit(0)
+            print(path + " is not a valid path")
+            path = input("Enter file path ('N' to exit): ")
+        f = open(path, 'r')
+        students = f.read().splitlines()
+        teacher.reqAddStudentList(students, course)
+        return False
+    else:
+        return True
+
+def addAssignmentTeacher(teacher, course):
+    nlist = os.listdir(teacher.username + "/" + course)
+    alist = getDB("http://localhost:8000/api/classes/" + course)['assignments']
+    print(nlist)
+    tlist = []
+    b = True
+    for n in nlist:
+        b = True
+        print(teacher.username + "/" + course + "/" + n)
+        for a  in alist:
+            if(n in a or n == a):
+                #print("Assignments: " + n)
+                b = False
+        if(not os.path.isdir(teacher.username + "/" + course + "/" + n)):
+            b = False
+        if(b):
+            tlist.append(n)
+
+
+    nlist = tlist
+    if(len(nlist) == 0):
+        print("No new assignments found")
+        sys.exit(0)
+    questions = [
+    {
+        'type': 'list',
+        'choices':nlist,
+        'name': 'assignment',
+        'message': 'Select new assignment: ',
+    },        
+    ]
+    ass = prompt(questions)['assignment']
+    apath = teacher.username + "/" + course + "/" + ass
+    due = input("Enter due date (Example: 2020-08-11 16:58): ")
+    due = due +  ":33.383124"
+    due = due.strip()
+    f = False
+    while(not f):
+        try:
+            datetime.datetime.strptime(due, '%Y-%m-%d %H:%M:%S.%f')
+            f = True
+        except:
+            print("Due-date format is incorrect.")
+            print(due)
+            due = input("Enter due date (Example: 2020-08-11 16:58): ")
+            due = due +  ":33.383124"
+    teacher.addAssignment(apath, course, due)
+
 def teacherCLI(user, password):
     from CLI import teacher
     data = getUser(user, password, 'teacher')
     print(data)
     teacher = teacher.Teacher(data)
+    EXIT = False
     # 1. make a class
     # 2. add studeents to an existing class
     # 3. Get progress logs on a student
     # 2. make an assignment for a class
     # 3. view student submissions for an assignment
-    carray = []
-    for c in teacher.classes:
-        carray.append(c)
-    carray.append("Make New Class")
-    carray.append("Exit SkoolOS")
-    courses = [
-    {
-        'type': 'list',
-        'name': 'course',
-        'choices':carray,
-        'message': 'Select class: ',
-    },
-    ]
-    course = chooseGeneralTeacher(teacher)
-    if course == "Exit SkoolOS":
-        teacher.exitCLI()
-    if course == "Make New Class":
-        questions = [
-        {
-            'type': 'input',
-            'name': 'cname',
-            'message': 'Class Name (Must be: <subject>_<ion_user>): ',
-        },
-        ]
-        cname = prompt(questions)['cname']
-        print(cname)
-        teacher.makeClass(cname)
-        soption = ["1) Add individual student", "2) Add list of students through path", "3) Exit"]
-        questions = [
-        {
-            'type': 'list',
-            'choices':soption,
-            'name': 'students',
-            'message': 'Add Students): ',
-        },        
-        ]
-        choice = prompt(questions)['students'].split(")")[0]
-        if("1" == choice):
-            s = input("Student name: ")
-            teacher.addStudent(s, cname)
-        if("2" == choice):
-            print("File must be .txt and have 1 student username per line")
-            path = input("Relative Path: ")
-            while(not os.path.exists(path)):
-                if(path == 'N'):
-                    sys.exit(0)
-                print(path + " is not a valid path")
-                path = input("Enter file path ('N' to exit): ")
-            f = open(path, 'r')
-            students = f.read().splitlines()
-            teacher.reqAddStudentList(students, cname)
-
-    else:
-        print("Class: " + course)
-        unconf = getDB("http://localhost:8000/api/classes/" + course)['unconfirmed']
-        for s in unconf:
-            teacher.addStudent(s, course)
-        options = ['1) Request Student', "2) Add assignment", "3) View student information", "Exit"]
-        questions = [
-        {
-            'type': 'list',
-            'name': 'course',
-            'choices':options,
-            'message': 'Select option: ',
-        },
-        ]
-        option = prompt(questions)['course'].split(")")[0]
-        if(option == '1'):
-            soption = ["1) Add individual student", "2) Add list of students through path", "3) Exit"]
-            questions = [
-            {
-                'type': 'list',
-                'choices':soption,
-                'name': 'students',
-                'message': 'Add list of students (input path): ',
-            },        
-            ]
-            schoice = prompt(questions)['students'].split(")")[0]
-            if(schoice == '1'):
-                questions = [
-                {
-                    'type': 'input',
-                    'name': 'student',
-                    'message': 'Student Name: ',
-                },
-                ]
-                s = prompt(questions)['student']
-                teacher.reqStudent(s, course)
-            if(schoice == '2'):
-                questions = [
-                {
-                    'type': 'input',
-                    'name': 'path',
-                    'message': 'Path: ',
-                },
-                ]
-                path = prompt(questions)['path']
-                while(not os.path.exists(path)):
-                    if(path == 'N'):
-                        sys.exit(0)
-                    print(path + " is not a valid path")
-                    path = input("Enter file path ('N' to exit): ")
-                f = open(path, 'r')
-                students = f.read().splitlines()
-                teacher.reqAddStudentList(students, course)
-            else:
-                sys.exit(0)
-        if(option == '2'):
-            nlist = os.listdir(teacher.username + "/" + course)
-            alist = getDB("http://localhost:8000/api/classes/" + course)['assignments']
-            print(nlist)
-            tlist = []
-            b = True
-            for n in nlist:
+    while(not EXIT):
+        #Options: '1) Request Student', "2) Add assignment", "3) View student information", "4) Exit"
+        course = chooseGeneralTeacher(teacher)
+        if course == "Exit SkoolOS":
+            EXIT = True
+        if course == "Make New Class":
+            EXIT = makeClassTeacher(teacher)
+        #selected a class
+        else:
+            option = classOptionsTeacher(teacher, course)
+            if(option == '1'):
+                EXIT = addStudentsTeacher(teacher, course)
+            if(option == '2'):
+                nlist = os.listdir(teacher.username + "/" + course)
+                alist = getDB("http://localhost:8000/api/classes/" + course)['assignments']
+                print(nlist)
+                tlist = []
                 b = True
-                print(teacher.username + "/" + course + "/" + n)
-                for a  in alist:
-                    if(n in a or n == a):
-                        #print("Assignments: " + n)
+                for n in nlist:
+                    b = True
+                    print(teacher.username + "/" + course + "/" + n)
+                    for a  in alist:
+                        if(n in a or n == a):
+                            #print("Assignments: " + n)
+                            b = False
+                    if(not os.path.isdir(teacher.username + "/" + course + "/" + n)):
                         b = False
-                if(not os.path.isdir(teacher.username + "/" + course + "/" + n)):
-                    b = False
-                if(b):
-                    tlist.append(n)
+                    if(b):
+                        tlist.append(n)
 
 
-            nlist = tlist
-            if(len(nlist) == 0):
-                print("No new assignments found")
-                sys.exit(0)
-            questions = [
-            {
-                'type': 'list',
-                'choices':nlist,
-                'name': 'assignment',
-                'message': 'Select new assignment: ',
-            },        
-            ]
-            ass = prompt(questions)['assignment']
-            apath = teacher.username + "/" + course + "/" + ass
-            due = input("Enter due date (Example: 2020-08-11 16:58): ")
-            due = due +  ":33.383124"
-            due = due.strip()
-            f = False
-            while(not f):
-                try:
-                    datetime.datetime.strptime(due, '%Y-%m-%d %H:%M:%S.%f')
-                    f = True
-                except:
-                    print("Due-date format is incorrect.")
-                    print(due)
-                    due = input("Enter due date (Example: 2020-08-11 16:58): ")
-                    due = due +  ":33.383124"
-            teacher.addAssignment(apath, course, due)
+                nlist = tlist
+                if(len(nlist) == 0):
+                    print("No new assignments found")
+                    sys.exit(0)
+                questions = [
+                {
+                    'type': 'list',
+                    'choices':nlist,
+                    'name': 'assignment',
+                    'message': 'Select new assignment: ',
+                },        
+                ]
+                ass = prompt(questions)['assignment']
+                apath = teacher.username + "/" + course + "/" + ass
+                due = input("Enter due date (Example: 2020-08-11 16:58): ")
+                due = due +  ":33.383124"
+                due = due.strip()
+                f = False
+                while(not f):
+                    try:
+                        datetime.datetime.strptime(due, '%Y-%m-%d %H:%M:%S.%f')
+                        f = True
+                    except:
+                        print("Due-date format is incorrect.")
+                        print(due)
+                        due = input("Enter due date (Example: 2020-08-11 16:58): ")
+                        due = due +  ":33.383124"
+                teacher.addAssignment(apath, course, due)
 
 ######################################################################
 
