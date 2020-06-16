@@ -201,6 +201,7 @@ def teacherCLI(user, password):
         if(option == '2'):
             nlist = os.listdir(teacher.username + "/" + course)
             alist = getDB("http://localhost:8000/api/classes/" + course)['assignments']
+            print(nlist)
             tlist = []
             b = True
             for n in nlist:
@@ -215,6 +216,8 @@ def teacherCLI(user, password):
                     b = False
                 if(b):
                     tlist.append(n)
+
+
             nlist = tlist
             if(len(nlist) == 0):
                 print("No new assignments found")
@@ -319,8 +322,8 @@ def authenticate():
     # web_dir = os.path.join(os.getcwd(), 'CLI', 'oauth')
     # print(web_dir)
     # os.chdir(web_dir)
-    # if os.path.exists("index.html"):
-    #     os.remove("index.html")
+    ## if os.path.exists("index.html"):
+    ##     os.remove("index.html")
 
     # template = open("template.html", "r")
     # index = open("index.html", "w")
