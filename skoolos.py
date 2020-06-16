@@ -40,7 +40,9 @@ def main():
     print("╚═════╝░╚═╝░░╚═╝░╚════╝░░╚════╝░╚══════╝  ░╚════╝░╚═════╝░")
     print("")
 
-    if not (os.path.exists(".sprofile") or os.path.exists(".tprofile")):
+    profiles = os.listdir()
+
+    if not ("profile" in str(profiles)):
         try:
             URL = "http://127.0.0.1:8000/api/"
             r = requests.get(url=URL)
@@ -65,6 +67,7 @@ def main():
                 info.append(d)
                 users.append(str(count) + ") " + d['username'])
                 count = count + 1
+        users.append(str(count) + ") Make new user")
         user = [
             {
                 'type': 'list',
@@ -74,6 +77,9 @@ def main():
             },
         ]
         u = int(prompt(user)['user'].split(")")[0]) - 1
+        if(u+1 == count):
+            authenticate()
+            return
         data = info[u]
         PWD = data['password']
         USER = data['username']
@@ -83,8 +89,7 @@ def main():
         else:
             teacherCLI(USER, PWD)
 
-
-################################################ STUDENT METHODS
+#################################################################################################### STUDENT METHODS
 
 def studentCLI(user, password):
     """
@@ -94,11 +99,13 @@ def studentCLI(user, password):
     """
     from CLI import student
     data = getUser(user, password, 'student')
-    student = student.Student(data)
+    student = student.Student(data, password)
     student.update()
     EXIT = False
     while not EXIT:
         course = chooseClassStudent(student)
+        if(course == "Exit SkoolOS"):
+            return
         EXIT = classOptionsStudent(student, course)
 
 
@@ -162,7 +169,7 @@ def classOptionsStudent(student, course):
         return True
 
 
-################################################ TEACHER METHODS
+#################################################################################################### TEACHER METHODS
 def teacherCLI(user, password):
     from CLI import teacher
     data = getUser(user, password, 'teacher')
@@ -174,25 +181,24 @@ def teacherCLI(user, password):
     # 3. Get progress logs on a student
     # 2. make an assignment for a class
     # 3. view student submissions for an assignment
-    while (not EXIT):
-        # Options: '1) Request Student', "2) Add assignment", "3) View student information", "4) Exit"
+    while(not EXIT):
+        #Options: '1) Request Student', "2) Add assignment", "3) View student information", "4) Exit"
         course = chooseGeneralTeacher(teacher)
         if course == "Exit SkoolOS":
             EXIT = True
         elif course == "Make New Class":
             EXIT = makeClassTeacher(teacher)
-        # selected a class
+        #selected a class
         else:
             option = classOptionsTeacher(teacher, course)
-            if (option == '1'):
+            if(option == '1'):
                 EXIT = addStudentsTeacher(teacher, course)
-            elif (option == '2'):
+            elif(option == '2'):
                 EXIT = addAssignmentTeacher(teacher, course)
-            elif (option == '3'):
+            elif(option == '3'):
                 EXIT = viewStudentsTeacher(teacher, course)
             else:
                 EXIT = True
-
 
 def chooseGeneralTeacher(teacher):
     carray = []
@@ -201,57 +207,56 @@ def chooseGeneralTeacher(teacher):
     carray.append("Make New Class")
     carray.append("Exit SkoolOS")
     courses = [
-        {
-            'type': 'list',
-            'name': 'course',
-            'choices': carray,
-            'message': 'Select class: ',
-        },
+    {
+        'type': 'list',
+        'name': 'course',
+        'choices':carray,
+        'message': 'Select class: ',
+    },
     ]
     course = prompt(courses)['course']
     return course
 
-
 def makeClassTeacher(teacher):
     questions = [
+    {
+        'type': 'input',
+        'name': 'cname',
+        'message': 'Class Name (Must be: <subject>_<ion_user>): ',
+    },
+    ]
+    cname = prompt(questions)['cname']
+    print(cname)
+    while(not ("_" + teacher.username) in cname):
+        print("Incorrect naming format")
+        questions = [
         {
             'type': 'input',
             'name': 'cname',
             'message': 'Class Name (Must be: <subject>_<ion_user>): ',
         },
-    ]
-    cname = prompt(questions)['cname']
-    print(cname)
-    while (not ("_" + teacher.username) in cname):
-        print("Incorrect naming format")
-        questions = [
-            {
-                'type': 'input',
-                'name': 'cname',
-                'message': 'Class Name (Must be: <subject>_<ion_user>): ',
-            },
         ]
         cname = prompt(questions)['cname']
 
     teacher.makeClass(cname)
     soption = ["1) Add individual student", "2) Add list of students through path", "3) Exit"]
     questions = [
-        {
-            'type': 'list',
-            'choices': soption,
-            'name': 'students',
-            'message': 'Add Students): ',
-        },
+    {
+        'type': 'list',
+        'choices':soption,
+        'name': 'students',
+        'message': 'Add Students): ',
+    },
     ]
     choice = prompt(questions)['students'].split(")")[0]
-    if ("1" == choice):
+    if("1" == choice):
         s = input("Student name: ")
         teacher.addStudent(s, cname)
-    if ("2" == choice):
+    if("2" == choice):
         print("File must be .txt and have 1 student username per line")
         path = input("Relative Path: ")
-        while (not os.path.exists(path)):
-            if (path == 'N'):
+        while(not os.path.exists(path)):
+            if(path == 'N'):
                 return True
             print(path + " is not a valid path")
             path = input("Enter file path ('N' to exit): ")
@@ -260,7 +265,6 @@ def makeClassTeacher(teacher):
         teacher.reqAddStudentList(students, cname)
         return False
 
-
 def classOptionsTeacher(teacher, course):
     print("Class: " + course)
     unconf = getDB(teacher.username, teacher.password, "http://localhost:8000/api/classes/" + course)['unconfirmed']
@@ -268,50 +272,49 @@ def classOptionsTeacher(teacher, course):
         teacher.addStudent(s, course)
     options = ['1) Request Student', "2) Add assignment", "3) View student information", "4) Exit"]
     questions = [
-        {
-            'type': 'list',
-            'name': 'course',
-            'choices': options,
-            'message': 'Select option: ',
-        },
+    {
+        'type': 'list',
+        'name': 'course',
+        'choices':options,
+        'message': 'Select option: ',
+    },
     ]
     option = prompt(questions)['course'].split(")")[0]
     return option
 
-
 def addStudentsTeacher(teacher, course):
     soption = ["1) Add individual student", "2) Add list of students through path", "3) Exit"]
     questions = [
-        {
-            'type': 'list',
-            'choices': soption,
-            'name': 'students',
-            'message': 'Add list of students (input path): ',
-        },
+    {
+        'type': 'list',
+        'choices':soption,
+        'name': 'students',
+        'message': 'Add list of students (input path): ',
+    },
     ]
     schoice = prompt(questions)['students'].split(")")[0]
-    if (schoice == '1'):
+    if(schoice == '1'):
         questions = [
-            {
-                'type': 'input',
-                'name': 'student',
-                'message': 'Student Name: ',
-            },
+        {
+            'type': 'input',
+            'name': 'student',
+            'message': 'Student Name: ',
+        },
         ]
         s = prompt(questions)['student']
         teacher.reqStudent(s, course)
         return False
-    if (schoice == '2'):
+    if(schoice == '2'):
         questions = [
-            {
-                'type': 'input',
-                'name': 'path',
-                'message': 'Path: ',
-            },
+        {
+            'type': 'input',
+            'name': 'path',
+            'message': 'Path: ',
+        },
         ]
         path = prompt(questions)['path']
-        while (not os.path.exists(path)):
-            if (path == 'N'):
+        while(not os.path.exists(path)):
+            if(path == 'N'):
                 sys.exit(0)
             print(path + " is not a valid path")
             path = input("Enter file path ('N' to exit): ")
@@ -322,7 +325,6 @@ def addStudentsTeacher(teacher, course):
     else:
         return True
 
-
 def addAssignmentTeacher(teacher, course):
     nlist = os.listdir(teacher.username + "/" + course)
     alist = getDB(teacher.username, teacher.password, "http://localhost:8000/api/classes/" + course)['assignments']
@@ -332,36 +334,36 @@ def addAssignmentTeacher(teacher, course):
     for n in nlist:
         b = True
         print(teacher.username + "/" + course + "/" + n)
-        for a in alist:
-            if (n in a or n == a):
-                # print("Assignments: " + n)
+        for a  in alist:
+            if(n in a or n == a):
+                #print("Assignments: " + n)
                 b = False
-        if (not os.path.isdir(teacher.username + "/" + course + "/" + n)):
+        if(not os.path.isdir(teacher.username + "/" + course + "/" + n)):
             b = False
-        if (b):
+        if(b):
             tlist.append(n)
 
+
     nlist = tlist
-    if (len(nlist) == 0):
+    if(len(nlist) == 0):
         print("No new assignments found")
-        print(
-            "To make an assignment: make a subdirectory in the " + course + " folder. Add a file within the new folder")
+        print("To make an assignment: make a subdirectory in the " + course + " folder. Add a file within the new folder")
         return False
     questions = [
-        {
-            'type': 'list',
-            'choices': nlist,
-            'name': 'assignment',
-            'message': 'Select new assignment: ',
-        },
+    {
+        'type': 'list',
+        'choices':nlist,
+        'name': 'assignment',
+        'message': 'Select new assignment: ',
+    },
     ]
     ass = prompt(questions)['assignment']
     apath = teacher.username + "/" + course + "/" + ass
     due = input("Enter due date (Example: 2020-08-11 16:58): ")
-    due = due + ":33.383124"
+    due = due +  ":33.383124"
     due = due.strip()
     f = False
-    while (not f):
+    while(not f):
         try:
             datetime.datetime.strptime(due, '%Y-%m-%d %H:%M:%S.%f')
             f = True
@@ -369,10 +371,9 @@ def addAssignmentTeacher(teacher, course):
             print("Due-date format is incorrect.")
             print(due)
             due = input("Enter due date (Example: 2020-08-11 16:58): ")
-            due = due + ":33.383124"
+            due = due +  ":33.383124"
     teacher.addAssignment(apath, course, due)
     return False
-
 
 def viewStudentsTeacher(teacher, course):
     data = getDB(teacher.username, teacher.password, "http://127.0.0.1:8000/api/classes/" + course)
@@ -385,7 +386,7 @@ def viewStudentsTeacher(teacher, course):
     for s in unconf:
         print(s)
     student = input("View student (Enter student's ion username): ")
-    while ((not student in str(data['confirmed'])) or (not student in str(data['unconfirmed']))):
+    while((not student in str(data['confirmed'])) or (not student in str(data['unconfirmed']))):
         print("Student not affiliated with class")
         student = input("View student ('N' to exit): ")
         if student == 'N':
@@ -393,7 +394,8 @@ def viewStudentsTeacher(teacher, course):
     print(getDB(teacher.username, teacher.password, "http://127.0.0.1:8000/api/students/" + student + "/"))
 
 
-######################################################################
+
+############################################################################################################################################
 
 
 def getUser(ion_user, password, utype):
@@ -408,6 +410,7 @@ def getUser(ion_user, password, utype):
         URL = "http://127.0.0.1:8000/api/students/" + ion_user + "/"
     else:
         URL = "http://127.0.0.1:8000/api/teachers/" + ion_user + "/"
+        print(URL)
     r = requests.get(url=URL, auth=(ion_user, password))
     print(r.json())
     if r.status_code == 200:
@@ -424,49 +427,32 @@ def getUser(ion_user, password, utype):
         print(r.status_code)
         return None
 
-
-def patchDB(data, url):
-    r = requests.patch(url=url, data=data, auth=('raffukhondaker', 'hackgroup1'))
+def patchDB(USER, PWD, url, data):
+    r = requests.patch(url = url, data=data, auth=(USER,PWD))
     print("PATH:" + str(r.status_code))
     return r.json()
 
 
-def getDB(url):
-    """
-    Sends a GET request to the URL
-    :param url: URL for request
-    """
-    r = requests.get(url=url, auth=('raffukhondaker', 'hackgroup1'))
+def getDB(USER, PWD, url):
+    r = requests.get(url = url, auth=(USER,PWD))
     print("GET:" + str(r.status_code))
     return r.json()
 
 
-def postDB(data, url):
-    """
-    Sends a POST request to the URL
-    :param url: URL for request
-    """
-    r = requests.post(url=url, data=data, auth=('raffukhondaker', 'hackgroup1'))
+def postDB(USER, PWD, url, data):
+    r = requests.post(url = url, data=data, auth=(USER,PWD))
     print("POST:" + str(r.status_code))
     return r.json()
 
 
-def putDB(data, url):
-    """
-    Sends a PUT request to the URL
-    :param url: URL for request
-    """
-    r = requests.put(url=url, data=data, auth=('raffukhondaker', 'hackgroup1'))
+def putDB(USER, PWD, url, data):
+    r = requests.put(url = url, data=data, auth=(USER,PWD))
     print("PUT:" + str(r.status_code))
     return r.json()
 
 
-def delDB(url):
-    """
-    Sends a DEL request to the URL
-    :param url: URL for request
-    """
-    r = requests.delete(url=url, auth=('raffukhondaker', 'hackgroup1'))
+def delDB(USER, PWD, url):
+    r = requests.delete(url = url, auth=(USER,PWD))
     print("DELETE:" + str(r.status_code))
     return None
 
@@ -514,10 +500,7 @@ def authenticate():
     # Linux: chromdriver-linux
     # Macos: chromdriver-mac
     # Windows: chromdriver.exe
-    if 'CLI' in os.getcwd():
-        path = os.path.join(os.getcwd(), '../', 'chromedriver-mac')
-    else:
-        path = os.path.join(os.getcwd(), 'chromedriver-mac')
+    path = os.path.join(os.getcwd(),'chromedriver','chromedriver-mac')
 
     browser = webdriver.Chrome(path)
 
@@ -577,7 +560,8 @@ def authenticate():
             'is_student': is_student,
             'password': pwd,
         }
-        profileFile = open(".sprofile", "w")
+        fname = "." + username + "profile"
+        profileFile = open(fname, "w")
         profileFile.write(json.dumps(profile))
         profileFile.close()
 
@@ -591,7 +575,8 @@ def authenticate():
             'is_student': is_student,
             'password': pwd,
         }
-        profileFile = open(".tprofile", "w")
+        fname = "." + username + "profile"
+        profileFile = open(fname, "w")
         profileFile.write(json.dumps(profile))
         profileFile.close()
 

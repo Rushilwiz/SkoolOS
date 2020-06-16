@@ -5,7 +5,12 @@ from django.contrib import messages
 
 from django.contrib.auth.models import User
 
-from .forms import UserUpdateForm, StudentUpdateForm, TeacherUpdateForm
+from .forms import (
+    UserUpdateForm,
+    StudentUpdateForm,
+    TeacherUpdateForm,
+    ClassCreationForm,
+)
 
 from api.models import Student, Teacher, Class, Assignment
 
@@ -14,14 +19,14 @@ from api.models import Student, Teacher, Class, Assignment
 @login_required()
 def home (request):
     try:
-        student = Student.objects.get(user=request.user)
-        return render(request, "skoolos/home.html",  {'classes': student.confirmed.all()})
+        student = request.user.student
+        return render(request, "skoolos/home.html",  {'classes': student.confirmed.all(), 'isTeacher': False})
     except Student.DoesNotExist:
         pass
 
     try:
-        teacher = Teacher.objects.get(user=request.user)
-        return render(request, "skoolos/home.html",  {'classes': teacher.classes.all()})
+        teacher = request.user.teacher
+        return render(request, "skoolos/home.html",  {'classes': teacher.classes.all(), 'isTeacher': True})
     except Teacher.DoesNotExist:
         pass
 
@@ -36,38 +41,37 @@ def classDetail (request, id):
     classObj = Class.objects.get(id=id)
 
     try:
-        student = Student.objects.get(user=request.user)
+        student = request.user.student
     except Student.DoesNotExist:
         pass
     else:
         if classObj.confirmed.filter(user=student.user).count() != 1:
             return redirect('/')
         else:
-            return render(request, "skoolos/class_detail.html", {'class': classObj,'assignments': classObj.assignments.all(), 'teachers': classObj.classes.all()})
+            return render(request, "skoolos/class_detail.html", {'class': classObj,'assignments': classObj.assignments.all(), 'teachers': classObj.classes.all(), 'isTeacher': False})
 
     try:
-        teacher = Teacher.objects.get(user=request.user)
-        return render(request, "skoolos/home.html",  {'classes': teacher.classes.all()})
+        teacher = request.user.teacher
     except Teacher.DoesNotExist:
         pass
     else:
-        if classObj.confirmed.filter(user=student.user).count() != 1:
+        if teacher.classes.filter(id=classObj.id).count() != 1:
             return redirect('/')
         else:
-            return render(request, "skoolos/class_detail.html", {'class': classObj,'assignments': classObj.assignments.all(), 'teachers': classObj.classes.all()})
+            return render(request, "skoolos/class_detail.html", {'class': classObj,'assignments': classObj.assignments.all(), 'teachers': classObj.classes.all(), 'isTeacher': True})
 
     return redirect('/')
 
 @login_required()
 def profile (request):
     try:
-        student = Student.objects.get(user=request.user)
+        student = request.user.student
         return student_profile(request)
     except Student.DoesNotExist:
         pass
 
     try:
-        teacher = Teacher.objects.get(user=request.user)
+        teacher = request.user.teacher
         return teacher_profile(request)
     except Teacher.DoesNotExist:
         pass
@@ -91,7 +95,8 @@ def student_profile (request):
     context = {
         'userForm': userForm,
         'profileForm': profileForm,
-        'classes': request.user.student.confirmed.all()
+        'classes': request.user.student.confirmed.all(),
+        'isTeacher': False,
     }
 
     return render(request, 'skoolos/profile_student.html', context)
@@ -113,7 +118,46 @@ def teacher_profile (request):
     context = {
         'userForm': userForm,
         'profileForm': profileForm,
-        'classes': request.user.teacher.classes.all()
+        'classes': request.user.teacher.classes.all(),
+        'isTeacher': True,
     }
 
     return render(request, 'skoolos/profile_teacher.html', context)
+
+@login_required()
+def createClass (request):
+    try:
+        teacher = request.user.teacher
+    except Teacher.DoesNotExist:
+        pass
+    else:
+        return createClassHelper(request)
+
+    return redirect('/')
+
+def createClassHelper(request):
+    teacher = request.user.teacher
+
+    if request.method == "POST":
+        classForm = ClassCreationForm(request.POST)
+        if classForm.is_valid():
+            cleaned_data = classForm.clean()
+            print(cleaned_data)
+            classForm.save(username=teacher.user.username)
+            messages.success(request, cleaned_data['subject'].capitalize() + " has been created!")
+            return redirect('home')
+    else:
+        classForm = ClassCreationForm()
+
+    context = {
+        'teacher': teacher,
+        'classes': teacher.classes.all(),
+        'classForm': classForm
+
+    }
+
+    return render(request, "skoolos/createClass.html", context)
+
+@login_required()
+def createAssignment (request):
+    pass

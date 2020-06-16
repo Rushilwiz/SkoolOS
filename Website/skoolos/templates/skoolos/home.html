@@ -10,6 +10,12 @@
         </div>
       </a>
     </div>
+  {% empty %}
+    {% if isTeacher %}
+      <p>Looks like you haven't created any classes yet, hit the button in the top right to get started.</p>
+    {% else %}
+      <p>Looks like you're not enrolled in any classes at the moment! Ask your teacher if you think this is wrong.</p>
+    {% endif %}
   {% endfor %}
 </div>
 {% endblock content %}

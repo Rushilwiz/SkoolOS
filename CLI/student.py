@@ -13,15 +13,15 @@ import datetime
 # git clone student directory ==> <student-id>/classes/assignments
 
 # get teacher info from api
-def getStudent(ion_user):
+def getStudent(ion_user, password):
     """
     Get's student information from the api
     :param ion_user: a student
     :return: student information or error
     """
     URL = "http://127.0.0.1:8000/api/students/" + ion_user + "/"
-    r = requests.get(url=URL, auth=('raffukhondaker', 'hackgroup1'))
-    if r.status_code == 200:
+    r = requests.get(url=URL, auth=(ion_user, password))
+    if (r.status_code == 200):
         data = r.json()
         return data
     elif r.status_code == 404:
@@ -36,60 +36,61 @@ def getStudent(ion_user):
 
 
 # makes a GET request to given url, returns dict
-def getDB(url):
+def getDB(user, pwd, url):
     """
     Sends a GET request to the URL
     :param url: URL for request
     """
-    r = requests.get(url=url, auth=('raffukhondaker', 'hackgroup1'))
+    r = requests.get(url=url, auth=(user, pwd))
     print("GET:" + str(r.status_code))
     return r.json()
 
 
 # makes a PATCH (updates instance) request to given url, returns dict
-def patchDB(data, url):
+def patchDB(user, pwd, data, url):
     """
     Sends a PATCH request to the URL
     :param data:
     :param url: URL for request
     """
-    r = requests.patch(url=url, data=data, auth=('raffukhondaker', 'hackgroup1'))
+    r = requests.patch(url=url, data=data, auth=(user, pwd))
     print("PATCH:" + str(r.status_code))
     return r.json()
 
 
 # makes a POST (makes new instance) request to given url, returns dict
-def postDB(data, url):
+def postDB(user, pwd, data, url):
     """
     Sends a POST request to the URL
     :param data:
     :param url: URL for request
     """
-    r = requests.post(url=url, data=data, auth=('raffukhondaker', 'hackgroup1'))
+    r = requests.post(url=url, data=data, auth=(user, pwd))
     print("POST:" + str(r.status_code))
     return r.json()
 
 
 # makes a PUT (overwrites instance) request to given url, returns dict
-def putDB(data, url):
+def putDB(user, pwd, data, url):
     """
     Sends a PUT request to the URL
     :param data:
     :param url: URL for request
-    """
-    r = requests.put(url=url, data=data, auth=('raffukhondaker', 'hackgroup1'))
+   """
+    r = requests.put(url=url, data=data, auth=(user, pwd))
     print("PUT:" + str(r.status_code))
     return r.json()
 
 
 # makes a DELETE (delete instance) request to given url, returns dict
-def delDB(url):
+def delDB(user, pwd, url):
     """
     Sends a DELETE request to the URL
     :param url: URL for request
     """
-    r = requests.delete(url=url, auth=('raffukhondaker', 'hackgroup1'))
+    r = requests.delete(url=url, auth=(user, pwd))
     print("DELETE:" + str(r.status_code))
+    return None
 
 
 def command(command):
@@ -112,7 +113,7 @@ def command(command):
 
 # public methods: deleteClass, makeClass, update
 class Student:
-    def __init__(self, data):
+    def __init__(self, data, password):
         # teacher info already  stored in API
         # intitialze fields after GET request
         """
@@ -125,6 +126,7 @@ class Student:
         self.grade = data['grade']
         self.completed = data['completed']
         self.user = data['user']
+        self.password = password
         # classes in id form (Example: 4,5)
         # storing  actual classes
         cid = data['classes'].split(",")
@@ -139,7 +141,7 @@ class Student:
         classes = []
         for c in cid:
             url = "http://127.0.0.1:8000/api/classes/" + str(c) + "/"
-            classes.append(getDB(url))
+            classes.append(getDB(self.username, self.password,url))
 
         self.classes = classes
         self.sclass = str(data['classes'])
@@ -157,7 +159,7 @@ class Student:
         nclasses = []
         for c in nid:
             url = "http://127.0.0.1:8000/api/classes/" + str(c) + "/"
-            nclasses.append(getDB(url))
+            nclasses.append(getDB(self.username, self.password,url))
 
         self.new = nclasses
         self.snew = str(data['added_to'])
@@ -184,7 +186,7 @@ class Student:
             data = {
                 'repo': self.repo
             }
-            print(patchDB(data, self.url))
+            print(patchDB(self.username, self.password,data, self.url))
         print("Synced to " + self.username)
 
     def getClasses(self):
@@ -206,7 +208,7 @@ class Student:
             print(c['name'])
             alist = c['assignments']
             for a in alist:
-                ass = getDB("http://127.0.0.1:8000/api/assignments/" + a)
+                ass = getDB(self.username, self.password,"http://127.0.0.1:8000/api/assignments/" + a)
                 now = datetime.datetime.now()
                 try:
                     due = ass['due_date'].replace("T", " ").replace("Z", "")
@@ -231,7 +233,7 @@ class Student:
         command("git checkout master")
         for c in self.classes:
             print("UPDATING CLASS: " + str(c['name']))
-            data = getDB("http://127.0.0.1:8000/api/classes/" + str(c['name']))
+            data = getDB(self.username, self.password,"http://127.0.0.1:8000/api/classes/" + str(c['name']))
             # command("git checkout master")
             command("git checkout " + data['name'])
             command("git add .")
@@ -272,8 +274,8 @@ class Student:
         :param cid: the id number of the class
         :return: data from the class, None if an error occures
         """
-        data = getDB('http://127.0.0.1:8000/api/classes/' + str(cid))
-        if not (cid in self.snew) or (self.username in data['confirmed']):
+        data = getDB(self.username, self.password,'http://127.0.0.1:8000/api/classes/' + str(cid))
+        if ((cid in self.snew) == False or (self.username in data['confirmed'])):
             print("Already enrolled in this class.")
             return None
         if (cid in self.sclass) or not (self.username in data['unconfirmed']):
@@ -283,7 +285,7 @@ class Student:
         # add class teacher as collaborator to student repo
         print(os.getcwd())
         pwd = input("Enter Github password: ")
-        tgit = getDB("http://127.0.0.1:8000/api/teachers/" + data['teacher'] + "/")['git']
+        tgit = getDB(self.username, self.password,"http://127.0.0.1:8000/api/teachers/" + data['teacher'] + "/")['git']
         url = "curl -i -u " + self.git + ":" + pwd + " -X PUT -d '' " + "'https://api.github.com/repos/" + self.git + "/" + self.username + "/collaborators/" + tgit + "'"
         print(url)
         os.system(url)
@@ -336,7 +338,7 @@ class Student:
                 # recreate sclass field, using ids
                 for c in self.new:
                     snew = snew + str(c['name']) + ","
-                    new.append(getDB("http://127.0.0.1:8000/api/classes/" + str(cid)))
+                    new.append(getDB(self.username, self.password,"http://127.0.0.1:8000/api/classes/" + str(cid)))
                 self.snew = snew
                 self.new = new
                 break
@@ -348,7 +350,7 @@ class Student:
             'classes': self.sclass
         }
         print(self.url)
-        print(patchDB(data, self.url))
+        print(patchDB(self.username, self.password,data, self.url))
         return data
 
     def viewClass(self, courses):
@@ -413,8 +415,8 @@ class Student:
         os.chdir(cdir)
 
 
-# data = getStudent("2022rkhondak")
-# s = Student(data)
+#data = getStudent("2022rkhondak", "PWD")
+#s = Student(data, "PWD")
 # s.viewClass("APLit_eharris1")
 # #s.addClass("APLit_eharris1")
 # # #s.update()

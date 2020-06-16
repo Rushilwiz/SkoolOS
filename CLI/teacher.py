@@ -26,14 +26,16 @@ from datetime import datetime
 # git clone student directory ==> <student-id>/classes/assignments
 
 # get teacher info from api
-def getTeacher(ion_user):
+def getTeacher(ion_user, password):
     """
     Gets information about a teacher from the api
     :param ion_user: a teacher
+    :param password: a string
     :return: teacher information or error
     """
     URL = "http://127.0.0.1:8000/api/teachers/" + ion_user + "/"
-    r = requests.get(url=URL, auth=('raffukhondaker', 'hackgroup1'))
+    r = requests.get(url=URL, auth=(ion_user,password))
+    print(r.json())
     if r.status_code == 200:
         data = r.json()
         return data
@@ -48,58 +50,67 @@ def getTeacher(ion_user):
         print(r.status_code)
 
 #makes a GET request to given url, returns dict
-def getDB(url):
+def getDB(user, pwd, url):
     """
     Sends a GET request to the URL
+    :param user: a string
+    :param password: a string
     :param url: URL for request
     """
-    r = requests.get(url=url, auth=('raffukhondaker', 'hackgroup1'))
+    r = requests.get(url=url, auth=(user, pwd))
     print("GET:" + str(r.status_code))
     return(r.json())
 
 #makes a PATCH (updates instance) request to given url, returns dict
-def patchDB(data, url):
+def patchDB(user, pwd, data, url):
     """
     Sends a PATCH request to the URL
     :param data:
+    :param user: a string
+    :param password: a string
     :param url: URL for request
     """
-    r = requests.patch(url=url, data=data, auth=('raffukhondaker', 'hackgroup1'))
+    r = requests.patch(url=url, data=data, auth=(user, pwd))
     print("PATCH:" + str(r.status_code))
     return r.json()
 
 
 #makes a POST (makes new instance) request to given url, returns dict
-def postDB(data, url):
+def postDB(user, pwd, data, url):
     """
     Sends a POST request to the URL
     :param data:
+    :param user: a string
+    :param password: a string
     :param url: URL for request
     """
-    r = requests.post(url=url, data=data, auth=('raffukhondaker', 'hackgroup1'))
+    r = requests.post(url=url, data=data, auth=(user, pwd))
     print("POST:" + str(r.status_code))
     return r.json()
 
 
 #makes a PUT (overwrites instance) request to given url, returns dict
-def putDB(data, url):
+def putDB(user, pwd, data, url):
     """
     Sends a PUT request to the URL
-    :param data:
+    :param user: a string
+    :param password: a string
     :param url: URL for request
     """
-    r = requests.put(url=url, data=data, auth=('raffukhondaker', 'hackgroup1'))
+    r = requests.put(url=url, data=data, auth=(user, pwd))
     print("PUT:" + str(r.status_code))
     return r.json()
 
 
 #makes a DELETE (delete instance) request to given url, returns dict
-def delDB(url):
+def delDB(user, pwd, url):
     """
     Sends a DELETE request to the URL
+    :param user: a string
+    :param password: a string
     :param url: URL for request
     """
-    r = requests.delete(url=url, auth=('raffukhondaker', 'hackgroup1'))
+    r = requests.delete(url=url, auth=(user, pwd))
     print("DELETE:" + str(r.status_code))
     return None
 
@@ -123,7 +134,7 @@ def command(command):
 
 # public methods: deleteClass, makeClass, update
 class Teacher:
-    def __init__(self, data):
+    def __init__(self, data, password):
         # teacher info already  stored in API
         # intitialze fields after GET request
         """
@@ -134,6 +145,7 @@ class Teacher:
         self.username = data['ion_user']
         self.url = "http://127.0.0.1:8000/api/teachers/" + self.username + "/"
         self.id = data['user']
+        self.password = password
         # classes in id form (Example: 4,5)
 
         # array
@@ -218,15 +230,22 @@ class Teacher:
                 return
         if self.checkClass(path):
             cpath = self.username + "/" + cname
+            subject = cname.split("_")[0]
+            period = int(input("Enter period: "))
+            while(not (type(period) is int and period >= 0)):
+                print("Incorrect format")
+                period = int(input("Enter period: "))
             data = {
                 "name": cname,
                 "repo": "",
                 "path": cpath,
+                "subject": subject,
+                "period":period,
                 "teacher": self.username,
                 "owner": self.id
             }
             # make class instance in db
-            postDB(data, 'http://127.0.0.1:8000/api/classes/')
+            postDB(self.username, self.password, data, 'http://127.0.0.1:8000/api/classes/')
             time.sleep(1)
             self.classes.append(cname)
             # add to  instance
@@ -235,7 +254,7 @@ class Teacher:
                 'classes': self.classes
             }
             print(self.classes)
-            print(patchDB(data, 'http://127.0.0.1:8000/api/teachers/' + self.username + "/"))
+            print(patchDB(self.username, self.password, data, 'http://127.0.0.1:8000/api/teachers/' + self.username + "/"))
 
     # make a new class from scratch
     # subject: string, assignments: list
@@ -248,7 +267,7 @@ class Teacher:
         # check if class exists
         path = self.username + "/" + cname
         isclass = False
-        acourses = getDB("http://127.0.0.1:8000/api/classes/")['results']
+        acourses = getDB(self.username, self.password, "http://127.0.0.1:8000/api/classes/")['results']
         for c in acourses:
             if c['name'] == cname:
                 isclass = True
@@ -300,7 +319,7 @@ class Teacher:
                 #     'classes':self.classes,
                 # }
                 # print(patchDB(data, self.url))
-                delDB("http://127.0.0.1:8000/api/classes/" + cname + "/")
+                delDB(self.username, self.password, "http://127.0.0.1:8000/api/classes/" + cname + "/")
                 break
 
         # remove locally
@@ -318,7 +337,7 @@ class Teacher:
         :return: True if student exists, False otherwise
         """
         r = requests.get(url="http://127.0.0.1:8000/api/students/" + student + "/",
-                         auth=('raffukhondaker', 'hackgroup1'))
+                         auth=(self.username, self.password))
         if r.status_code != 200:
             return False
         return True
@@ -333,7 +352,7 @@ class Teacher:
         if not self.isStudent(sname):
             print(sname + " does not exist.")
             return False
-        course = getDB("http://127.0.0.1:8000/api/classes/" + cname)
+        course = getDB(self.username, self.password, "http://127.0.0.1:8000/api/classes/" + cname)
         if sname in str(course['unconfirmed']):
             print(sname + " already requested.")
             return True
@@ -341,7 +360,7 @@ class Teacher:
             print(sname + " already enrolled.")
             return False
 
-        student = getDB("http://127.0.0.1:8000/api/students/" + sname)
+        student = getDB(self.username, self.password, "http://127.0.0.1:8000/api/students/" + sname)
         try:
             if student['added_to'] == "":
                 student['added_to'] = course['name']
@@ -354,8 +373,8 @@ class Teacher:
         data = {
             'added_to': student['added_to'],
         }
-        student = patchDB(data, "http://localhost:8000/api/students/" + student['ion_user'] + "/")
-        student = getDB("http://localhost:8000/api/students/" + sname + "/")
+        student = patchDB(self.username, self.password, data, "http://localhost:8000/api/students/" + student['ion_user'] + "/")
+        student = getDB(self.username, self.password, "http://localhost:8000/api/students/" + sname + "/")
         if not course['unconfirmed']:
             course['unconfirmed'] = student['ion_user']
         else:
@@ -364,7 +383,7 @@ class Teacher:
             "unconfirmed": course['unconfirmed']
         }
         print(cinfo)
-        patchDB(cinfo, "http://localhost:8000/api/classes/" + course['name'] + "/")
+        patchDB(self.username, self.password, cinfo, "http://localhost:8000/api/classes/" + course['name'] + "/")
         return True
 
     # Student should have confirmed on their endd, but class had not been updated yet
@@ -380,8 +399,8 @@ class Teacher:
             print(sname + " does not exist.")
             return False
 
-        student = getDB("http://127.0.0.1:8000/api/students/" + sname)
-        course = getDB("http://127.0.0.1:8000/api/classes/" + cname)
+        student = getDB(self.username, self.password, "http://127.0.0.1:8000/api/students/" + sname)
+        course = getDB(self.username, self.password, "http://127.0.0.1:8000/api/classes/" + cname)
 
         if (os.path.exists(self.username + "/Students/" + cname + "/" + student['ion_user']) or (
                 student['ion_user'] in course['confirmed']) == True):
@@ -435,7 +454,7 @@ class Teacher:
             "confirmed": course["confirmed"],
             "unconfirmed": course['unconfirmed']
         }
-        print(putDB(course, "http://localhost:8000/api/classes/" + course['name'] + "/"))
+        print(putDB(self.username, self.password, course, "http://localhost:8000/api/classes/" + course['name'] + "/"))
         return True
 
     # goes through list of studennts, tries to add, then request, return unconfirmed students
@@ -494,7 +513,7 @@ class Teacher:
             print("Due-date format is incorrect")
             return False
 
-        course = getDB("http://127.0.0.1:8000/api/classes/" + course)
+        course = getDB(self.username, self.password, "http://127.0.0.1:8000/api/classes/" + course)
         if aname in str(course['assignments']):
             print("Assignment name already taken.")
             return False
@@ -525,22 +544,23 @@ class Teacher:
                     print(st + " already has assignment")
 
         # check if assignment already exists
-        r = requests.get(url='http://127.0.0.1:8000/api/assignments/' + aname, auth=('raffukhondaker', 'hackgroup1'))
+        r = requests.get(url='http://127.0.0.1:8000/api/assignments/' + aname, auth=(self.username, self.password))
         if r.status_code != 200:
             ass = {
                 'name': oname,
                 'path': path,
                 'classes': course['name'],
                 'teacher': self.username,
-                'due_date': due
+                'due_date': due,
+                'owner':self.id
             }
-            postDB(ass, 'http://127.0.0.1:8000/api/assignments/')
+            postDB(self.username, self.password, ass, 'http://127.0.0.1:8000/api/assignments/')
             course['assignments'].append(oname)
 
             cinfo = {
                 "assignments": course['assignments'],
             }
-            print(patchDB(cinfo, "http://127.0.0.1:8000/api/classes/" + course['name'] + "/"))
+            print(patchDB(self.username, self.password, cinfo, "http://127.0.0.1:8000/api/classes/" + course['name'] + "/"))
             return True
         else:
             print("Assignment already addedd")
@@ -561,12 +581,12 @@ class Teacher:
                 d = {
                     'due_date': due,
                 }
-                print(patchDB(d, 'http://localhost:8000/api/assignments/' + oname + "/"))
+                print(patchDB(self.username, self.password, d, 'http://localhost:8000/api/assignments/' + oname + "/"))
                 print("Due-date changed " + due)
         except:
             print("Due-date is the same")
         input()
-        course = getDB("http://127.0.0.1:8000/api/classes/" + course)
+        course = getDB(self.username, self.password, "http://127.0.0.1:8000/api/classes/" + course)
         slist = os.listdir(os.getcwd() + "/" + self.username + "/Students/" + course['name'])
         cdir = os.getcwd()
         for st in slist:
@@ -597,7 +617,7 @@ class Teacher:
             os.chdir(cdir)
 
     def getCommits(self, student, course, commits):
-        course = getDB("http://127.0.0.1:8000/api/classes/" + course)
+        course = getDB(self.username, self.password, "http://127.0.0.1:8000/api/classes/" + course)
         try:
             if not (student in course['confirmed']):
                 print("Student not in class")
@@ -645,7 +665,7 @@ class Teacher:
         :param course: the course
         :param commits: commits the CLI has made for the assignment
         """
-        course = getDB("http://127.0.0.1:8000/api/classes/" + course + "/")
+        course = getDB(self.username, self.password, "http://127.0.0.1:8000/api/classes/" + course + "/")
         ar = self.getCommits(student, course['name'], commits)
         commit = ar[len(ar) - 1][0]
         start = ""
@@ -670,7 +690,7 @@ class Teacher:
 
     def afterSubmit(self, course, assignment, student):
 
-        assignment = getDB("http://127.0.0.1:8000/api/assignments/" + assignment)
+        assignment = getDB(self.username, self.password, "http://127.0.0.1:8000/api/assignments/" + assignment)
         # assignment = {
         #     'name': assignment,
         #     'due_date': "2020-04-11 16:58:33.383124",
@@ -705,8 +725,9 @@ class Teacher:
         print("heheheh")
 
 
-# data = getTeacher("eharris1")
-# t = Teacher(data)
+# data = getTeacher("eharris1","PWD")
+# print(data)
+# t = Teacher(data, "PWD")
 # t.makeClass("APLit_eharris1")
 # t.updateAssignment("eharris1/APLit_eharris1/BookReport", "APLit_eharris1", '2020-08-11 16:58:33.383124')
 # ar = ['2022rkhondak','2022inafi','2023rumareti']
