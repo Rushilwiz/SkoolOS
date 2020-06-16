@@ -105,6 +105,10 @@ def delDB(url):
 
 
 def command(command):
+    """
+    Runs a shell command
+    :param command: shell command
+    """
     ar = []
     command = command.split(" ")
     for c in command:
@@ -146,6 +150,10 @@ class Teacher:
     # turn existing directory into class, Pre-condition: directory exists
     # relative path to  class: 2022rkhondak/Math4
     def checkClass(self, path):
+        """
+        Checks if a directory is valid for creating a class
+        :param path: path to the new class directory
+        """
         cname = path.split("/")
         cname = cname[len(cname) - 1]
         if os.path.isfile(path):
@@ -185,6 +193,10 @@ class Teacher:
         return True
 
     def checkInDB(self, path):
+        """
+        Checks if "path" is in the database
+        :param path: path to directory
+        """
         n = path.split("/")
         n = n[len(n) - 1]
         for c in self.classes:
@@ -194,6 +206,10 @@ class Teacher:
 
     # make class from existing directory, add to git and api
     def addClass(self, path):
+        """
+        Creates a class from an existing directory, adding it to the proper git repository and the api
+        :param path:
+        """
         cname = path.split("/")
         cname = cname[len(cname) - 1]
         for c in self.classes:
@@ -225,6 +241,10 @@ class Teacher:
     # subject: string, assignments: list
     # class name must be: <subject>_<ion_user>
     def makeClass(self, cname):
+        """
+        Makes a class with its own new directory
+        :param cname: name of class
+        """
         # check if class exists
         path = self.username + "/" + cname
         isclass = False
@@ -258,6 +278,10 @@ class Teacher:
             self.addClass(path)
 
     def deleteClass(self, path):
+        """
+        Deletes an existing class
+        :param path: class directory path
+        """
         if not os.path.exists(path):
             print(path + " does not exist locally.")
         resp = input("Do you want to delete " + path + " from the SkoolOS system? (y/N) ")
@@ -288,6 +312,11 @@ class Teacher:
         # remove from student directories
 
     def isStudent(self, student):
+        """
+        Checks if the student exists
+        :param student: a student
+        :return: True if student exists, False otherwise
+        """
         r = requests.get(url="http://127.0.0.1:8000/api/students/" + student + "/",
                          auth=('raffukhondaker', 'hackgroup1'))
         if r.status_code != 200:
@@ -295,6 +324,12 @@ class Teacher:
         return True
 
     def reqStudent(self, sname, cname):
+        """
+        Request student informatiion from the api
+        :param sname: student's name
+        :param cname: class name
+        :return: True if successful
+        """
         if not self.isStudent(sname):
             print(sname + " does not exist.")
             return False
@@ -335,6 +370,12 @@ class Teacher:
     # Student should have confirmed on their endd, but class had not been updated yet
     # git clone confirmed student repo, copy files into repo and push branch
     def addStudent(self, sname, cname):
+        """
+        Adds a student to a class
+        :param sname: student name
+        :param cname: class name
+        :return:
+        """
         if not self.isStudent(sname):
             print(sname + " does not exist.")
             return False
@@ -399,6 +440,12 @@ class Teacher:
 
     # goes through list of studennts, tries to add, then request, return unconfirmed students
     def reqAddStudentList(self, array, cname):
+        """
+        Runs addStudent() on all students in array
+        :param array: an array of students
+        :param cname: class name
+        :return: students that have not confirmed the request
+        """
         unconf = []
         for i in range(len(array)):
             a = array[i]
@@ -409,6 +456,13 @@ class Teacher:
 
     # add local path to student directory, make new instance in api
     def addAssignment(self, path, course, due):
+        """
+        Creates an assignment for "course" that is  due on "due"
+        :param path: directory of assignment
+        :param course: course name
+        :param due: due date
+        :return: False if unsuccessful
+        """
         parts = path.split("/")
         aname = parts[len(parts) - 1]
         oname = aname + "_" + course
@@ -585,6 +639,12 @@ class Teacher:
         return fout
 
     def getChanges(self, student, course, commits):
+        """
+        Checks for new submissions by a student
+        :param student: the student
+        :param course: the course
+        :param commits: commits the CLI has made for the assignment
+        """
         course = getDB("http://127.0.0.1:8000/api/classes/" + course + "/")
         ar = self.getCommits(student, course['name'], commits)
         commit = ar[len(ar) - 1][0]
@@ -638,6 +698,10 @@ class Teacher:
         return False
 
     def comment(self):
+        """
+        The ultimate form of laughter
+        :return: pure joy
+        """
         print("heheheh")
 
 
