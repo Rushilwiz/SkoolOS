@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+import secrets
 
 
 
@@ -12,7 +13,6 @@ class Student(models.Model):
     classes=models.CharField(max_length=100, default="", blank=True)
     added_to=models.CharField(max_length=100, default="", blank=True)
     completed=models.TextField(default="", blank=True)
-    ion_user=models.CharField(primary_key=True, max_length=100)
 
     def save(self, *args, **kwargs):
         super(Student, self).save(*args, **kwargs)
@@ -37,6 +37,7 @@ class Class(models.Model):
     owner = models.ForeignKey('auth.User', related_name='classes', on_delete=models.CASCADE)
     teacher = models.CharField(max_length=100)
     name = models.CharField(primary_key=True, max_length=100)
+    id = models.CharField(max_length=8, blank=True, null=True)
     description = models.CharField(default="Class Description", max_length=500)
     repo=models.URLField(default="", blank=True)
     path=models.CharField(max_length=100, default="")
@@ -48,6 +49,12 @@ class Class(models.Model):
     # assignments = models.ManyToManyField(Assignment, default="")
     # default_file = models.ManyToManyField(DefFiles)
     def save(self, *args, **kwargs):
+        id = self.id
+        if not id:
+            id = secrets.token_urlsafe()[:8].lower()
+        while Class.objects.filter(id=id).exclude(pk=self.pk).exists():
+            id = sercrets.token_urlsafe()[:8].lower()
+        self.id = id
         return super(Class, self).save(*args, **kwargs)
 
     def __str__(self):
