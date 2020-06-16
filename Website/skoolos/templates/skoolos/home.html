@@ -3,7 +3,7 @@
 <div class="content-section">
   {% for class in classes %}
     <div class="card-columns">
-      <a class="card" href="/class/{{ class.pk }}" style="text-decoration: none;">
+      <a class="card" href="/class/{{ class.id }}" style="text-decoration: none;">
         <div class="card-body">
           <h5 class="card-title">{{ class.name }}</h5>
           <p class="card-text">{{ class.description }}</p>

@@ -1,0 +1,28 @@
+{% extends "skoolos/base.html" %}
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+    <h4>Assignments:</h4>
+    <hr>
+    {% for assignment in assignments %}
+    <article class="media content-section">
+      <div class="media-body">
+        <a class="mr-2" href="#">{{ assignment }}</a>
+        <small class="text-muted">Due: {{ assignment.due_date|date:"F d, Y" }}</small>
+      </div>
+    </article>
+    {% endfor %}
+    </div>
+
+  <div class="col-md-4 content-section">
+      <h3>{{ class.name }}</h3>
+      <p>Teachers:</p>
+      <ul>
+      {% for teacher in teachers %}
+        <li>{{ teacher.user.first_name }} {{ teacher.user.last_name }} ({{teacher.ion_user}})</li>
+      {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock content %}
