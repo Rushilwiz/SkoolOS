@@ -18,7 +18,10 @@ if(outputs['init']):
 
 #already ccrerrated account through website, has to login
 def update():
-    #get data from database
+    """
+    Gets data from the database
+    :return:
+    """
     return
 
 def yesorno(question):
@@ -35,6 +38,10 @@ def yesorno(question):
     return False
 
 def login():
+    """
+    Login to the website with a username and password
+    :return: user information json if successful, None otherwise
+    """
     #enter username
     #enter password
     questions = [
@@ -66,6 +73,11 @@ def login():
 
 #did not create account through website, has to signup/login
 def signup():
+    """
+    Used to create an account for the service.
+    Called if the user does not have an existing account and must create one.
+    :return: the new user account
+    """
     questions = [
         {
             'type': 'input',
@@ -114,6 +126,10 @@ def signup():
     return user
 
 def relogin():
+    """
+    Login to an already verified user account
+    :return:
+    """
     questions = [
         {
             'type': 'list',
@@ -128,12 +144,21 @@ def relogin():
 def setup(user):
     #Read classes/assignenments and setup directory:
     #SkoolOS/Math/Week1
+    """
+    Reads classes and assignments of/for the user and properly sets of their work directory
+    :param user:
+    :return:
+    """
     for c in user["classes"]:
         os.makedirs(c)
         for a in user["classes"][c]:
             os.makedirs(c + "/" + a)
 
 def start():
+    """
+    Prompts the user for whether or not they have an account and allows them to login/signup depending on their response
+    :return:
+    """
     if(os.path.exists(".login.txt") == False):
         b = yesorno("Do you have a SkoolOS account?(y/N)")
         if(b):
