@@ -3,9 +3,15 @@
 <div class="content-section">
   {% for class in classes %}
     <div class="card-columns">
-      <a class="card" href="/class/{{ class.id }}" style="text-decoration: none;">
+      <a class="card class-card" href="/class/{{ class.id }}" style="">
         <div class="card-body">
-          <h5 class="card-title">{{ class.name }}</h5>
+          <h5 class="card-title">{{ class.subject }}</h5>
+          {% if class.period != 0 %}
+            <small>Period: {{ class.period }}<br></small>
+          {% endif %}
+          {% if class.name %}
+            <small style="font-size:.75em"><i>{{ class.name }}</i></small>
+          {% endif %}
           <p class="card-text">{{ class.description }}</p>
         </div>
       </a>
