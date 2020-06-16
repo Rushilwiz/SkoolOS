@@ -1,62 +1,81 @@
 appdirs==1.4.3
-asgiref==3.2.7
-astroid==2.4.2
-CacheControl==0.12.6
-certifi==2020.4.5.1
-chardet==3.0.4
+cachecontrol==0.12.6
 click==7.1.2
 colorama==0.4.3
 contextlib2==0.6.0
 distlib==0.3.0
 distro==1.4.0
-Django==3.0.7
 django-cors-middleware==1.5.0
 django-crispy-forms==1.9.1
+django-forms-bootstrap==3.1.0
 django-oauth-toolkit==1.3.2
+django-request-token==0.10.1
 djangorestframework==3.11.0
-greenlet==0.4.16
+hashids==1.2.0
 html5lib==1.0.1
-idna==2.9
-isort==4.3.21
-lazy-object-proxy==1.4.3
-mccabe==0.6.1
 meson==0.53.2
-msgpack==0.6.2
 numpy==1.18.5
-oauthlib==3.1.0
 ordered-set==3.1.1
-packaging==20.1
 pep517==0.8.1
-Pillow==7.1.2
+pip-chill==1.0.0
 progress==1.5
-prompt-toolkit==1.0.14
 pulsemixer==1.5.0
 pycairo==1.19.1
 pyclipper==1.1.0.post3
-Pygments==2.6.1
-PyGObject==3.34.0
 pyinotify==0.9.6
-PyInquirer==1.0.3
+pyinquirer==1.0.3
 pylint==2.5.3
 pynvim==0.4.1
-pyparsing==2.4.6
 pyperclip==1.8.0
 pytoml==0.1.21
-pytz==2020.1
-pywal==3.3.0
-regex==2020.5.14
-requests==2.23.0
+requests-oauth==0.4.1
 requests-oauthlib==1.3.0
 retrying==1.3.3
 selenium==3.141.0
-six==1.15.0
-sqlparse==0.3.1
-toml==0.10.0
-urllib3==1.25.9
-wcwidth==0.2.3
-webencodings==0.5.1
-Werkzeug==1.0.1
+sphinx==3.1.1
+werkzeug==1.0.1
 wpgtk==6.1.3
-wrapt==1.12.1
 yapf==0.30.0
-
+# alabaster==0.7.12 # Installed as dependency for sphinx
+# asgiref==3.2.7 # Installed as dependency for django
+# astroid==2.4.2 # Installed as dependency for pylint
+# babel==2.8.0 # Installed as dependency for sphinx
+# certifi==2020.4.5.1 # Installed as dependency for requests
+# chardet==3.0.4 # Installed as dependency for requests
+# django==3.0.7 # Installed as dependency for django-request-token, djangorestframework, django-oauth-toolkit
+# docutils==0.16 # Installed as dependency for sphinx
+# greenlet==0.4.16 # Installed as dependency for pynvim
+# idna==2.9 # Installed as dependency for requests
+# imagesize==1.2.0 # Installed as dependency for sphinx
+# isort==4.3.21 # Installed as dependency for pylint
+# jinja2==2.11.2 # Installed as dependency for sphinx
+# lazy-object-proxy==1.4.3 # Installed as dependency for astroid
+# markupsafe==1.1.1 # Installed as dependency for jinja2
+# mccabe==0.6.1 # Installed as dependency for pylint
+# msgpack==0.6.2 # Installed as dependency for pynvim, cachecontrol
+# oauthlib==3.1.0 # Installed as dependency for requests-oauthlib, django-oauth-toolkit
+# packaging==20.1 # Installed as dependency for sphinx
+# pillow==7.1.2 # Installed as dependency for wpgtk
+# prompt-toolkit==1.0.14 # Installed as dependency for pyinquirer
+# psycopg2-binary==2.8.5 # Installed as dependency for django-request-token
+# pygments==2.6.1 # Installed as dependency for sphinx, pyinquirer
+# pyjwt==1.7.1 # Installed as dependency for django-request-token
+# pyparsing==2.4.6 # Installed as dependency for packaging
+# pytz==2020.1 # Installed as dependency for django, babel
+# pywal==3.3.0 # Installed as dependency for wpgtk
+# regex==2020.5.14 # Installed as dependency for pyinquirer
+# requests==2.23.0 # Installed as dependency for cachecontrol, requests-oauth, django-oauth-toolkit, sphinx, requests-oauthlib
+# six==1.15.0 # Installed as dependency for astroid, prompt-toolkit, html5lib, retrying, packaging
+# snowballstemmer==2.0.0 # Installed as dependency for sphinx
+# sphinxcontrib-applehelp==1.0.2 # Installed as dependency for sphinx
+# sphinxcontrib-devhelp==1.0.2 # Installed as dependency for sphinx
+# sphinxcontrib-htmlhelp==1.0.3 # Installed as dependency for sphinx
+# sphinxcontrib-jsmath==1.0.1 # Installed as dependency for sphinx
+# sphinxcontrib-qthelp==1.0.3 # Installed as dependency for sphinx
+# sphinxcontrib-serializinghtml==1.1.4 # Installed as dependency for sphinx
+# sqlparse==0.3.1 # Installed as dependency for django, django-request-token
+# toml==0.10.0 # Installed as dependency for pylint, pep517
+# urllib3==1.25.9 # Installed as dependency for selenium, requests
+# wcwidth==0.2.3 # Installed as dependency for prompt-toolkit
+# webencodings==0.5.1 # Installed as dependency for html5lib
+# wrapt==1.12.1 # Installed as dependency for astroid
