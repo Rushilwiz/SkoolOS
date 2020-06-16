@@ -47,7 +47,7 @@ def getTeacher(ion_user):
         return None
         print(r.status_code)
 
-
+#makes a GET request to given url, returns dict
 def getDB(url):
     """
     Sends a GET request to the URL
@@ -55,9 +55,9 @@ def getDB(url):
     """
     r = requests.get(url=url, auth=('raffukhondaker', 'hackgroup1'))
     print("GET:" + str(r.status_code))
-    return r.json()
+    return(r.json())
 
-
+#makes a PATCH (updates instance) request to given url, returns dict
 def patchDB(data, url):
     """
     Sends a PATCH request to the URL
@@ -69,6 +69,7 @@ def patchDB(data, url):
     return r.json()
 
 
+#makes a POST (makes new instance) request to given url, returns dict
 def postDB(data, url):
     """
     Sends a POST request to the URL
@@ -80,6 +81,7 @@ def postDB(data, url):
     return r.json()
 
 
+#makes a PUT (overwrites instance) request to given url, returns dict
 def putDB(data, url):
     """
     Sends a PUT request to the URL
@@ -91,6 +93,7 @@ def putDB(data, url):
     return r.json()
 
 
+#makes a DELETE (delete instance) request to given url, returns dict
 def delDB(url):
     """
     Sends a DELETE request to the URL
@@ -208,13 +211,14 @@ class Teacher:
             }
             # make class instance in db
             postDB(data, 'http://127.0.0.1:8000/api/classes/')
+            time.sleep(1)
             self.classes.append(cname)
             # add to  instance
             # update  self.classes
             data = {
                 'classes': self.classes
             }
-            print(self.username)
+            print(self.classes)
             print(patchDB(data, 'http://127.0.0.1:8000/api/teachers/' + self.username + "/"))
 
     # make a new class from scratch

@@ -100,9 +100,11 @@ def teacherCLI(user, password):
     # 3. Get progress logs on a student
     # 2. make an assignment for a class
     # 3. view student submissions for an assignment
-    carray = teacher.classes
-    carray.append("Exit SkoolOS")
+    carray = []
+    for c in teacher.classes:
+        carray.append(c)
     carray.append("Make New Class")
+    carray.append("Exit SkoolOS")
     courses = [
     {
         'type': 'list',
@@ -119,10 +121,11 @@ def teacherCLI(user, password):
         {
             'type': 'input',
             'name': 'cname',
-            'message': 'Class Name: ',
+            'message': 'Class Name (Must be: <subject>_<ion_user>): ',
         },
         ]
         cname = prompt(questions)['cname']
+        print(cname)
         teacher.makeClass(cname)
         soption = ["1) Add individual student", "2) Add list of students through path", "3) Exit"]
         questions = [
@@ -130,7 +133,7 @@ def teacherCLI(user, password):
             'type': 'list',
             'choices':soption,
             'name': 'students',
-            'message': 'Add list of students (input path): ',
+            'message': 'Add Students): ',
         },        
         ]
         choice = prompt(questions)['students'].split(")")[0]
@@ -138,15 +141,22 @@ def teacherCLI(user, password):
             s = input("Student name: ")
             teacher.addStudent(s, cname)
         if("2" == choice):
-            p = input("Relativee Path: ")
-            if(os.path.exists(p)):
-                print(p + " does not exist.")
+            print("File must be .txt and have 1 student username per line")
+            path = input("Relative Path: ")
+            while(not os.path.exists(path)):
+                if(path == 'N'):
+                    sys.exit(0)
+                print(path + " is not a valid path")
+                path = input("Enter file path ('N' to exit): ")
+            f = open(path, 'r')
+            students = f.read().splitlines()
+            teacher.reqAddStudentList(students, cname)
 
     else:
         print("Class: " + course)
         unconf = getDB("http://localhost:8000/api/classes/" + course)['unconfirmed']
         for s in unconf:
-            teacher.addStudent()
+            teacher.addStudent(s, course)
         options = ['1) Request Student', "2) Add assignment", "3) View student information"]
         questions = [
         {
