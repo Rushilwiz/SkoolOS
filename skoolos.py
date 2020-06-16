@@ -178,7 +178,7 @@ def teacherCLI(user, password):
         'message': 'Select class: ',
     },
     ]
-    course = prompt(courses)['course']
+    course = chooseGeneralTeacher(teacher)
     if course == "Exit SkoolOS":
         teacher.exitCLI()
     if course == "Make New Class":
