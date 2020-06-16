@@ -100,7 +100,7 @@ def teacher_profile (request):
     if request.method == "POST":
         userForm = UserUpdateForm(request.POST, instance=request.user)
         profileForm = TeacherUpdateForm(request.POST,
-                                        instance=request.user.student)
+                                        instance=request.user.teacher)
         if userForm.is_valid() and profileForm.is_valid():
             userForm.save()
             profileForm.save()
@@ -108,7 +108,7 @@ def teacher_profile (request):
             return redirect('profile')
     else:
         userForm = UserUpdateForm(instance=request.user)
-        profileForm = TeacherUpdateForm(instance=request.user.student)
+        profileForm = TeacherUpdateForm(instance=request.user.teacher)
 
     context = {
         'userForm': userForm,

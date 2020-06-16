@@ -254,27 +254,27 @@ class Teacher:
             print(sname + " does not exist.")
             return False
         course = getDB("http://127.0.0.1:8000/api/classes/" + cname)
-        # if(sname in str(course['unconfirmed'])):
-        #     print (sname + " already requested.")
-        #     return True
-        # if(sname in str(course['confirmed'])):
-        #     print (sname + " alredy enrolled.")
-        #     return False
+        if(sname in str(course['unconfirmed'])):
+            print (sname + " already requested.")
+            return True
+        if(sname in str(course['confirmed'])):
+            print (sname + " alredy enrolled.")
+            return False
         
-        # student = getDB("http://127.0.0.1:8000/api/students/" + sname)
-        # try:
-        #     if(student['added_to']==""):
-        #         student['added_to']=course['name']
-        #     else:
-        #         student['added_to']=student['added_to']+ "," + course['name']
-        # except:
-        #     print(sname + " does not exist.")
-        #     return False
-        # print(student['added_to'])
-        # data={
-        #     'added_to':student['added_to'],
-        # }
-        # student = patchDB(data, "http://localhost:8000/api/students/" + student['ion_user'] + "/")
+        student = getDB("http://127.0.0.1:8000/api/students/" + sname)
+        try:
+            if(student['added_to']==""):
+                student['added_to']=course['name']
+            else:
+                student['added_to']=student['added_to']+ "," + course['name']
+        except:
+            print(sname + " does not exist.")
+            return False
+        print(student['added_to'])
+        data={
+            'added_to':student['added_to'],
+        }
+        student = patchDB(data, "http://localhost:8000/api/students/" + student['ion_user'] + "/")
         student = getDB( "http://localhost:8000/api/students/" + (sname)+ "/")
         if(course['unconfirmed']==[]):
             course['unconfirmed']=student['ion_user']
@@ -597,8 +597,8 @@ class Teacher:
 
 data = getTeacher("eharris1")
 t = Teacher(data)
-#t.addClass("eharris1/APLit_eharris1")
-t.addAssignment("eharris1/APLit_eharris1/Essay1_APLit_eharris1", "APLit_eharris1", '2020-08-11 16:58:33.383124')
+#t.makeClass("APLit_eharris1")
+#t.addAssignment("eharris1/APLit_eharris1/Essay1_eharris1", "APLit_eharris1", '2020-08-11 16:58:33.383124')
 #ar = ['2022rkhondak','2022inafi','2023rumareti']
 #extra = t.reqAddStudentList(ar, "APLit_eharris1")
 #print(extra)
