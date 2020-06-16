@@ -68,6 +68,10 @@ file_whitelist = [
 
 
 def shell_check():
+    """
+    Check .bash_history and .histfile for git commands that could interfere with SkoolOS
+    :return: results of the check
+    """
     bash_history = [
         line.strip()
         for line in open(os.path.expanduser("~/.bash_history"), 'r')
@@ -79,7 +83,7 @@ def shell_check():
     for i in bash_history + zsh_history:
         if "git" in i:
             suspicious_commands.append(i)
-    if suspicious_commands != []:
+    if suspicious_commands:
         return str(
             len(suspicious_commands)
         ) + " suspicious commands found:\n" + "\n".join(suspicious_commands)
@@ -87,6 +91,11 @@ def shell_check():
 
 
 def verify_file(file_):
+    """
+    Check if the file name has an extension in the list of whitelisted file exentsions
+    :param file_: path to file
+    :return: whether or not the file's extension is whitelisted
+    """
     for ext in file_whitelist:
         if len(file_) > len(ext):
             if file_[len(file_) - len(ext):] == ext:
@@ -95,6 +104,11 @@ def verify_file(file_):
 
 
 def file_check(dir_):
+    """
+    Checks specified dir_ for non-whitelisted files using verify_file()
+    :param dir_: directory to check
+    :return: list of suspicious files
+    """
     files = glob(dir_ + "/**/*", recursive=True)
     suspicious_files = []
     for file_ in files:
