@@ -315,9 +315,9 @@ def authenticate():
     #Macos: chromdriver-mac
     #Windows: chromdriver.exe
     if('CLI' in os.getcwd()):
-        path = os.path.join(os.getcwd(), '../','chromedriver-mac')
+        path = os.path.join(os.getcwd(), '../','chromedriver/chromedriver-mac')
     else:
-        path = os.path.join(os.getcwd(), 'chromedriver-mac')
+        path = os.path.join(os.getcwd(), 'chromedriver/chromedriver-mac')
 
     browser = webdriver.Chrome(path)
 
