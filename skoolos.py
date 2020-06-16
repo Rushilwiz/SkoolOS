@@ -203,6 +203,17 @@ def makeClassTeacher(teacher):
     ]
     cname = prompt(questions)['cname']
     print(cname)
+    while(not ("_" + teacher.username) in cname):
+        print("Incorrect naming format")
+        questions = [
+        {
+            'type': 'input',
+            'name': 'cname',
+            'message': 'Class Name (Must be: <subject>_<ion_user>): ',
+        },
+        ]
+        cname = prompt(questions)['cname']
+
     teacher.makeClass(cname)
     soption = ["1) Add individual student", "2) Add list of students through path", "3) Exit"]
     questions = [
