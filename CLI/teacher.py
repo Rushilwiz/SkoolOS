@@ -604,7 +604,7 @@ class Teacher:
 
     # pull student's work, no modifications
     def getStudents(self, course):
-        if not (course in self.sclass):
+        if not (course in str(self.classes)):
             print(course + " not a class.")
             return
         path = self.username + "/Students/" + course
@@ -697,7 +697,7 @@ class Teacher:
         #     'classes':course
         # }
         log = self.getCommits(student, course, 30)
-        assignment['due_date'] = datetime.strptime(assignment['due_date'], '%Y-%m-%d %H:%M:%S.%f')
+        assignment['due_date'] = datetime.strptime(assignment['due_date'], '%Y-%m-%dT%H:%M:%S.%fZ')
         late = False
         cdir = os.getcwd()
         os.chdir(self.username + "/Students/" + course + "/" + student)
