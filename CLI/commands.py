@@ -4,7 +4,6 @@ import json
 import os
 import argparse
 
-
 '''
 my_parser = argparse.ArgumentParser(prog='skool', description='Let SkoolOS control your system', epilog="Try again")
 my_parser.add_argument('--init', action="store_true") #returns true if run argument
@@ -16,13 +15,15 @@ if(outputs['init']):
     start()
 '''
 
-#already ccrerrated account through website, has to login
+
+# already created account through website, has to login
 def update():
     """
     Gets data from the database
     :return:
     """
     return
+
 
 def yesorno(question):
     questions = [
@@ -33,17 +34,18 @@ def yesorno(question):
         },
     ]
     answers = prompt(questions)
-    if(answers["response"] == "y"):
+    if answers["response"] == "y":
         return True
     return False
+
 
 def login():
     """
     Login to the website with a username and password
     :return: user information json if successful, None otherwise
     """
-    #enter username
-    #enter password
+    # enter username
+    # enter password
     questions = [
         {
             'type': 'input',
@@ -57,12 +59,12 @@ def login():
         },
     ]
     user = prompt(questions)
-    #reading from json of users (replace w GET to database) to check if user is registered
+    # reading from json of users (replace w GET to database) to check if user is registered
     with open('users.json', 'r') as json_file:
         data = json.load(json_file)
         for i in range(len(data)):
             if user["webmail"] == data[i]["webmail"]:
-                if(user["password"] == data[i]["password"]):
+                if user["password"] == data[i]["password"]:
                     print("Logged in!")
                     return data[i]
                 else:
@@ -71,7 +73,8 @@ def login():
         print("User not found. Please Try again")
         return None
 
-#did not create account through website, has to signup/login
+
+# did not create account through website, has to signup/login
 def signup():
     """
     Used to create an account for the service.
@@ -93,7 +96,7 @@ def signup():
             'type': 'list',
             'name': 'grade',
             'message': 'Grade?',
-            'choices':["9","10","11","12"]
+            'choices': ["9", "10", "11", "12"]
         },
         {
             'type': 'input',
@@ -114,7 +117,7 @@ def signup():
     if len(user["password"]) < 6:
         print("Password is too short. Try again.")
         return None
-    if (("@tjhsst.edu" in user['webmail']) == False):
+    if not ("@tjhsst.edu" in user['webmail']):
         print("Webmail entered was not a @tjhhsst.edu. Try again.")
         return None
 
@@ -124,6 +127,7 @@ def signup():
         data.append(user)
         open("users.json", "w").write(str(json.dumps(data)))
     return user
+
 
 def relogin():
     """
@@ -135,15 +139,15 @@ def relogin():
             'type': 'list',
             'name': 'choice',
             'message': '',
-            'choices':["Continue as current user","Login into new user","Sign up into new account"]
+            'choices': ["Continue as current user", "Login into new user", "Sign up into new account"]
         },
     ]
     answer = prompt(questions)
 
 
 def setup(user):
-    #Read classes/assignenments and setup directory:
-    #SkoolOS/Math/Week1
+    # Read classes/assignenments and setup directory:
+    # SkoolOS/Math/Week1
     """
     Reads classes and assignments of/for the user and properly sets of their work directory
     :param user:
@@ -154,20 +158,20 @@ def setup(user):
         for a in user["classes"][c]:
             os.makedirs(c + "/" + a)
 
+
 def start():
     """
     Prompts the user for whether or not they have an account and allows them to login/signup depending on their response
     :return:
     """
-    if(os.path.exists(".login.txt") == False):
+    if not os.path.exists(".login.txt"):
         b = yesorno("Do you have a SkoolOS account?(y/N)")
-        if(b):
+        if b:
             user = login()
-            if(user != None):
+            if user is not None:
                 setup(user)
                 open(".login.txt", "w").write(str(user))
         else:
             user = signup()
-            if(user != None):
+            if user is not None:
                 open(".login.txt").write(str(user))
-
