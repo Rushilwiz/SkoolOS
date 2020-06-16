@@ -230,17 +230,18 @@ class Student:
         os.system(url)
 
         cdir = os.getcwd()
-        path1 = self.username + "/" + self.username
-        path2 = self.username
-        if (os.path.isdir(path1)):
-            os.chdir(path1)
-        else:
-            os.chdir(self.username)
-            command("git clone " + self.repo)
-            os.chdir(self.username)
+        os.chdir(self.username)
+        # path1 = self.username + "/" + self.username
+        # path2 = self.username
+        # if(os.path.isdir(path1)):
+        #     os.chdir(path1)
+        # else:
+        #     os.chdir(self.username)
+        #     command("git clone " + self.repo)
+        #     os.chdir(self.username)
 
         # push to git, start at master
-        os.chdir(self.username)
+        #os.chdir(self.username)
         command("git checkout master")
         command("git branch " + data['name'])
         command("git commit -m initial")
@@ -338,7 +339,8 @@ class Student:
             if c['name'] == courses:
                 command("git checkout " + courses)
                 print(os.listdir())
-                break
+                os.chdir(cdir)
+                return
         os.chdir(cdir)
         print("Class not found")
         return

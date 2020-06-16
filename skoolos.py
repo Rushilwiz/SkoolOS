@@ -47,12 +47,29 @@ def main():
         #webbrowser.open("http://127.0.0.1:8000/login", new=2)
         authenticate()
     else:
-        try:
-            f = open('.tprofile','r')
-        except:
-            f = open('.sprofile','r')
-        data = json.loads(f.read())
-        f.close()
+        profiles = os.listdir()
+        users = []
+        info = []
+        count = 1
+        for i in range(len(profiles)):
+            p = profiles[i]
+            if('profile' in p):
+                f = open(p,'r')
+                d = json.loads(f.read())
+                f.close()
+                info.append(d)
+                users.append(str(count) + ") " + d['username'])
+                count = count+1
+        user = [
+        {
+            'type': 'list',
+            'name': 'user',
+            'choices':users,
+            'message': 'Select User: ',
+        },
+        ]
+        u = int(prompt(user)['user'].split(")")[0]) -1
+        data = info[u]
         PWD = data['password']
         USER = data['username']
         print(data['username'])
@@ -61,17 +78,24 @@ def main():
         else:
             teacherCLI(USER, PWD)
         
+################################################ STUDENT METHODS
 
-    # while True:
-    #     pass
 def studentCLI(user, password):
     from CLI import student
     data = getUser(user, password, 'student')
     student = student.Student(data)
+    student.update()
+    EXIT = False
+    while(not EXIT):
+        course = chooseClassStudent(student)
+        EXIT = classOptionsStudent(student, course)
+
+#return class
+def  chooseClassStudent(student):
     carray = student.sclass.split(",")
     if(len(carray) == 1 and carray[0] == ""):
+        carray.remove("")
         print("No classes")
-        return
         
     carray.append("Exit SkoolOS")
     courses = [
@@ -84,11 +108,52 @@ def studentCLI(user, password):
     ]
     course = prompt(courses)['course']
     print(course)
-    if course == "Exit SkoolOS":
+    return course
+
+def classOptionsStudent(student, course):
+    student.viewClass(course)
+    student.getAssignments(course,  100)
+    choices = ["Save","Back","Exit SkoolOS"]
+    options = [
+    {
+        'type': 'list',
+        'name': 'option',
+        'choices':choices,
+        'message': 'Select: ',
+    },
+    ]
+    option = prompt(options)['option']
+    if(option == "Save"):
+        student.update()
+        print("Saved!")
+        classOptionsStudent(student, course)
+    if(option == "Back"):
         student.exitCLI()
-    else:
-        student.viewClass(course)
-        student.getAssignments(course,  100)
+        #dont exit cli
+        return False
+    if(option == "Exit SkoolOS"):
+        student.exitCLI()
+        #exit cli
+        return True
+
+        
+################################################ TEACHER METHODS
+def chooseGeneralTeacher(teacher):
+    carray = []
+    for c in teacher.classes:
+        carray.append(c)
+    carray.append("Make New Class")
+    carray.append("Exit SkoolOS")
+    courses = [
+    {
+        'type': 'list',
+        'name': 'course',
+        'choices':carray,
+        'message': 'Select class: ',
+    },
+    ]
+    course = prompt(courses)['course']
+    return course
 
 def teacherCLI(user, password):
     from CLI import teacher
@@ -113,7 +178,7 @@ def teacherCLI(user, password):
         'message': 'Select class: ',
     },
     ]
-    course = prompt(courses)['course']
+    course = chooseGeneralTeacher(teacher)
     if course == "Exit SkoolOS":
         teacher.exitCLI()
     if course == "Make New Class":
@@ -157,7 +222,7 @@ def teacherCLI(user, password):
         unconf = getDB("http://localhost:8000/api/classes/" + course)['unconfirmed']
         for s in unconf:
             teacher.addStudent(s, course)
-        options = ['1) Request Student', "2) Add assignment", "3) View student information"]
+        options = ['1) Request Student', "2) Add assignment", "3) View student information", "Exit"]
         questions = [
         {
             'type': 'list',
@@ -206,7 +271,7 @@ def teacherCLI(user, password):
                 students = f.read().splitlines()
                 teacher.reqAddStudentList(students, course)
             else:
-                sys.exit()
+                sys.exit(0)
         if(option == '2'):
             nlist = os.listdir(teacher.username + "/" + course)
             alist = getDB("http://localhost:8000/api/classes/" + course)['assignments']
@@ -241,9 +306,21 @@ def teacherCLI(user, password):
             ass = prompt(questions)['assignment']
             apath = teacher.username + "/" + course + "/" + ass
             due = input("Enter due date (Example: 2020-08-11 16:58): ")
-            due = due +  ":00.000000"
+            due = due +  ":33.383124"
             due = due.strip()
+            f = False
+            while(not f):
+                try:
+                    datetime.datetime.strptime(due, '%Y-%m-%d %H:%M:%S.%f')
+                    f = True
+                except:
+                    print("Due-date format is incorrect.")
+                    print(due)
+                    due = input("Enter due date (Example: 2020-08-11 16:58): ")
+                    due = due +  ":33.383124"
             teacher.addAssignment(apath, course, due)
+
+######################################################################
 
 
 def getUser(ion_user, password, utype):
