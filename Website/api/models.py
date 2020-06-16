@@ -6,7 +6,7 @@ import secrets
 
 class Student(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    ion_user = models.CharField(max_length=100)
+    ion_user = models.CharField(max_length=100, primary_key=True)
     grade = models.IntegerField(default=0, blank=True)
     git=models.CharField(default="", max_length=100, blank=True)
     repo=models.URLField(default="", blank=True)
