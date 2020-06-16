@@ -139,14 +139,13 @@ def createClassHelper(request):
     teacher = request.user.teacher
 
     if request.method == "POST":
-        userForm = UserUpdateForm(request.POST, instance=request.user)
-        profileForm = TeacherUpdateForm(request.POST,
-                                        instance=request.user.teacher)
-        if userForm.is_valid() and profileForm.is_valid():
-            userForm.save()
-            profileForm.save()
-            messages.success(request, "Your account has been updated!")
-            return redirect('profile')
+        classForm = ClassCreationForm(request.POST)
+        if classForm.is_valid():
+            cleaned_data = classForm.clean()
+            print(cleaned_data)
+            classForm.save(username=teacher.user.username)
+            messages.success(request, cleaned_data['subject'].capitalize() + " has been created!")
+            return redirect('home')
     else:
         classForm = ClassCreationForm()
 

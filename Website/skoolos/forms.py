@@ -54,23 +54,16 @@ class ClassCreationForm (forms.ModelForm):
             initial['unconfirmed'] = [t.pk for t in kwargs['instance'].unconfirmed.all()]
 
     # Overriding save allows us to process the value of 'unconfirmed' field
-    def save(self, commit=True):
-        # Get the unsave Pizza instance
-        instance = forms.ModelForm.save(self, False)
+    def save(self, username=""):
+        cleaned_data = self.cleaned_data
+        print(self)
 
-        # Prepare a 'save_m2m' method for the form,
-        old_save_m2m = self.save_m2m
-        def save_m2m():
-           old_save_m2m()
-           # This is where we actually link the pizza with toppings
-           instance.topping_set.clear()
-           instance.topping_set.add(*self.cleaned_data['unconfirmed'])
-        self.save_m2m = save_m2m
-
-        # Do we need to save all changes now?
-        if commit:
-            instance.save()
-            self.save_m2m()
+        # Get the unsave Class instance
+        instance = forms.ModelForm.save(self)
+        instance.unconfirmed.clear()
+        instance.unconfirmed.add(*cleaned_data['unconfirmed'])
+        instance.name = cleaned_data['subject'] + str(cleaned_data['period']) + "_" + username
+        print("Class name: " + instance.name)
 
         return instance
 
