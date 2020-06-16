@@ -96,7 +96,7 @@ def putDB(user, pwd, data, url):
     :param user: a string
     :param password: a string
     :param url: URL for request
-   """
+    """
     r = requests.put(url=url, data=data, auth=(user, pwd))
     print("PUT:" + str(r.status_code))
     return r.json()

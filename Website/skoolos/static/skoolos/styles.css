@@ -92,3 +92,13 @@ a.article-title:hover {
 .account-heading {
   font-size: 2.5rem;
 }
+
+.class-card {
+  text-decoration: none;
+  color: gray;
+}
+
+.class-card:hover {
+  text-decoration: none;
+  color: black;
+}
