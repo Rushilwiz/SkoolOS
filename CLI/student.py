@@ -186,6 +186,7 @@ class Student:
             print("ADDING CLASS: " + str(c['name']))
             self.addClass(str(c['name']))
         command("git checkout master")
+        print(os.getcwd())
     
     #updates 1 class, does not switch to master
     def updateClass(self, course):
@@ -222,14 +223,14 @@ class Student:
         os.system(url)
 
         cdir = os.getcwd()
-        # path1 = self.username + "/" + self.username
-        # path2 = self.username
-        # if(os.path.isdir(path1)):
-        #     os.chdir(path1)
-        # else:
-        #     os.chdir(self.username)
-        #     command("git clone " + self.repo)
-        #     os.chdir(self.username)
+        path1 = self.username + "/" + self.username
+        path2 = self.username
+        if(os.path.isdir(path1)):
+            os.chdir(path1)
+        else:
+            os.chdir(self.username)
+            command("git clone " + self.repo)
+            os.chdir(self.username)
 
         #push to git, start at master
         os.chdir(self.username)
@@ -277,6 +278,7 @@ class Student:
         data={
             'user':self.user,
             'added_to':self.snew,
+            'classes':self.sclass
         }
         print(self.url)
         print(patchDB(data, self.url))
@@ -366,15 +368,14 @@ class Student:
         command('git checkout master')
         os.chdir(cdir)
 
-# data = getStudent("2022rkhondak")
-# s = Student(data)
-# #s.viewClass("APLit_eharris1")
-# #s.updateClass("APLit_eharris1")
+data = getStudent("2022rkhondak")
+s = Student(data)
+#s.viewClass("APLit_eharris1")
+s.addClass("APLit_eharris1")
 # #s.update()
 # s.exitCLI()
 
 def main():
-    print("noooo")
     pass
 
 if __name__ == "__main__":
