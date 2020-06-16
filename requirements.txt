@@ -34,7 +34,7 @@ pulsemixer==1.5.0
 pycairo==1.19.1
 pyclipper==1.1.0.post3
 Pygments==2.6.1
-PyGObject==3.34.0
+# PyGObject==3.34.0
 pyinotify==0.9.6
 PyInquirer==1.0.3
 pylint==2.5.3
