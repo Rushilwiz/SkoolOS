@@ -365,6 +365,7 @@ class Teacher:
     def addAssignment(self, path, course, due):
         parts = path.split("/")
         aname = parts[len(parts)-1]
+        oname = aname  + "_" + course
 
         if(os.path.isdir(path) == 0 or len(parts) < 3) or aname in str(self.classes):
             print("Not valid path.")
@@ -373,9 +374,9 @@ class Teacher:
             print("Not in valid class directory")
             return False
         #parts of assignment name (Essay1, APLit)
-        if((course in aname) == False):
-            print("Assignment named incorrectly; could be "+ aname + "_" + course)
-            return False
+        # if((course in aname) == False):
+        #     print("Assignment named incorrectly; could be "+ aname + "_" + course)
+        #     return False
     
         ar  = [x[2] for x in os.walk(path)]
         print(ar)
@@ -383,10 +384,10 @@ class Teacher:
             if len(folder) == 0:
                 print("Assignment is completely empty, needs a file.")
                 return False
-        p1 = course.split("_")[0]
-        if(p1 in aname == False):
-            print(aname + "incorrectly formated: must be " + aname + "_" + p1 + ".")
-            return False
+        # p1 = course.split("_")[0]
+        # if(p1 in aname == False):
+        #     print(aname + "incorrectly formated: must be " + aname + "_" + p1 + ".")
+        #     return False
         try:
             datetime.strptime(due, '%Y-%m-%d %H:%M:%S.%f')
         except:
@@ -397,9 +398,8 @@ class Teacher:
         if(aname in str(course['assignments'])):
             print("Assignment name already taken.")
             return False
-    
         print(course['assignments'])
-        input()
+        print(aname)
         #################### FINISH VERIFYING
 
         if(os.path.exists(os.getcwd() + "/" + self.username + "/Students/" + course['name']) == False):
@@ -428,14 +428,14 @@ class Teacher:
         r = requests.get(url = 'http://127.0.0.1:8000/api/assignments/' + aname, auth=('raffukhondaker','hackgroup1')) 
         if(r.status_code != 200):
             ass = {
-                'name': aname,
+                'name': oname,
                 'path':path,
                 'classes':course['name'],
                 'teacher':self.username,
                 'due_date':due
             }
             postDB(ass, 'http://127.0.0.1:8000/api/assignments/')
-            course['assignments'].append(aname)
+            course['assignments'].append(oname)
                 
             cinfo = {
                 "assignments": course['assignments'],
@@ -451,6 +451,7 @@ class Teacher:
     def updateAssignment(self, path, course, due):
         parts = path.split("/")
         aname =  parts[len(parts)-1]
+        oname=aname + "_" + course
         if(os.path.isdir(path) == False):
             print(path + " is not an assignment.")
             return
@@ -460,7 +461,7 @@ class Teacher:
                 d = {
                     'due_date':due,
                 }
-                patchDB(d, 'http://localhost:8000/api/assignments/' + aname + "/")
+                print(patchDB(d, 'http://localhost:8000/api/assignments/' + oname + "/"))
                 print("Due-date changed " + due)
         except:
             print("Due-date is the same")
@@ -471,19 +472,15 @@ class Teacher:
         for st in slist:
             if st in course['confirmed']:
                 spath =  os.path.join(os.getcwd() + "/" + self.username + "/Students/" + course['name'], st)
-                if(os.path.exists(spath + "/" + aname) == False):
-                    os.mkdir(spath + "/"  + aname)
-                    print(st)
-                    print(copy_tree(path, spath + "/" + aname))
-                    os.chdir(spath)
-                    command('git checkout ' + course['name'])
-                    command('git pull origin ' + course['name'])
-                    command('git add .')
-                    command('git commit -m Hello')
-                    command('git push -u origin ' + course['name'])
-                    os.chdir(cdir)
-                else:
-                    print(st + " already has assignment")
+                print(st)
+                print(copy_tree(path, spath + "/" + aname))
+                os.chdir(spath)
+                #command('git checkout ' + course['name'])
+                command('git add .')
+                command('git commit -m Hello')
+                command('git pull origin ' + course['name'])
+                command('git push -u origin ' + course['name'])
+                os.chdir(cdir)
 
     #pull student's work, no modifications
     def getStudents(self, course):
@@ -598,7 +595,7 @@ class Teacher:
 data = getTeacher("eharris1")
 t = Teacher(data)
 #t.makeClass("APLit_eharris1")
-#t.addAssignment("eharris1/APLit_eharris1/Essay1_eharris1", "APLit_eharris1", '2020-08-11 16:58:33.383124')
+t.updateAssignment("eharris1/APLit_eharris1/BookReport", "APLit_eharris1", '2020-08-11 16:58:33.383124')
 #ar = ['2022rkhondak','2022inafi','2023rumareti']
 #extra = t.reqAddStudentList(ar, "APLit_eharris1")
 #print(extra)
