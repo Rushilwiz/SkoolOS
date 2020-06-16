@@ -233,22 +233,6 @@ def authenticate():
         path = os.path.join(os.getcwd(), 'chromedriver-mac')
 
     browser = webdriver.Chrome(path)
-    # web_dir = os.path.join(os.getcwd(), 'CLI', 'oauth')
-    # print(web_dir)
-    # os.chdir(web_dir)
-    # if os.path.exists("index.html"):
-    #     os.remove("index.html")
-
-    # template = open("template.html", "r")
-    # index = open("index.html", "w")
-    # for line in template:
-    #     index.write(line.replace('AUTH_URL', authorization_url))
-    # template.close()
-    # index.close()
-
-    # server = Thread(target=create_server)
-    # server.daemon = True
-    # server.start()
 
     browser.get("localhost:8000/login")
 
