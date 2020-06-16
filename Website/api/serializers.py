@@ -34,7 +34,7 @@ class ClassSerializer(serializers.ModelSerializer):
     class Meta:
         model = Class
         # fields = ['url','name', 'repo','path', "teacher",'assignments',"default_file", 'confirmed', 'unconfirmed','owner']
-        fields = ['name', 'repo','path','assignments',"teacher","default_file", 'confirmed', 'unconfirmed','owner']
+        fields = ['name', 'repo','path','subject','period','assignments',"teacher","default_file", 'confirmed', 'unconfirmed','owner']
 
 class StudentSerializer(serializers.ModelSerializer):
     # Class = ClassSerializer(many=True, read_only=True,allow_null=True)

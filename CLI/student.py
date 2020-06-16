@@ -13,9 +13,9 @@ import datetime
 # git clone student directory ==> <student-id>/classes/assignments
 
 # get teacher info from api
-def getStudent(ion_user):
+def getStudent(ion_user, password):
     URL = "http://127.0.0.1:8000/api/students/" + ion_user + "/"
-    r = requests.get(url=URL, auth=('raffukhondaker', 'hackgroup1'))
+    r = requests.get(url=URL, auth=(ion_user, password))
     if (r.status_code == 200):
         data = r.json()
         return data
@@ -30,33 +30,60 @@ def getStudent(ion_user):
         print(r.status_code)
 
 #makes a GET request to given url, returns dict
-def getDB(url):
-    r = requests.get(url=url, auth=('raffukhondaker', 'hackgroup1'))
+def getDB(user, pwd, url):
+    """
+    Sends a GET request to the URL
+    :param url: URL for request
+    """
+    r = requests.get(url=url, auth=(user, pwd))
     print("GET:" + str(r.status_code))
-    return (r.json())
-
-#makes a PATCH (updates instance) request to given url, returns dict
-def patchDB(data, url):
-    r = requests.patch(url = url, data=data, auth=('raffukhondaker','hackgroup1'))
-    print("PATCH:" + str(r.status_code))
     return(r.json())
 
+#makes a PATCH (updates instance) request to given url, returns dict
+def patchDB(user, pwd, data, url):
+    """
+    Sends a PATCH request to the URL
+    :param data:
+    :param url: URL for request
+    """
+    r = requests.patch(url=url, data=data, auth=(user, pwd))
+    print("PATCH:" + str(r.status_code))
+    return r.json()
+
+
 #makes a POST (makes new instance) request to given url, returns dict
-def postDB(data, url):
-    r = requests.post(url=url, data=data, auth=('raffukhondaker', 'hackgroup1'))
+def postDB(user, pwd, data, url):
+    """
+    Sends a POST request to the URL
+    :param data:
+    :param url: URL for request
+    """
+    r = requests.post(url=url, data=data, auth=(user, pwd))
     print("POST:" + str(r.status_code))
-    return (r.json())
+    return r.json()
+
 
 #makes a PUT (overwrites instance) request to given url, returns dict
-def putDB(data, url):
-    r = requests.put(url=url, data=data, auth=('raffukhondaker', 'hackgroup1'))
+def putDB(user, pwd, data, url):
+    """
+    Sends a PUT request to the URL
+    :param data:
+    :param url: URL for request
+   """
+    r = requests.put(url=url, data=data, auth=(user, pwd))
     print("PUT:" + str(r.status_code))
-    return (r.json())
+    return r.json()
+
 
 #makes a DELETE (delete instance) request to given url, returns dict
-def delDB(url):
-    r = requests.delete(url=url, auth=('raffukhondaker', 'hackgroup1'))
+def delDB(user, pwd, url):
+    """
+    Sends a DELETE request to the URL
+    :param url: URL for request
+    """
+    r = requests.delete(url=url, auth=(user, pwd))
     print("DELETE:" + str(r.status_code))
+    return None
 
 
 def command(command):
