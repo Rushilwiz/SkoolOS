@@ -566,7 +566,7 @@ class Teacher:
                 'path': path,
                 'classes': course['name'],
                 'teacher': self.username,
-                'due_date': due,
+                'due_date': str(due),
                 'owner':self.id
             }
             postDB(self.username, self.password, ass, 'http://127.0.0.1:8000/api/assignments/')
@@ -740,9 +740,11 @@ class Teacher:
         print("heheheh")
 
 
-# data = getTeacher("eharris1","PWD")
+data = getTeacher("eharris1",'hackgroup1')
 # print(data)
-#t = Teacher(data, "PWD")
+t = Teacher(data, 'hackgroup1')
+t.addAssignment("eharris1/Truck_eharris1/Assignment1", "Truck_eharris1", '2020-08-11 16:58:33.383124')
+
 # t.makeClass("APLit_eharris1")
 # t.updateAssignment("eharris1/APLit_eharris1/BookReport", "APLit_eharris1", '2020-08-11 16:58:33.383124')
 # ar = ['2022rkhondak','2022inafi','2023rumareti']
@@ -752,6 +754,13 @@ class Teacher:
 # t.getChanges('2022rkhondak','APLit_eharris1', 10)
 
 '''
+{
+    "name": "a",
+    "due_date": '2020-08-11 16:58:33.383124',
+    "path": "",
+    "teacher": ""
+}
+
 TO-DO
 - More checks
     - add students to APLit_eharris1

@@ -33,10 +33,10 @@ def getStudent(ion_user, password):
 def getDB(user, pwd, url):
     """
     Sends a GET request to url
-    :param user: username
-    :param pwd: password
-    :param url: URL for request
-    :return: json request response
+    param user: username
+    param pwd: password
+    param url: URL for request
+    return: json request response
     """
     r = requests.get(url=url, auth=(user, pwd))
     print("GET:" + str(r.status_code))
@@ -46,11 +46,11 @@ def getDB(user, pwd, url):
 def patchDB(user, pwd, data, url):
     """
     Sends a PATCH request to url
-    :param user: username
-    :param pwd: password
-    :param url: URL for request
-    :param data: data to request
-    :return: json request response
+    param user: username
+    param pwd: password
+    param url: URL for request
+    param data: data to request
+    return: json request response
     """
     r = requests.patch(url=url, data=data, auth=(user, pwd))
     print("PATCH:" + str(r.status_code))
@@ -61,11 +61,11 @@ def patchDB(user, pwd, data, url):
 def postDB(user, pwd, data, url):
     """
     Sends a POST request to url
-    :param user: username
-    :param pwd: password
-    :param url: URL for request
-    :param data: data to request
-    :return: json request response
+    param user: username
+    param pwd: password
+    param url: URL for request
+    param data: data to request
+    return: json request response
     """
     r = requests.post(url=url, data=data, auth=(user, pwd))
     print("POST:" + str(r.status_code))
@@ -76,11 +76,11 @@ def postDB(user, pwd, data, url):
 def putDB(user, pwd, data, url):
     """
     Sends a PUT request to url
-    :param user: username
-    :param pwd: password
-    :param url: URL for request
-    :param data: data to request
-    :return: json request response
+    param user: username
+    param pwd: password
+    param url: URL for request
+    param data: data to request
+    return: json request response
     """
     r = requests.put(url=url, data=data, auth=(user, pwd))
     print("PUT:" + str(r.status_code))
@@ -91,10 +91,10 @@ def putDB(user, pwd, data, url):
 def delDB(user, pwd, url):
     """
     Sends a DELETE request to url
-    :param user: username
-    :param pwd: password
-    :param url: URL for request
-    :return: json request response
+    param user: username
+    param pwd: password
+    param url: URL for request
+    return: json request response
     """
     r = requests.delete(url=url, auth=(user, pwd))
     print("DELETE:" + str(r.status_code))
