@@ -1,3 +1,6 @@
+"""
+The main program file for SkoolOS
+"""
 import sys
 from urllib.parse import urlparse
 import requests
