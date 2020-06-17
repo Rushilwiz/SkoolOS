@@ -5,6 +5,7 @@
   <div class="media">
     <div class="media-body">
       <h2 class="account-heading">{{ user.username }}</h2>
+      <p class="text-secondary">Student</p>
       <large>{{ user.first_name }} {{ user.last_name }}</large>
       <p class="text-secondary">
         {{ user.email }}
@@ -16,6 +17,8 @@
   <ul>
     {% for class in classes %}
     <li>{{ class.name }}</li>
+    {% empty %}
+    <li>No classes</li>
     {% endfor %}
   </ul>
   <form method="post" enctype="multipart/form-data">
