@@ -7,11 +7,14 @@ import time
 import sys
 import os
 import pyinotify
-import checker
+from . import checker
 from pathlib import Path
 
 
 class EventHandler(pyinotify.ProcessEvent):
+    """
+    Custom event handler for watching a SkoolOS work directory
+    """
     _methods = [
         "IN_CREATE",
         "IN_CLOSE_WRITE",
@@ -24,8 +27,8 @@ class EventHandler(pyinotify.ProcessEvent):
     def process_IN_CREATE(self, event):
         """
         Generates an output to record for IN_CREATE events
-        :param event: event automatically passed to function
-        :return: none
+        param event: event automatically passed to function
+        return: none
         """
         description = \
             "Event: Created file\n" \
@@ -39,8 +42,8 @@ class EventHandler(pyinotify.ProcessEvent):
     def process_IN_CLOSE_WRITE(self, event):
         """
         Generates an output to record for IN_CLOSE_WRITE events
-        :param event: event automatically passed to function
-        :return: none
+        param event: event automatically passed to function
+        return: none
         """
         description = \
             "Event: Wrote to a file\n" \
@@ -54,8 +57,8 @@ class EventHandler(pyinotify.ProcessEvent):
     def process_IN_DELETE(self, event):
         """
         Generates an output to record for IN_DELETE events
-        :param event: event automatically passed to function
-        :return: none
+        param event: event automatically passed to function
+        return: none
         """
         description = \
             "Event: Deleted file\n" \
@@ -69,8 +72,8 @@ class EventHandler(pyinotify.ProcessEvent):
     def process_IN_MOVED_TO(self, event):
         """
         Generates an output to record for IN_MOVED_TO events
-        :param event: event automatically passed to function
-        :return: none
+        param event: event automatically passed to function
+        return: none
         """
         description = \
             "Event: Moved a file in\n" \
@@ -84,8 +87,8 @@ class EventHandler(pyinotify.ProcessEvent):
     def process_IN_MOVED_FROM(self, event):
         """
         Generates an output to record for IN_MOVED_FROM events
-        :param event: event automatically passed to function
-        :return: none
+        param event: event automatically passed to function
+        return: none
         """
         description = \
             "Event: Moved a file out\n" \
@@ -99,8 +102,8 @@ class EventHandler(pyinotify.ProcessEvent):
     def process_IN_OPEN(self, event):
         """
         Generates an output to record for IN_OPEN events
-        :param event: event automatically passed to function
-        :return: none
+        param event: event automatically passed to function
+        return: none
         """
         description = \
             "Event: Opened file\n" \
@@ -122,9 +125,9 @@ def watch_dir(watched_dir=str(Path.home()), log_dir="SkoolOS/logs"):
     """
     Watches the specified directory for changes and outputs it in
     human readable format to a log file in the specified log directory.
-    :param watched_dir: directory to watch for changes
-    :param log_dir: directory to store log files
-    :return: none
+    param watched_dir: directory to watch for changes
+    param log_dir: directory to store log files
+    return: none
     """
     global DIR
     global START_TIME
@@ -152,7 +155,7 @@ def watch_dir(watched_dir=str(Path.home()), log_dir="SkoolOS/logs"):
 def stop_watching():
     """
     Stops the watch started by watch_dir()
-    :return: none
+    return: none
     """
     NOTIFIER.stop()
     now = time.time()

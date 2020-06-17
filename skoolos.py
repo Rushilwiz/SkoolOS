@@ -50,7 +50,9 @@ def main():
             URL = "http://127.0.0.1:8000/api/"
             r = requests.get(url=URL)
         except:
-            print("Run Django server on http://127.0.0.1:8000/ before continuing")
+            print(
+                "Run Django server on http://127.0.0.1:8000/ before continuing"
+            )
             sys.exit(0)
 
         input("Welcome to SkoolOS. Press any key to create an account")
@@ -94,11 +96,12 @@ def main():
 
 #################################################################################################### STUDENT METHODS
 
+
 def studentCLI(user, password):
     """
     The CLI for students to access
-    @param user: student username
-    @param password: student password
+    param user: student username
+    param password: student password
     """
     from CLI import student
     data = getUser(user, password, 'student')
@@ -116,8 +119,8 @@ def studentCLI(user, password):
 def chooseClassStudent(student):
     """
     Chooses a class for a student to view and work on
-    @param student: a student
-    :return: a course prompt
+    param student: a student
+    return: a course prompt
     """
     carray = student.sclass.split(",")
     if len(carray) == 1 and carray[0] == "":
@@ -142,13 +145,13 @@ def classOptionsStudent(student, course):
     """
     Allows students to choose what they want to do related to a class
     The student can save, exit, or go back
-    @param student: a student
-    @param course: a course
-    :return: True if exiting, False if going back
+    param student: a student
+    param course: a course
+    return: True if exiting, False if going back
     """
     student.viewClass(course)
-    student.getAssignments(course,  100)
-    choices = ["Save","Submit assignment","Back","Exit SkoolOS"]
+    student.getAssignments(course, 100)
+    choices = ["Save", "Submit assignment", "Back", "Exit SkoolOS"]
     options = [
         {
             'type': 'list',
@@ -170,29 +173,30 @@ def classOptionsStudent(student, course):
         student.exitCLI()
         # exit cli
         return True
-    if(option == "Submit assignment"):
+    if (option == "Submit assignment"):
         assignments = os.listdir(student.username)
         tlist = []
         b = True
         for a in assignments:
-            oname = a + "_" + course            
+            oname = a + "_" + course
             a = student.username + "/" + a
-            if(os.path.isdir(a) and not "." in a and not oname in student.completed):
+            if (os.path.isdir(a) and not "." in a
+                    and not oname in student.completed):
                 tlist.append(a)
         assignments = tlist
         assignments.append("Back")
         print(assignments)
-            
+
         options = [
-        {
-            'type': 'list',
-            'name': 'submit',
-            'choices':assignments,
-            'message': 'Select: ',
-        },
+            {
+                'type': 'list',
+                'name': 'submit',
+                'choices': assignments,
+                'message': 'Select: ',
+            },
         ]
         ass = prompt(options)['submit']
-        if(ass == "Back"):
+        if (ass == "Back"):
             return False
         else:
             student.submit(course, ass)
@@ -203,8 +207,8 @@ def classOptionsStudent(student, course):
 def teacherCLI(user, password):
     """
     The CLI for teachers to access
-    @param user: teachers username
-    @param password: teachers password
+    param user: teachers username
+    param password: teachers password
     """
     from CLI import teacher
     data = getUser(user, password, 'teacher')
@@ -278,7 +282,10 @@ def makeClassTeacher(teacher):
         cname = prompt(questions)['cname']
 
     teacher.makeClass(cname)
-    soption = ["1) Add individual student", "2) Add list of students through path", "3) Exit"]
+    soption = [
+        "1) Add individual student", "2) Add list of students through path",
+        "3) Exit"
+    ]
     questions = [
         {
             'type': 'list',
@@ -307,10 +314,15 @@ def makeClassTeacher(teacher):
 
 def classOptionsTeacher(teacher, course):
     print("Class: " + course)
-    unconf = getDB(teacher.username, teacher.password, "http://localhost:8000/api/classes/" + course)['unconfirmed']
+    unconf = getDB(teacher.username, teacher.password,
+                   "http://localhost:8000/api/classes/" +
+                   course)['unconfirmed']
     for s in unconf:
         teacher.addStudent(s, course)
-    options = ['1) Request Student', "2) Add assignment", "3) View student information", "4) Exit"]
+    options = [
+        '1) Request Student', "2) Add assignment",
+        "3) View student information", "4) Exit"
+    ]
     questions = [
         {
             'type': 'list',
@@ -324,7 +336,10 @@ def classOptionsTeacher(teacher, course):
 
 
 def addStudentsTeacher(teacher, course):
-    soption = ["1) Add individual student", "2) Add list of students through path", "3) Exit"]
+    soption = [
+        "1) Add individual student", "2) Add list of students through path",
+        "3) Exit"
+    ]
     questions = [
         {
             'type': 'list',
@@ -369,7 +384,8 @@ def addStudentsTeacher(teacher, course):
 
 def addAssignmentTeacher(teacher, course):
     nlist = os.listdir(teacher.username + "/" + course)
-    alist = getDB(teacher.username, teacher.password, "http://localhost:8000/api/classes/" + course)['assignments']
+    alist = getDB(teacher.username, teacher.password,
+                  "http://localhost:8000/api/classes/" + course)['assignments']
     print(nlist)
     tlist = []
     b = True
@@ -388,8 +404,8 @@ def addAssignmentTeacher(teacher, course):
     nlist = tlist
     if len(nlist) == 0:
         print("No new assignments found")
-        print(
-            "To make an assignment: make a subdirectory in the " + course + " folder. Add a file within the new folder")
+        print("To make an assignment: make a subdirectory in the " + course +
+              " folder. Add a file within the new folder")
         return False
     questions = [
         {
@@ -419,7 +435,8 @@ def addAssignmentTeacher(teacher, course):
 
 
 def viewStudentsTeacher(teacher, course):
-    data = getDB(teacher.username, teacher.password, "http://127.0.0.1:8000/api/classes/" + course)
+    data = getDB(teacher.username, teacher.password,
+                 "http://127.0.0.1:8000/api/classes/" + course)
     students = data["confirmed"]
     unconf = data['unconfirmed']
     print("Studented in class: ")
@@ -429,23 +446,25 @@ def viewStudentsTeacher(teacher, course):
     for s in unconf:
         print(s)
     student = input("View student (Enter student's ion username): ")
-    while((not student in str(data['confirmed'])) and (not student in str(data['unconfirmed']))):
+    while ((not student in str(data['confirmed']))
+           and (not student in str(data['unconfirmed']))):
         print("Student not affiliated with class")
         student = input("View student ('N' to exit): ")
         if student == 'N':
             return False
-    sinfo = getDB(teacher.username, teacher.password, "http://127.0.0.1:8000/api/students/" + student + "/")
+    sinfo = getDB(teacher.username, teacher.password,
+                  "http://127.0.0.1:8000/api/students/" + student + "/")
     pprint.pprint(sinfo)
     print("Confirmed: " + str(student in str(data['confirmed'])))
-    if(student in str(data['confirmed'])):
+    if (student in str(data['confirmed'])):
         path = teacher.username + "/Students/" + course + "/" + student
         print(student + "'s work: " + path)
         fin = sinfo['completed'].split(",")
         alist = []
         for f in fin:
-            if(course in f):
+            if (course in f):
                 late = teacher.afterSubmit(course, f, student)
-                if(late):
+                if (late):
                     s = f.split("_")[0] + " (LATE)"
                 else:
                     s = f.split("_")[0]
@@ -454,16 +473,17 @@ def viewStudentsTeacher(teacher, course):
 
     #put log stuff
 
+
 ############################################################################################################################################
 
 
 def getUser(ion_user, password, utype):
     """
     Returns user information
-    @param ion_user: user
-    @param password: user's password
-    @param utype: type of user (student or teacher
-    :return: api user information
+    param ion_user: user
+    param password: user's password
+    param utype: type of user (student or teacher
+    return: api user information
     """
     if 'student' in utype:
         URL = "http://127.0.0.1:8000/api/students/" + ion_user + "/"
@@ -490,11 +510,11 @@ def getUser(ion_user, password, utype):
 def patchDB(USER, PWD, url, data):
     """
     Sends a PATCH request to url
-    @param USER: username
-    @param PWD: password
-    @param url: URL for request
-    @param data: data to request
-    :return: json request response
+    param USER: username
+    param PWD: password
+    param url: URL for request
+    param data: data to request
+    return: json request response
     """
     r = requests.patch(url=url, data=data, auth=(USER, PWD))
     print("PATH:" + str(r.status_code))
@@ -504,10 +524,10 @@ def patchDB(USER, PWD, url, data):
 def getDB(USER, PWD, url):
     """
     Sends a GET request to url
-    @param USER: username
-    @param PWD: password
-    @param url: URL for request
-    :return: json request response
+    param USER: username
+    param PWD: password
+    param url: URL for request
+    return: json request response
     """
     r = requests.get(url=url, auth=(USER, PWD))
     print("GET:" + str(r.status_code))
@@ -517,11 +537,11 @@ def getDB(USER, PWD, url):
 def postDB(USER, PWD, url, data):
     """
     Sends a POST request to url
-    @param USER: username
-    @param PWD: password
-    @param url: URL for request
-    @param data: data to request
-    :return: json request response
+    param USER: username
+    param PWD: password
+    param url: URL for request
+    param data: data to request
+    return: json request response
     """
     r = requests.post(url=url, data=data, auth=(USER, PWD))
     print("POST:" + str(r.status_code))
@@ -531,11 +551,11 @@ def postDB(USER, PWD, url, data):
 def putDB(USER, PWD, url, data):
     """
     Sends a PUT request to url
-    @param USER: username
-    @param PWD: password
-    @param url: URL for request
-    @param data: data to request
-    :return: json request response
+    param USER: username
+    param PWD: password
+    param url: URL for request
+    param data: data to request
+    return: json request response
     """
     r = requests.put(url=url, data=data, auth=(USER, PWD))
     print("PUT:" + str(r.status_code))
@@ -545,10 +565,10 @@ def putDB(USER, PWD, url, data):
 def delDB(USER, PWD, url):
     """
     Sends a DELETE request to url
-    @param USER: username
-    @param PWD: password
-    @param url: URL for request
-    :return: json request response
+    param USER: username
+    param PWD: password
+    param url: URL for request
+    return: json request response
     """
     r = requests.delete(url=url, auth=(USER, PWD))
     print("DELETE:" + str(r.status_code))
@@ -558,7 +578,7 @@ def delDB(USER, PWD, url):
 def makePass():
     """
     Prompts the user to create a password
-    :return: the password
+    return: the password
     """
     questions = [
         {
@@ -591,8 +611,11 @@ def authenticate():
     """
     Authenticates the user via Ion OAuth
     """
-    oauth = OAuth2Session(client_id=client_id, redirect_uri=redirect_uri, scope=scope)
-    authorization_url, state = oauth.authorization_url("https://ion.tjhsst.edu/oauth/authorize/")
+    oauth = OAuth2Session(client_id=client_id,
+                          redirect_uri=redirect_uri,
+                          scope=scope)
+    authorization_url, state = oauth.authorization_url(
+        "https://ion.tjhsst.edu/oauth/authorize/")
     import os
     cdir = os.getcwd()
     # Linux: chromdriver-linux
@@ -603,14 +626,14 @@ def authenticate():
     print("Linux")
 
     system = input("Enter OS: ")
-    while(system.lower() != "linux" and system.lower() != "macos"):
+    while (system.lower() != "linux" and system.lower() != "macos"):
         print("Not valid OS")
         system = input("Enter OS: ")
-    if(system.lower() == 'macos'):
+    if (system.lower() == 'macos'):
         path = os.path.join(os.getcwd(), 'chromedriver', 'chromedriver-mac')
-    if(system.lower() == 'linux'):
+    if (system.lower() == 'linux'):
         path = os.path.join(os.getcwd(), 'chromedriver', 'chromedriver-linux')
-    
+
     browser = webdriver.Chrome(path)
 
     browser.get("localhost:8000/login")
@@ -621,11 +644,13 @@ def authenticate():
     url = browser.current_url
     gets = url_decode(url.replace("http://localhost:8000/login/?", ""))
     while "http://localhost:8000/login/?username=" not in browser.current_url and (
-            not browser.current_url == "http://localhost:8000/"):  # http://localhost:8000/
+            not browser.current_url
+            == "http://localhost:8000/"):  # http://localhost:8000/
         time.sleep(0.25)
 
     url = browser.current_url
-    gets = url_decode(url.replace("http://localhost:8000/login/?username=", ""))
+    gets = url_decode(url.replace("http://localhost:8000/login/?username=",
+                                  ""))
     # code = gets.get("code")
     # if state == gets.get("state"):
     #     state = gets.get("state")
@@ -654,12 +679,15 @@ def authenticate():
         pwd = data['pwd']
         user = data['username']
         print(r.status_code)
-    r = requests.get(url="http://localhost:8000/api/students/" + user + "/", auth=(user, pwd))
+    r = requests.get(url="http://localhost:8000/api/students/" + user + "/",
+                     auth=(user, pwd))
     is_student = False
     if r.status_code == 200:
         is_student = True
         print("Welcome, student " + user)
-        r = requests.get(url="http://localhost:8000/api/students/" + user + "/", auth=(user, pwd))
+        r = requests.get(url="http://localhost:8000/api/students/" + user +
+                         "/",
+                         auth=(user, pwd))
         profile = r.json()
         username = profile['ion_user']
         grade = profile['grade']
@@ -676,7 +704,9 @@ def authenticate():
 
     else:
         print("Welcome, teacher " + user)
-        r = requests.get(url="http://localhost:8000/api/teachers/" + user + "/", auth=(user, pwd))
+        r = requests.get(url="http://localhost:8000/api/teachers/" + user +
+                         "/",
+                         auth=(user, pwd))
         profile = r.json()
         username = profile['ion_user']
         profile = {
