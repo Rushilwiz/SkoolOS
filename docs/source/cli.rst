@@ -25,7 +25,8 @@ Start the CLI and select your username. For instance, teacher 'eharris1'::
     ❯ 2) eharris1
     3) Make new user
 
-You will then be given the choice to select an existing class, Make a new class, or exit the CLI:::
+You will then be given the choice to select an existing class, Make a new class, or exit the CLI:
+::
 
     ? Select class:   (Use arrow keys)
      ❯ Art12_eharris1
@@ -122,7 +123,7 @@ To add an assignment, make an assginment subdirectory in the corresponding class
 
   eharris1/English12_eharris1/Assignment1/instruct.txt
 
-You must also put a due date in the correct format.
+You must also put a due date in the correct format.::
 
   ? Select new assignment:   Assignment1
   Enter due date (Example: 2020-08-11 16:58):  2020-08-11 16:58
@@ -132,7 +133,7 @@ View student information
 
 You can view certain information of any student requested or confirmed in the given class. Simply select enter their name and see their profile. You are also given the choice
 to view their logs (files they have saved, written, git commands, and file that dont match the extention whitelist). Note that as a teacher, you can view a student's current
-work at ANY TIME. Simply go to the 'Students' directory and select the student's directory.
+work at ANY TIME. Simply go to the 'Students' directory and select the student's directory.::
 
   eharris1/Students/English12_eharris1/2022rkhondak
   eharris1/Students/English12_eharris1/2023rumareti
@@ -154,7 +155,7 @@ work at ANY TIME. Simply go to the 'Students' directory and select the student's
 ============
 
 As a student, you can edit your work for certain classes and submit assignments. By default, your workr directory (your username) has a single readme. AND IT SHOULD STAY THAT WAY.
-To make changes to a class, you must first select that class via the CLI. 
+To make changes to a class, you must first select that class via the CLI.::
 
   Select a class first:
     ? Select class:   (Use arrow keys)
@@ -165,6 +166,7 @@ To make changes to a class, you must first select that class via the CLI.
 
 You can then view the assignments associated with the class. Open you work directory and modify files within your assignments. At any time, you can 'Save' or go 'Back'. 
 When you are ready, you can submit an assignment:
+::
 
   ? Select:   (Use arrow keys)
     Save
@@ -175,7 +177,3 @@ When you are ready, you can submit an assignment:
     ? Select:   (Use arrow keys)
     Assignment1
     ❯ Back
-
-2. CLI as a student:
-============
-
