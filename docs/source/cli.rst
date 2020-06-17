@@ -114,3 +114,6 @@ OR::
     ? Add Students):   2) Add list of students through path
     File must be .txt and have 1 student username per line
     Relative Path: students.txt
+
+Adding an assignment
+-------

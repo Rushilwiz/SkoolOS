@@ -25,7 +25,7 @@ class Student(models.Model):
 class Assignment(models.Model):
     owner = models.ForeignKey(User, null=True, blank=True, related_name='aowner', on_delete=models.CASCADE)
     name=models.CharField(max_length=100, primary_key=True)
-    due_date=models.DateTimeField()
+    due_date=models.CharField(max_length=100, default="", blank=True)
     # files = models.ManyToManyField(DefFiles)
     files=models.CharField(max_length=100, default="", blank=True)
     path=models.CharField(max_length=100, default="", blank=True)
