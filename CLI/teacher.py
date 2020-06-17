@@ -164,6 +164,7 @@ class Teacher:
                     os.mkdir(self.username + "/" + c)
                     print("Updated: " + c)
                     command("touch " + self.username + "/" + c + "/README.md")
+                    os.makedirs(self.username + "/Students/" + c)
 
         else:
             os.makedirs(self.username + "/Students")
@@ -298,6 +299,7 @@ class Teacher:
             os.mkdir(path)
             f = open(path + "/README.md", "w")
             f.close()
+            os.makedirs(self.username + "/Students/" + cname)
             # push to remote repo
             # os.chdir(path)
             # for a in assignments:

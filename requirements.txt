@@ -1,5 +1,6 @@
 appdirs==1.4.3
 cachecontrol==0.12.6
+chromedriver==2.24.1
 click==7.1.2
 colorama==0.4.3
 contextlib2==0.6.0
@@ -52,20 +53,20 @@ yapf==0.30.0
 # lazy-object-proxy==1.4.3 # Installed as dependency for astroid
 # markupsafe==1.1.1 # Installed as dependency for jinja2
 # mccabe==0.6.1 # Installed as dependency for pylint
-# msgpack==0.6.2 # Installed as dependency for pynvim, cachecontrol
-# oauthlib==3.1.0 # Installed as dependency for requests-oauthlib, django-oauth-toolkit
+# msgpack==0.6.2 # Installed as dependency for cachecontrol, pynvim
+# oauthlib==3.1.0 # Installed as dependency for django-oauth-toolkit, requests-oauthlib
 # packaging==20.1 # Installed as dependency for sphinx
 # pillow==7.1.2 # Installed as dependency for wpgtk
 # prompt-toolkit==1.0.14 # Installed as dependency for pyinquirer
 # psycopg2-binary==2.8.5 # Installed as dependency for django-request-token
-# pygments==2.6.1 # Installed as dependency for sphinx, pyinquirer
+# pygments==2.6.1 # Installed as dependency for pyinquirer, sphinx
 # pyjwt==1.7.1 # Installed as dependency for django-request-token
 # pyparsing==2.4.6 # Installed as dependency for packaging
-# pytz==2020.1 # Installed as dependency for django, babel
+# pytz==2020.1 # Installed as dependency for babel, django
 # pywal==3.3.0 # Installed as dependency for wpgtk
 # regex==2020.5.14 # Installed as dependency for pyinquirer
-# requests==2.23.0 # Installed as dependency for cachecontrol, requests-oauth, django-oauth-toolkit, sphinx, requests-oauthlib
-# six==1.15.0 # Installed as dependency for astroid, prompt-toolkit, html5lib, retrying, packaging
+# requests==2.23.0 # Installed as dependency for cachecontrol, requests-oauthlib, django-oauth-toolkit, sphinx, requests-oauth
+# six==1.15.0 # Installed as dependency for prompt-toolkit, astroid, retrying, html5lib, packaging
 # snowballstemmer==2.0.0 # Installed as dependency for sphinx
 # sphinxcontrib-applehelp==1.0.2 # Installed as dependency for sphinx
 # sphinxcontrib-devhelp==1.0.2 # Installed as dependency for sphinx
@@ -73,9 +74,9 @@ yapf==0.30.0
 # sphinxcontrib-jsmath==1.0.1 # Installed as dependency for sphinx
 # sphinxcontrib-qthelp==1.0.3 # Installed as dependency for sphinx
 # sphinxcontrib-serializinghtml==1.1.4 # Installed as dependency for sphinx
-# sqlparse==0.3.1 # Installed as dependency for django, django-request-token
+# sqlparse==0.3.1 # Installed as dependency for django-request-token, django
 # toml==0.10.0 # Installed as dependency for pylint, pep517
-# urllib3==1.25.9 # Installed as dependency for selenium, requests
+# urllib3==1.25.9 # Installed as dependency for requests, selenium
 # wcwidth==0.2.3 # Installed as dependency for prompt-toolkit
 # webencodings==0.5.1 # Installed as dependency for html5lib
 # wrapt==1.12.1 # Installed as dependency for astroid
