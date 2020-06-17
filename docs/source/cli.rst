@@ -69,6 +69,7 @@ Accessing an existing class
 Once you have created a class, you can then view and modify certain fields. (Open opening a class, any students who have accepted the request will be automatically
 added you the class.)::
 
+:
     ? Select class:   (Use arrow keys)
        Art12_eharris1
        Civ_eharris1
@@ -93,6 +94,7 @@ Select 'Request Student'. You will then be prompted to add students. If you have
 The file must be a .txt file and have one student username per line. If you add an individual student, simply enter their ion username.
 one username per line.::
 
+:
     Class: English12_eharris1
     ? Select option:   (Use arrow keys)
      ❯ 1) Request Student
@@ -124,6 +126,7 @@ To add an assignment, make an assginment subdirectory in the corresponding class
 
 You must also put a due date in the correct format.
 
+:
   ? Select new assignment:   Assignment1
   Enter due date (Example: 2020-08-11 16:58):  2020-08-11 16:58
 
@@ -137,6 +140,7 @@ work at ANY TIME. Simply go to the 'Students' directory and select the student's
   eharris1/Students/English12_eharris1/2022rkhondak
   eharris1/Students/English12_eharris1/2023rumareti
 
+:
   ? Select option:   (Use arrow keys)
    1) Request Student
    2) Add assignment
@@ -156,6 +160,7 @@ work at ANY TIME. Simply go to the 'Students' directory and select the student's
 As a student, you can edit your work for certain classes and submit assignments. By default, your workr directory (your username) has a single readme. AND IT SHOULD STAY THAT WAY.
 To make changes to a class, you must first select that class via the CLI. 
 
+:
   Select a class first:
     ? Select class:   (Use arrow keys)
     English12_eharris1
@@ -166,6 +171,7 @@ To make changes to a class, you must first select that class via the CLI.
 You can then view the assignments associated with the class. Open you work directory and modify files within your assignments. At any time, you can 'Save' or go 'Back'. 
 When you are ready, you can submit an assignment:
 
+:
   ? Select:   (Use arrow keys)
     Save
    ❯  Submit assignment
