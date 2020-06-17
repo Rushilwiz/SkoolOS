@@ -32,8 +32,11 @@ def getStudent(ion_user, password):
 #makes a GET request to given url, returns dict
 def getDB(user, pwd, url):
     """
-    Sends a GET request to the URL
+    Sends a GET request to url
+    :param user: username
+    :param pwd: password
     :param url: URL for request
+    :return: json request response
     """
     r = requests.get(url=url, auth=(user, pwd))
     print("GET:" + str(r.status_code))
@@ -42,9 +45,12 @@ def getDB(user, pwd, url):
 #makes a PATCH (updates instance) request to given url, returns dict
 def patchDB(user, pwd, data, url):
     """
-    Sends a PATCH request to the URL
-    :param data:
+    Sends a PATCH request to url
+    :param user: username
+    :param pwd: password
     :param url: URL for request
+    :param data: data to request
+    :return: json request response
     """
     r = requests.patch(url=url, data=data, auth=(user, pwd))
     print("PATCH:" + str(r.status_code))
@@ -54,9 +60,12 @@ def patchDB(user, pwd, data, url):
 #makes a POST (makes new instance) request to given url, returns dict
 def postDB(user, pwd, data, url):
     """
-    Sends a POST request to the URL
-    :param data:
+    Sends a POST request to url
+    :param user: username
+    :param pwd: password
     :param url: URL for request
+    :param data: data to request
+    :return: json request response
     """
     r = requests.post(url=url, data=data, auth=(user, pwd))
     print("POST:" + str(r.status_code))
@@ -66,10 +75,13 @@ def postDB(user, pwd, data, url):
 #makes a PUT (overwrites instance) request to given url, returns dict
 def putDB(user, pwd, data, url):
     """
-    Sends a PUT request to the URL
-    :param data:
+    Sends a PUT request to url
+    :param user: username
+    :param pwd: password
     :param url: URL for request
-   """
+    :param data: data to request
+    :return: json request response
+    """
     r = requests.put(url=url, data=data, auth=(user, pwd))
     print("PUT:" + str(r.status_code))
     return r.json()
@@ -78,8 +90,11 @@ def putDB(user, pwd, data, url):
 #makes a DELETE (delete instance) request to given url, returns dict
 def delDB(user, pwd, url):
     """
-    Sends a DELETE request to the URL
+    Sends a DELETE request to url
+    :param user: username
+    :param pwd: password
     :param url: URL for request
+    :return: json request response
     """
     r = requests.delete(url=url, auth=(user, pwd))
     print("DELETE:" + str(r.status_code))
@@ -112,6 +127,7 @@ class Student:
         self.completed = data['completed']
         self.user = data['user']
         self.password = password
+        self.completed = data['completed']
         # classes in id form (Example: 4,5)
         # storing  actual classes
         cid = data['classes'].split(",")
@@ -385,12 +401,13 @@ class Student:
         command("git add .")
         command("git commit -m update")
         command('git checkout ' + course)
-        time.sleep(5)
         ass = os.listdir()
+        oname = ''
         inclass = False
         for a in ass:
-            if a == assignment:
+            if a in assignment:
                 inclass = True
+                oname = a + "_" + course
                 break
         if (inclass == False):
             print(assignment + " not an assignment of " + course)
@@ -404,6 +421,11 @@ class Student:
         command("git tag " + assignment + "-final")
         command("git push -u origin " + course + " --tags")
         command('git checkout master')
+        self.completed = assignment + "," + self.completed
+        data = {
+            'completed': self.completed
+        }
+        patchDB(self.username, self.password, data, self.url)
         os.chdir(cdir)
 
 
