@@ -133,7 +133,7 @@ def command(command):
     process = subprocess.Popen(ar, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     p = process.poll()
     output = process.communicate()[1]
-    print(output.decode('utf-8'))
+    # print(output.decode('utf-8'))
 
 
 ####################################################################################################################################
@@ -566,7 +566,7 @@ class Teacher:
                 'path': path,
                 'classes': course['name'],
                 'teacher': self.username,
-                'due_date': due,
+                'due_date': str(due),
                 'owner':self.id
             }
             postDB(self.username, self.password, ass, 'http://127.0.0.1:8000/api/assignments/')
@@ -754,6 +754,13 @@ t.addAssignment("eharris1/Truck_eharris1/Assignment1", "Truck_eharris1", '2020-0
 # t.getChanges('2022rkhondak','APLit_eharris1', 10)
 
 '''
+{
+    "name": "a",
+    "due_date": '2020-08-11 16:58:33.383124',
+    "path": "",
+    "teacher": ""
+}
+
 TO-DO
 - More checks
     - add students to APLit_eharris1

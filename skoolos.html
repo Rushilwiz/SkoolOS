@@ -1,0 +1,112 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module skoolos</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>skoolos</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/nkenschaft/Sysadmin/skoolos/skoolos.py">/home/nkenschaft/Sysadmin/skoolos/skoolos.py</a></font></td></tr></table>
+    <p><tt>The&nbsp;main&nbsp;program&nbsp;file&nbsp;for&nbsp;SkoolOS</tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="argparse.html">argparse</a><br>
+<a href="datetime.html">datetime</a><br>
+<a href="http.html">http</a><br>
+</td><td width="25%" valign=top><a href="json.html">json</a><br>
+<a href="os.html">os</a><br>
+<a href="pprint.html">pprint</a><br>
+</td><td width="25%" valign=top><a href="requests.html">requests</a><br>
+<a href="socketserver.html">socketserver</a><br>
+<a href="sys.html">sys</a><br>
+</td><td width="25%" valign=top><a href="time.html">time</a><br>
+<a href="webbrowser.html">webbrowser</a><br>
+<a href="selenium.webdriver.html">selenium.webdriver</a><br>
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-addAssignmentTeacher"><strong>addAssignmentTeacher</strong></a>(teacher, course)</dt></dl>
+ <dl><dt><a name="-addStudentsTeacher"><strong>addStudentsTeacher</strong></a>(teacher, course)</dt></dl>
+ <dl><dt><a name="-authenticate"><strong>authenticate</strong></a>()</dt><dd><tt>Authenticates&nbsp;the&nbsp;user&nbsp;via&nbsp;Ion&nbsp;OAuth</tt></dd></dl>
+ <dl><dt><a name="-chooseClassStudent"><strong>chooseClassStudent</strong></a>(student)</dt><dd><tt>Chooses&nbsp;a&nbsp;class&nbsp;for&nbsp;a&nbsp;student&nbsp;to&nbsp;view&nbsp;and&nbsp;work&nbsp;on<br>
+param&nbsp;student:&nbsp;a&nbsp;student<br>
+return:&nbsp;a&nbsp;course&nbsp;prompt</tt></dd></dl>
+ <dl><dt><a name="-chooseGeneralTeacher"><strong>chooseGeneralTeacher</strong></a>(teacher)</dt></dl>
+ <dl><dt><a name="-classOptionsStudent"><strong>classOptionsStudent</strong></a>(student, course)</dt><dd><tt>Allows&nbsp;students&nbsp;to&nbsp;choose&nbsp;what&nbsp;they&nbsp;want&nbsp;to&nbsp;do&nbsp;related&nbsp;to&nbsp;a&nbsp;class<br>
+The&nbsp;student&nbsp;can&nbsp;save,&nbsp;exit,&nbsp;or&nbsp;go&nbsp;back<br>
+param&nbsp;student:&nbsp;a&nbsp;student<br>
+param&nbsp;course:&nbsp;a&nbsp;course<br>
+return:&nbsp;True&nbsp;if&nbsp;exiting,&nbsp;False&nbsp;if&nbsp;going&nbsp;back</tt></dd></dl>
+ <dl><dt><a name="-classOptionsTeacher"><strong>classOptionsTeacher</strong></a>(teacher, course)</dt></dl>
+ <dl><dt><a name="-create_server"><strong>create_server</strong></a>()</dt><dd><tt>Creates&nbsp;a&nbsp;simple&nbsp;HTTP&nbsp;server&nbsp;for&nbsp;creating&nbsp;api&nbsp;requests&nbsp;from&nbsp;the&nbsp;CLI</tt></dd></dl>
+ <dl><dt><a name="-delDB"><strong>delDB</strong></a>(USER, PWD, url)</dt><dd><tt>Sends&nbsp;a&nbsp;DELETE&nbsp;request&nbsp;to&nbsp;url<br>
+param&nbsp;USER:&nbsp;username<br>
+param&nbsp;PWD:&nbsp;password<br>
+param&nbsp;url:&nbsp;URL&nbsp;for&nbsp;request<br>
+return:&nbsp;json&nbsp;request&nbsp;response</tt></dd></dl>
+ <dl><dt><a name="-getDB"><strong>getDB</strong></a>(USER, PWD, url)</dt><dd><tt>Sends&nbsp;a&nbsp;GET&nbsp;request&nbsp;to&nbsp;url<br>
+param&nbsp;USER:&nbsp;username<br>
+param&nbsp;PWD:&nbsp;password<br>
+param&nbsp;url:&nbsp;URL&nbsp;for&nbsp;request<br>
+return:&nbsp;json&nbsp;request&nbsp;response</tt></dd></dl>
+ <dl><dt><a name="-getUser"><strong>getUser</strong></a>(ion_user, password, utype)</dt><dd><tt>Returns&nbsp;user&nbsp;information<br>
+param&nbsp;ion_user:&nbsp;user<br>
+param&nbsp;password:&nbsp;user's&nbsp;password<br>
+param&nbsp;utype:&nbsp;type&nbsp;of&nbsp;user&nbsp;(student&nbsp;or&nbsp;teacher<br>
+return:&nbsp;api&nbsp;user&nbsp;information</tt></dd></dl>
+ <dl><dt><a name="-main"><strong>main</strong></a>()</dt><dd><tt>The&nbsp;Command&nbsp;Line&nbsp;Interface&nbsp;(CLI)&nbsp;for&nbsp;SkoolOS<br>
+Serves&nbsp;to&nbsp;allow&nbsp;both&nbsp;teachers&nbsp;and&nbsp;students&nbsp;to&nbsp;access&nbsp;the&nbsp;majority&nbsp;of&nbsp;the&nbsp;features&nbsp;of&nbsp;SkoolOS</tt></dd></dl>
+ <dl><dt><a name="-makeClassTeacher"><strong>makeClassTeacher</strong></a>(teacher)</dt></dl>
+ <dl><dt><a name="-makePass"><strong>makePass</strong></a>()</dt><dd><tt>Prompts&nbsp;the&nbsp;user&nbsp;to&nbsp;create&nbsp;a&nbsp;password<br>
+return:&nbsp;the&nbsp;password</tt></dd></dl>
+ <dl><dt><a name="-patchDB"><strong>patchDB</strong></a>(USER, PWD, url, data)</dt><dd><tt>Sends&nbsp;a&nbsp;PATCH&nbsp;request&nbsp;to&nbsp;url<br>
+param&nbsp;USER:&nbsp;username<br>
+param&nbsp;PWD:&nbsp;password<br>
+param&nbsp;url:&nbsp;URL&nbsp;for&nbsp;request<br>
+param&nbsp;data:&nbsp;data&nbsp;to&nbsp;request<br>
+return:&nbsp;json&nbsp;request&nbsp;response</tt></dd></dl>
+ <dl><dt><a name="-postDB"><strong>postDB</strong></a>(USER, PWD, url, data)</dt><dd><tt>Sends&nbsp;a&nbsp;POST&nbsp;request&nbsp;to&nbsp;url<br>
+param&nbsp;USER:&nbsp;username<br>
+param&nbsp;PWD:&nbsp;password<br>
+param&nbsp;url:&nbsp;URL&nbsp;for&nbsp;request<br>
+param&nbsp;data:&nbsp;data&nbsp;to&nbsp;request<br>
+return:&nbsp;json&nbsp;request&nbsp;response</tt></dd></dl>
+ <dl><dt><a name="-putDB"><strong>putDB</strong></a>(USER, PWD, url, data)</dt><dd><tt>Sends&nbsp;a&nbsp;PUT&nbsp;request&nbsp;to&nbsp;url<br>
+param&nbsp;USER:&nbsp;username<br>
+param&nbsp;PWD:&nbsp;password<br>
+param&nbsp;url:&nbsp;URL&nbsp;for&nbsp;request<br>
+param&nbsp;data:&nbsp;data&nbsp;to&nbsp;request<br>
+return:&nbsp;json&nbsp;request&nbsp;response</tt></dd></dl>
+ <dl><dt><a name="-studentCLI"><strong>studentCLI</strong></a>(user, password)</dt><dd><tt>The&nbsp;CLI&nbsp;for&nbsp;students&nbsp;to&nbsp;access<br>
+param&nbsp;user:&nbsp;student&nbsp;username<br>
+param&nbsp;password:&nbsp;student&nbsp;password</tt></dd></dl>
+ <dl><dt><a name="-teacherCLI"><strong>teacherCLI</strong></a>(user, password)</dt><dd><tt>The&nbsp;CLI&nbsp;for&nbsp;teachers&nbsp;to&nbsp;access<br>
+param&nbsp;user:&nbsp;teachers&nbsp;username<br>
+param&nbsp;password:&nbsp;teachers&nbsp;password</tt></dd></dl>
+ <dl><dt><a name="-viewStudentsTeacher"><strong>viewStudentsTeacher</strong></a>(teacher, course)</dt></dl>
+</td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><strong>PWD</strong> = ''<br>
+<strong>USER</strong> = ''<br>
+<strong>client_id</strong> = 'QeZPBSKqdvWFfBv1VYTSv9iFGz5T9pVJtNUjbEr6'<br>
+<strong>client_secret</strong> = '0Wl3hAIGY9SvYOqTOLUiLNYa4OlCgZYdno9ZbcgCT7RGQ8x2...mOADHIv5fHxaa7GqFNtQr11HX9ySTw3DscKsphCVi5P71mlGY'<br>
+<strong>redirect_uri</strong> = 'http://localhost:8000/callback/'<br>
+<strong>scope</strong> = ['read']<br>
+<strong>token_url</strong> = 'https://ion.tjhsst.edu/oauth/token/'</td></tr></table>
+</body></html>
