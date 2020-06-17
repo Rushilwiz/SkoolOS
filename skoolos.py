@@ -505,7 +505,6 @@ def getDB(USER, PWD, url):
     :param USER: username
     :param PWD: password
     :param url: URL for request
-    :param data: data to request
     :return: json request response
     """
     r = requests.get(url=url, auth=(USER, PWD))
@@ -547,7 +546,6 @@ def delDB(USER, PWD, url):
     :param USER: username
     :param PWD: password
     :param url: URL for request
-    :param data: data to request
     :return: json request response
     """
     r = requests.delete(url=url, auth=(USER, PWD))
