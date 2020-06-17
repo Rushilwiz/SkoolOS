@@ -160,7 +160,8 @@ work at ANY TIME. Simply go to the 'Students' directory and select the student's
 As a student, you can edit your work for certain classes and submit assignments. By default, your workr directory (your username) has a single readme. AND IT SHOULD STAY THAT WAY.
 To make changes to a class, you must first select that class via the CLI. 
 
-:
+::
+
   Select a class first:
     ? Select class:   (Use arrow keys)
     English12_eharris1
@@ -171,7 +172,8 @@ To make changes to a class, you must first select that class via the CLI.
 You can then view the assignments associated with the class. Open you work directory and modify files within your assignments. At any time, you can 'Save' or go 'Back'. 
 When you are ready, you can submit an assignment:
 
-:
+::
+
   ? Select:   (Use arrow keys)
     Save
    ❯  Submit assignment
