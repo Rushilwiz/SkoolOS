@@ -1,6 +1,3 @@
-"""
-The main program file for SkoolOS
-"""
 import sys
 from urllib.parse import urlparse
 import requests
@@ -439,7 +436,7 @@ def viewStudentsTeacher(teacher, course):
                  "http://127.0.0.1:8000/api/classes/" + course)
     students = data["confirmed"]
     unconf = data['unconfirmed']
-    print("Studented in class: ")
+    print("Students in class: ")
     for s in students:
         print(s)
     print("Requsted Students: ")
@@ -470,6 +467,7 @@ def viewStudentsTeacher(teacher, course):
                     s = f.split("_")[0]
                 alist.append(s)
         print("Has submitted: " + str(alist))
+        #Y/N
 
     #put log stuff
 
