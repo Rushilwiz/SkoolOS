@@ -569,7 +569,7 @@ class Teacher:
                 'due_date': str(due),
                 'owner':self.id
             }
-            postDB(self.username, self.password, ass, 'http://127.0.0.1:8000/api/assignments/')
+            print(postDB(self.username, self.password, ass, 'http://127.0.0.1:8000/api/assignments/'))
             course['assignments'].append(oname)
 
             cinfo = {
