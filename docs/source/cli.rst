@@ -38,7 +38,10 @@ You will then be given the choice to select an existing class, Make a new class,
 1. Making a new class:
 -------
 
-Select 'Make a New Class'. You will then be prompted to enter a class name. The format for every  class must be <subject>_<teacher_username> (Example: Art12_eharris1).
+Select 'Make a New Class'. You will then be prompted to enter a class name. The format for every  class must be <subject>_<teacher_username> (Example: Art12_eharris1). 
+Enter Period (must be a positive integer). You will then be prompted to add students. If you have a list of students, enter the relative path of a text file with the student usernames.
+The file must be a .txt file and have one student username per line. If you add an individual student, simply enter their ion username.
+one username per line.
 
 ? Select class:   (Use arrow keys)
    Art12_eharris1
@@ -46,6 +49,17 @@ Select 'Make a New Class'. You will then be prompted to enter a class name. The 
    History12_eharris1
  ❯ Make New Class
    Exit SkoolOS
+
+? Add Students):   (Use arrow keys)
+ ❯ 1) Add individual student
+   2) Add list of students through path
+   3) Exit
+
+? Add Students):   2) Add list of students through path
+File must be .txt and have 1 student username per line
+Relative Path: students.txt
+
+
 
 
 
