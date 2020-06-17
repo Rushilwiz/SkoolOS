@@ -1,3 +1,6 @@
+"""
+The main program file for SkoolOS
+"""
 import sys
 from urllib.parse import urlparse
 import requests
@@ -94,8 +97,8 @@ def main():
 def studentCLI(user, password):
     """
     The CLI for students to access
-    :param user: student username
-    :param password: student password
+    @param user: student username
+    @param password: student password
     """
     from CLI import student
     data = getUser(user, password, 'student')
@@ -113,7 +116,7 @@ def studentCLI(user, password):
 def chooseClassStudent(student):
     """
     Chooses a class for a student to view and work on
-    :param student: a student
+    @param student: a student
     :return: a course prompt
     """
     carray = student.sclass.split(",")
@@ -139,8 +142,8 @@ def classOptionsStudent(student, course):
     """
     Allows students to choose what they want to do related to a class
     The student can save, exit, or go back
-    :param student: a student
-    :param course: a course
+    @param student: a student
+    @param course: a course
     :return: True if exiting, False if going back
     """
     student.viewClass(course)
@@ -172,14 +175,14 @@ def classOptionsStudent(student, course):
         tlist = []
         b = True
         for a in assignments:
-            oname = a + "_" + course
+            oname = a + "_" + course            
             a = student.username + "/" + a
             if(os.path.isdir(a) and not "." in a and not oname in student.completed):
                 tlist.append(a)
         assignments = tlist
         assignments.append("Back")
         print(assignments)
-
+            
         options = [
         {
             'type': 'list',
@@ -200,8 +203,8 @@ def classOptionsStudent(student, course):
 def teacherCLI(user, password):
     """
     The CLI for teachers to access
-    :param user: teachers username
-    :param password: teachers password
+    @param user: teachers username
+    @param password: teachers password
     """
     from CLI import teacher
     data = getUser(user, password, 'teacher')
@@ -448,7 +451,6 @@ def viewStudentsTeacher(teacher, course):
                     s = f.split("_")[0]
                 alist.append(s)
         print("Has submitted: " + str(alist))
-        #Y/N
 
     #put log stuff
 
@@ -458,9 +460,9 @@ def viewStudentsTeacher(teacher, course):
 def getUser(ion_user, password, utype):
     """
     Returns user information
-    :param ion_user: user
-    :param password: user's password
-    :param utype: type of user (student or teacher
+    @param ion_user: user
+    @param password: user's password
+    @param utype: type of user (student or teacher
     :return: api user information
     """
     if 'student' in utype:
@@ -488,10 +490,10 @@ def getUser(ion_user, password, utype):
 def patchDB(USER, PWD, url, data):
     """
     Sends a PATCH request to url
-    :param USER: username
-    :param PWD: password
-    :param url: URL for request
-    :param data: data to request
+    @param USER: username
+    @param PWD: password
+    @param url: URL for request
+    @param data: data to request
     :return: json request response
     """
     r = requests.patch(url=url, data=data, auth=(USER, PWD))
@@ -502,9 +504,9 @@ def patchDB(USER, PWD, url, data):
 def getDB(USER, PWD, url):
     """
     Sends a GET request to url
-    :param USER: username
-    :param PWD: password
-    :param url: URL for request
+    @param USER: username
+    @param PWD: password
+    @param url: URL for request
     :return: json request response
     """
     r = requests.get(url=url, auth=(USER, PWD))
@@ -515,10 +517,10 @@ def getDB(USER, PWD, url):
 def postDB(USER, PWD, url, data):
     """
     Sends a POST request to url
-    :param USER: username
-    :param PWD: password
-    :param url: URL for request
-    :param data: data to request
+    @param USER: username
+    @param PWD: password
+    @param url: URL for request
+    @param data: data to request
     :return: json request response
     """
     r = requests.post(url=url, data=data, auth=(USER, PWD))
@@ -529,10 +531,10 @@ def postDB(USER, PWD, url, data):
 def putDB(USER, PWD, url, data):
     """
     Sends a PUT request to url
-    :param USER: username
-    :param PWD: password
-    :param url: URL for request
-    :param data: data to request
+    @param USER: username
+    @param PWD: password
+    @param url: URL for request
+    @param data: data to request
     :return: json request response
     """
     r = requests.put(url=url, data=data, auth=(USER, PWD))
@@ -543,9 +545,9 @@ def putDB(USER, PWD, url, data):
 def delDB(USER, PWD, url):
     """
     Sends a DELETE request to url
-    :param USER: username
-    :param PWD: password
-    :param url: URL for request
+    @param USER: username
+    @param PWD: password
+    @param url: URL for request
     :return: json request response
     """
     r = requests.delete(url=url, auth=(USER, PWD))
@@ -608,7 +610,7 @@ def authenticate():
         path = os.path.join(os.getcwd(), 'chromedriver', 'chromedriver-mac')
     if(system.lower() == 'linux'):
         path = os.path.join(os.getcwd(), 'chromedriver', 'chromedriver-linux')
-
+    
     browser = webdriver.Chrome(path)
 
     browser.get("localhost:8000/login")

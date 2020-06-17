@@ -1,3 +1,8 @@
+"""
+A simple background service to log events in a directory,
+check for git commands in bash/zsh history,
+and check for non-whitelisted files in the watched directory.
+"""
 import time
 import sys
 import os

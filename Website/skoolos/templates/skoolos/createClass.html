@@ -1,0 +1,26 @@
+{% extends "skoolos/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+  <legend class="border-bottom mb-4">Classes</legend>
+  <ul>
+    {% for class in classes %}
+    <li>{{ class.name }}</li>
+    {% empty %}
+    <li>Not teaching any classes</li>
+    {% endfor %}
+  </ul>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <fieldset class="form-group">
+      <legend class="border-bottom mb-4"> Create a new class </legend>
+        {{ classForm|crispy }}
+        <!-- mmmm crispy yummm -->
+        <small class="text-secondary">Use ctrl to select multiple students</small>
+    </fieldset>
+    <div class="form-group">
+      <button type="submit" class="btn btn-outline-info">Create</button>
+    </div>
+  </form>
+</div>
+</div>
+{% endblock content %}
