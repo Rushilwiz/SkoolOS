@@ -100,14 +100,21 @@ def main():
 #################################################################################################### STUDENT METHODS
 
 def stop_bg_service():
+    print("good")
     bg.stop_watching()
+    print('also')
     cur_path = os.path.dirname(__file__)
+    print('yes')
     newpath = os.path.relpath('bgservice/SkoolOS/logs')
+    logText = ""
+    with open(newpath, 'r') as logfile:
+        logfile.read()
+    print (logText)
 
 def empty_logs():
     logs_folder = os.path.dirname(__file__) + 'bgservice/SkoolOS/logs/'
     for filename in os.listdir(logs_folder):
-        file_path = os.path.join(folder, filename)
+        file_path = os.path.join(logs_folder, filename)
         try:
             if os.path.isfile(file_path) or os.path.islink(file_path):
                 os.unlink(file_path)
