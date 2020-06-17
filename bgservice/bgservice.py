@@ -7,7 +7,7 @@ import time
 import sys
 import os
 import pyinotify
-import checker
+from . import checker
 from pathlib import Path
 
 
@@ -136,9 +136,9 @@ def watch_dir(watched_dir=str(Path.home()), log_dir="SkoolOS/logs"):
     if not os.path.exists(log_dir):
         os.makedirs(log_dir)
     logfile_ = log_dir + "/skooloslog"
-    logfile = open(logfile_, 'w')
     if os.path.isfile(logfile_):
         os.remove(logfile_)
+    logfile = open(logfile_, 'w')
     START_TIME = time.time()
     wm = pyinotify.WatchManager()
     mask = pyinotify.IN_CREATE | pyinotify.IN_CLOSE_WRITE | pyinotify.IN_DELETE | \
