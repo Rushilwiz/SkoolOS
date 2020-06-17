@@ -142,7 +142,7 @@ work at ANY TIME. Simply go to the 'Students' directory and select the student's
   ? Select option:   (Use arrow keys)
    1) Request Student
    2) Add assignment
-    ❯ 3) View student information
+   ❯ 3) View student information
    4) Exit
 
    Students in class: 
@@ -156,9 +156,10 @@ work at ANY TIME. Simply go to the 'Students' directory and select the student's
 ============
 
 As a student, you can edit your work for certain classes and submit assignments. By default, your workr directory (your username) has a single readme. AND IT SHOULD STAY THAT WAY.
-To make changes to a class, you must first select that class via the CLI.::
+To make changes to a class, you must first select that class via the CLI.
 
-  Select a class first:
+Select a class first:
+::
     ? Select class:   (Use arrow keys)
     English12_eharris1
     Art12_eharris1
@@ -169,9 +170,9 @@ You can then view the assignments associated with the class. Open you work direc
 When you are ready, you can submit an assignment:
 ::
 
-  ? Select:   (Use arrow keys)
+    ? Select:   (Use arrow keys)
     Save
-   ❯  Submit assignment
+    ❯  Submit assignment
     Back
     Exit SkoolOS
 
