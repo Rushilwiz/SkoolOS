@@ -7,7 +7,7 @@ import time
 import sys
 import os
 import pyinotify
-import checker
+from . import checker
 from pathlib import Path
 
 
