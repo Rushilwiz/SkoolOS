@@ -135,9 +135,10 @@ def watch_dir(watched_dir=str(Path.home()), log_dir="SkoolOS/logs"):
     DIR = watched_dir
     if not os.path.exists(log_dir):
         os.makedirs(log_dir)
-    logfile = open(
-        log_dir + "/skoolos_" +
-        time.strftime("%m%d%Y-%H%M%S", time.localtime()), 'w')
+    logfile_ = log_dir + "/skooloslog"
+    if os.path.isfile(logfile_):
+        os.remove(logfile_)
+    logfile = open(logfile_, 'w')
     START_TIME = time.time()
     wm = pyinotify.WatchManager()
     mask = pyinotify.IN_CREATE | pyinotify.IN_CLOSE_WRITE | pyinotify.IN_DELETE | \
