@@ -596,8 +596,22 @@ def authenticate():
     # Linux: chromdriver-linux
     # Macos: chromdriver-mac
     # Windows: chromdriver.exe
-    path = os.path.join(os.getcwd(), 'chromedriver', 'chromedriver-mac')
+    print("OS: ")
+    print("MacOS")
+    print("Linux")
+    print("Windows")
 
+    os = input("Enter OS: ")
+    while(os != "Windows" or os != "Linux" or os != "Macos"):
+        print("Not valid OS")
+        os = input("Enter OS: ")
+    if(os == 'Windows'):
+        path = os.path.join(os.getcwd(), 'chromedriver', 'chromedriver.exe')
+    if(os == 'MacOS'):
+        path = os.path.join(os.getcwd(), 'chromedriver', 'chromedriver-linux')
+    if(os == 'Linux'):
+        path = os.path.join(os.getcwd(), 'chromedriver', 'chromedriver-mac')
+    
     browser = webdriver.Chrome(path)
 
     browser.get("localhost:8000/login")
