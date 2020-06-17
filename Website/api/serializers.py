@@ -41,7 +41,7 @@ class StudentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Student
         # fields = ['url','first_name', 'last_name', 'grade','email','student_id', 'git','ion_user','Class','added_to','completed', 'repo','owner']
-        fields = ['url','grade', 'ion_user','git','user','classes','added_to','completed', 'repo']
+        fields = ['url','grade', 'log', 'ion_user','git','user','classes','added_to','completed', 'repo']
 
 class TeacherSerializer(serializers.ModelSerializer):
     #classes = ClassSerializer(many=True, read_only=True,allow_null=True)

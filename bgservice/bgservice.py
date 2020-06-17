@@ -3,6 +3,7 @@ import sys
 import os
 import pyinotify
 import checker
+from pathlib import Path
 
 
 class EventHandler(pyinotify.ProcessEvent):
@@ -112,7 +113,7 @@ DIR = None
 START_TIME = None
 
 
-def watch_dir(watched_dir="/tmp", log_dir="/tmp/skooloslogs"):
+def watch_dir(watched_dir=str(Path.home()), log_dir="SkoolOS/logs"):
     """
     Watches the specified directory for changes and outputs it in
     human readable format to a log file in the specified log directory.
@@ -137,6 +138,7 @@ def watch_dir(watched_dir="/tmp", log_dir="/tmp/skooloslogs"):
     NOTIFIER.start()
     sys.stdout = open("/dev/null", 'w')
     wm.add_watch(watched_dir, mask, rec=True)
+    time.sleep(1)
     sys.stdout = logfile
     print("Start time: " +
           time.strftime("%A, %B %d, %Y %H:%M:%S", time.localtime()) + "\n")
@@ -162,4 +164,3 @@ def stop_watching():
             + "The paths to these files are listed below:\n")
         print(*suspicious_files, sep='\n')
     sys.stdout = STDOUT
-    print("Done watching.\n")
