@@ -1,5 +1,6 @@
 # SkoolOS
 Revolutionizing the interface between students and teachers through one easy service
+
 [Read the Docs](https://skoolos.readthedocs.io/en/latest/)
 
 ![Read the Docs](https://img.shields.io/readthedocs/skoolos?color=FF6663)
