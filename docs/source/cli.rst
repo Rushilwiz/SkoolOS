@@ -20,11 +20,11 @@ Enter the valid SkoolOS username and password. Congratialations, you have succes
 Start the CLI and select your username. For instance, teacher 'eharris1'
 
 python skoolos.py
-
-? Select User:   (Use arrow keys)
-   1) 2022rkhondak
- ❯ 2) eharris1
-   3) Make new user
+.. code-block:: python
+    ? Select User:   (Use arrow keys)
+    1) 2022rkhondak
+    ❯ 2) eharris1
+    3) Make new user
 
 You will then be given the choice to select an existing class, Make a new class, or exit the CLI:
 
