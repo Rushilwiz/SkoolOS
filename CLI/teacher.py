@@ -740,10 +740,10 @@ class Teacher:
         print("heheheh")
 
 
-data = getTeacher("eharris1",'hackgroup1')
+#data = getTeacher("eharris1",'hackgroup1')
 # print(data)
-t = Teacher(data, 'hackgroup1')
-t.addAssignment("eharris1/Truck_eharris1/Assignment1", "Truck_eharris1", '2020-08-11 16:58:33.383124')
+#t = Teacher(data, 'hackgroup1')
+#t.addAssignment("eharris1/Truck_eharris1/Assignment1", "Truck_eharris1", '2020-08-11 16:58:33.383124')
 
 # t.makeClass("APLit_eharris1")
 # t.updateAssignment("eharris1/APLit_eharris1/BookReport", "APLit_eharris1", '2020-08-11 16:58:33.383124')
