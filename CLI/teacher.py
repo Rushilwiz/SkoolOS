@@ -164,11 +164,16 @@ class Teacher:
                     os.mkdir(self.username + "/" + c)
                     print("Updated: " + c)
                     command("touch " + self.username + "/" + c + "/README.md")
-                    os.makedirs(self.username + "/Students/" + c)
+                    try:
+                        os.makedirs(self.username + "/Students/" + c)
+                    except:
+                        pass
 
         else:
-            os.makedirs(self.username + "/Students")
-
+            try:
+                os.makedirs(self.username + "/Students")
+            except:
+                pass
         # 2020-05-11 12:25:00
 
     # class name format: <course-name>_<ion_user>
@@ -299,7 +304,10 @@ class Teacher:
             os.mkdir(path)
             f = open(path + "/README.md", "w")
             f.close()
-            os.makedirs(self.username + "/Students/" + cname)
+            try:
+                os.makedirs(self.username + "/Students/" + cname)
+            except:
+                pass
             # push to remote repo
             # os.chdir(path)
             # for a in assignments:
