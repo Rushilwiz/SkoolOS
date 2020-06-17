@@ -12,4 +12,46 @@ the registration button bellow and create an account. Once you create an account
 Enter SkoolOS Username:
 Enter SkoolOS Password:
 
+Enter the valid SkoolOS username and password. Congratialations, you have successfully logged in.
+
+1. CLI as a teacher:
+============
+
+Start the CLI and select your username. For instance, teacher 'eharris1'
+
+python skoolos.py
+
+? Select User:   (Use arrow keys)
+   1) 2022rkhondak
+ ❯ 2) eharris1
+   3) Make new user
+
+You will then be given the choice to select an existing class, Make a new class, or exit the CLI:
+
+? Select class:   (Use arrow keys)
+ ❯ Art12_eharris1
+   English12_eharris1
+   History12_eharris1
+   Make New Class
+   Exit SkoolOS
+
+1. Making a new class:
+-------
+
+Select 'Make a New Class'. You will then be prompted to enter a class name. The format for every  class must be <subject>_<teacher_username> (Example: Art12_eharris1).
+
+? Select class:   (Use arrow keys)
+   Art12_eharris1
+   English12_eharris1
+   History12_eharris1
+ ❯ Make New Class
+   Exit SkoolOS
+
+
+
+
+
+
+
+
 
