@@ -19,8 +19,8 @@ Enter the valid SkoolOS username and password. Congratialations, you have succes
 
 Start the CLI and select your username. For instance, teacher 'eharris1'
 
-python skoolos.py
 .. code-block:: python
+    python skoolos.py
     ? Select User:   (Use arrow keys)
     1) 2022rkhondak
     ❯ 2) eharris1
@@ -89,6 +89,32 @@ Class: English12_eharris1
 
 Requesting Students
 -------
+
+Select 'Request Student'. You will then be prompted to add students. If you have a list of students, enter the relative path of a text file with the student usernames.
+The file must be a .txt file and have one student username per line. If you add an individual student, simply enter their ion username.
+one username per line.
+
+Class: English12_eharris1
+? Select option:   (Use arrow keys)
+ ❯ 1) Request Student
+   2) Add assignment
+   3) View student information
+   4) Exit
+
+? Add list of students (input path):   (Use arrow keys)
+ ❯ 1) Add individual student
+   2) Add list of students through path
+   3) Exit
+
+? Select option:   1) Request Student
+? Add list of students (input path):   1) Add individual student
+? Student Name:   2022rkhondak
+
+OR
+
+? Add Students):   2) Add list of students through path
+File must be .txt and have 1 student username per line
+Relative Path: students.txt
 
 
 
