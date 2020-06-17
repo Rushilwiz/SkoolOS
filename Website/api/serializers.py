@@ -25,7 +25,7 @@ class AssignmentSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Assignment
         # fields = ['url','name', 'due_date', 'path' , "Class","teacher",'owner']
-        fields = ['name', 'due_date', 'path' ,"teacher",'owner']
+        fields = ['name', 'due_date', 'path' ,'teacher','owner']
 
 class ClassSerializer(serializers.ModelSerializer):
     # assignments = AssignmentSerializer(many=True, read_only=True,allow_null=True)

@@ -18,7 +18,7 @@ import datetime
 import os
 import argparse
 import webbrowser
-#from bgservice import bgservice as bg
+from bgservice import bgservice as bg
 import atexit
 
 client_id = r'QeZPBSKqdvWFfBv1VYTSv9iFGz5T9pVJtNUjbEr6'
@@ -88,11 +88,9 @@ def main():
     USER = data['username']
     print(data['username'])
     if data['is_student']:
-        # empty_logs()
         # bg.watch_dir()
+        # atexit.register(stop_bg_service)
         studentCLI(USER, PWD)
-
-        atexit.register(stop_bg_service)
     else:
         teacherCLI(USER, PWD)
 
@@ -100,21 +98,16 @@ def main():
 #################################################################################################### STUDENT METHODS
 
 def stop_bg_service():
-    #bg.stop_watching()
-    cur_path = os.path.dirname(__file__)
-    #newpath = os.path.relpath('bgservice/SkoolOS/logs')
-
-# def empty_logs():
-#     logs_folder = os.path.dirname(__file__) + 'bgservice/SkoolOS/logs/'
-#     for filename in os.listdir(logs_folder):
-#         file_path = os.path.join(folder, filename)
-#         try:
-#             if os.path.isfile(file_path) or os.path.islink(file_path):
-#                 os.unlink(file_path)
-#             elif os.path.isdir(file_path):
-#                 shutil.rmtree(file_path)
-#         except Exception as e:
-#             print('Failed to delete %s. Reason: %s' % (file_path, e))
+    print("good")
+    bg.stop_watching()
+    print('also')
+    cur_path = os.path.dirname('') # Change to definite SkoolOS dir
+    print('yes')
+    newpath = os.path.relpath('bgservice/SkoolOS/logs/')
+    logText = ""
+    with open(newpath + '/skooloslog', 'r') as logfile:
+        logfile.read()
+    print (logText)
 
 
 
