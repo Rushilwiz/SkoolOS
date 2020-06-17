@@ -53,41 +53,40 @@ def main():
         input("Welcome to SkoolOS. Press any key to create an account")
         # webbrowser.open("http://127.0.0.1:8000/login", new=2)
         authenticate()
+    profiles = os.listdir()
+    users = []
+    info = []
+    count = 1
+    for i in range(len(profiles)):
+        p = profiles[i]
+        if 'profile' in p:
+            f = open(p, 'r')
+            d = json.loads(f.read())
+            f.close()
+            info.append(d)
+            users.append(str(count) + ") " + d['username'])
+            count = count + 1
+    users.append(str(count) + ") Make new user")
+    user = [
+        {
+            'type': 'list',
+            'name': 'user',
+            'choices': users,
+            'message': 'Select User: ',
+        },
+    ]
+    u = int(prompt(user)['user'].split(")")[0]) - 1
+    if u + 1 == count:
+        authenticate()
+        return
+    data = info[u]
+    PWD = data['password']
+    USER = data['username']
+    print(data['username'])
+    if data['is_student']:
+        studentCLI(USER, PWD)
     else:
-        profiles = os.listdir()
-        users = []
-        info = []
-        count = 1
-        for i in range(len(profiles)):
-            p = profiles[i]
-            if 'profile' in p:
-                f = open(p, 'r')
-                d = json.loads(f.read())
-                f.close()
-                info.append(d)
-                users.append(str(count) + ") " + d['username'])
-                count = count + 1
-        users.append(str(count) + ") Make new user")
-        user = [
-            {
-                'type': 'list',
-                'name': 'user',
-                'choices': users,
-                'message': 'Select User: ',
-            },
-        ]
-        u = int(prompt(user)['user'].split(")")[0]) - 1
-        if u + 1 == count:
-            authenticate()
-            return
-        data = info[u]
-        PWD = data['password']
-        USER = data['username']
-        print(data['username'])
-        if data['is_student']:
-            studentCLI(USER, PWD)
-        else:
-            teacherCLI(USER, PWD)
+        teacherCLI(USER, PWD)
 
 
 #################################################################################################### STUDENT METHODS
@@ -591,7 +590,7 @@ def authenticate():
     """
     oauth = OAuth2Session(client_id=client_id, redirect_uri=redirect_uri, scope=scope)
     authorization_url, state = oauth.authorization_url("https://ion.tjhsst.edu/oauth/authorize/")
-
+    import os
     cdir = os.getcwd()
     # Linux: chromdriver-linux
     # Macos: chromdriver-mac
@@ -599,18 +598,15 @@ def authenticate():
     print("OS: ")
     print("MacOS")
     print("Linux")
-    print("Windows")
 
-    os = input("Enter OS: ")
-    while(os != "Windows" or os != "Linux" or os != "Macos"):
+    system = input("Enter OS: ")
+    while(system.lower() != "Linux" and system.lower() != "macos"):
         print("Not valid OS")
-        os = input("Enter OS: ")
-    if(os == 'Windows'):
-        path = os.path.join(os.getcwd(), 'chromedriver', 'chromedriver.exe')
-    if(os == 'MacOS'):
-        path = os.path.join(os.getcwd(), 'chromedriver', 'chromedriver-linux')
-    if(os == 'Linux'):
+        system = input("Enter OS: ")
+    if(system.lower() == 'macos'):
         path = os.path.join(os.getcwd(), 'chromedriver', 'chromedriver-mac')
+    if(system.lower() == 'linux'):
+        path = os.path.join(os.getcwd(), 'chromedriver', 'chromedriver-linux')
     
     browser = webdriver.Chrome(path)
 
