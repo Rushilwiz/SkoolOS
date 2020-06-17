@@ -603,7 +603,7 @@ def authenticate():
     print("Linux")
 
     system = input("Enter OS: ")
-    while(system.lower() != "Linux" and system.lower() != "macos"):
+    while(system.lower() != "linux" and system.lower() != "macos"):
         print("Not valid OS")
         system = input("Enter OS: ")
     if(system.lower() == 'macos'):
