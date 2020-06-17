@@ -144,7 +144,7 @@ work at ANY TIME. Simply go to the 'Students' directory and select the student's
   ? Select option:   (Use arrow keys)
    1) Request Student
    2) Add assignment
-    ❯ 3) View student information
+   ❯ 3) View student information
    4) Exit
 
    Students in class: 
@@ -162,7 +162,7 @@ To make changes to a class, you must first select that class via the CLI.
 
 ::
 
-  Select a class first:
+    Select a class first:
     ? Select class:   (Use arrow keys)
     English12_eharris1
     Art12_eharris1
@@ -174,9 +174,9 @@ When you are ready, you can submit an assignment:
 
 ::
 
-  ? Select:   (Use arrow keys)
+    ? Select:   (Use arrow keys)
     Save
-   ❯  Submit assignment
+    ❯  Submit assignment
     Back
     Exit SkoolOS
 
