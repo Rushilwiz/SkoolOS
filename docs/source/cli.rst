@@ -17,8 +17,8 @@ Enter the valid SkoolOS username and password. Congratialations, you have succes
 1. CLI as a teacher:
 ============
 
-Start the CLI and select your username. For instance, teacher 'eharris1'::
-    
+
+.. code-block:: python
     python skoolos.py
     ? Select User:   (Use arrow keys)
     1) 2022rkhondak
@@ -140,12 +140,87 @@ work at ANY TIME. Simply go to the 'Students' directory and select the student's
   eharris1/Students/English12_eharris1/2022rkhondak
   eharris1/Students/English12_eharris1/2023rumareti
 
-:
-  ? Select option:   (Use arrow keys)
-   1) Request Student
+OR 
+
+? Add Students):   1) Add individual student
+Student name: 2022rkhondak
+
+Accessing an existing class
+=====================
+
+Once you have created a class, you can then view and modify certain fields. (Open opening a class, any students who have accepted the request will be automatically
+added you the class.)
+
+? Select class:   (Use arrow keys)
+   Art12_eharris1
+   Civ_eharris1
+ ❯ English12_eharris1
+   History12_eharris1
+   Random_eharris1
+   Truck_eharris1
+   Make New Class
+   Exit SkoolOS
+
+Class: English12_eharris1
+? Select option:   (Use arrow keys)
+ ❯ 1) Request Student
    2) Add assignment
-   ❯ 3) View student information
+   3) View student information
    4) Exit
+
+Requesting Students
+-------
+
+Select 'Request Student'. You will then be prompted to add students. If you have a list of students, enter the relative path of a text file with the student usernames.
+The file must be a .txt file and have one student username per line. If you add an individual student, simply enter their ion username.
+one username per line.
+
+Class: English12_eharris1
+? Select option:   (Use arrow keys)
+ ❯ 1) Request Student
+   2) Add assignment
+   3) View student information
+   4) Exit
+
+? Add list of students (input path):   (Use arrow keys)
+ ❯ 1) Add individual student
+   2) Add list of students through path
+   3) Exit
+
+? Select option:   1) Request Student
+? Add list of students (input path):   1) Add individual student
+? Student Name:   2022rkhondak
+
+OR
+
+? Add Students):   2) Add list of students through path
+File must be .txt and have 1 student username per line
+Relative Path: students.txt
+
+Adding Assignments
+-------
+
+To add an assignment, you must first make a subdirectory for that assignment in the given class. You must then add a file wihin that subdirectory. For Example:
+For teacher eharris1 and class English11_eharris1, valid assignment folder would look like:
+
+eharris1/English11_eharris1/Assignment1/instructions.txt
+
+Then, select an assignment from the given options. Then enter a due date in the correct format: YYYY-MM-DD HH:MM. The assignment will then be coppied to every student
+who has confirmed the class.
+
+Class: Truck_eharris1
+GET:200
+? Select option:   (Use arrow keys)
+   1) Request Student
+ ❯ 2) Add assignment
+   3) View student information
+   4) Exit
+
+? Select new assignment:   (Use arrow keys)
+ ❯ Assignment1
+
+? Select new assignment:   Assignment1
+Enter due date (Example: 2020-08-11 16:58): 2020-08-11 16:58
 
    Students in class: 
    2022rkhondak
