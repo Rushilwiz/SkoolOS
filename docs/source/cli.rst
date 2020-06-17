@@ -120,6 +120,7 @@ Adding an assignment
 -------
 
 To add an assignment, make an assginment subdirectory in the corresponding class wiht at least 1 file. Somehting like:
+::
 
   eharris1/English12_eharris1/Assignment1/instruct.txt
 
