@@ -152,6 +152,12 @@ def createClassHelper(request):
             messages.success(request, cleaned_data['subject'].capitalize() + " has been created!")
             print (newClass)
             teacher.classes.add(newClass)
+            for student in newClass.unconfirmed.all():
+                if student.added_to == "":
+                    student.added_to = newClass.name
+                else:
+                    student.added_to = student.added_to + "," + newClass.name
+                student.save()
             return redirect('home')
     else:
         classForm = ClassCreationForm()

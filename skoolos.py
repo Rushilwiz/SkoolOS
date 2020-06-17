@@ -456,7 +456,7 @@ def authenticate():
     #Linux: chromdriver-linux
     #Macos: chromdriver-mac
     #Windows: chromdriver.exe
-    path = os.path.join(os.getcwd(),'chromedriver','chromedriver-mac')
+    path = os.path.join(os.getcwd(),'chromedriver','chromedriver-linux')
 
     browser = webdriver.Chrome(path)
 
