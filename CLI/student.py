@@ -109,7 +109,7 @@ def command(command):
     process = subprocess.Popen(ar, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     p = process.poll()
     output = process.communicate()[0]
-    print(output.decode('utf-8'))
+    # print(output.decode('utf-8'))
     return output.decode('utf-8')
 
 
