@@ -30,7 +30,7 @@ def getTeacher(ion_user, password):
     """
     Gets information about a teacher from the api
     :param ion_user: a teacher
-    :param password: a string
+    :param password: the teacher's password
     :return: teacher information or error
     """
     URL = "http://127.0.0.1:8000/api/teachers/" + ion_user + "/"
@@ -52,10 +52,11 @@ def getTeacher(ion_user, password):
 #makes a GET request to given url, returns dict
 def getDB(user, pwd, url):
     """
-    Sends a GET request to the URL
-    :param user: a string
-    :param password: a string
+    Sends a GET request to url
+    :param user: username
+    :param pwd: password
     :param url: URL for request
+    :return: json request response
     """
     r = requests.get(url=url, auth=(user, pwd))
     print("GET:" + str(r.status_code))
@@ -64,11 +65,12 @@ def getDB(user, pwd, url):
 #makes a PATCH (updates instance) request to given url, returns dict
 def patchDB(user, pwd, data, url):
     """
-    Sends a PATCH request to the URL
-    :param data:
-    :param user: a string
-    :param password: a string
+    Sends a PATCH request to url
+    :param user: username
+    :param pwd: password
     :param url: URL for request
+    :param data: data to request
+    :return: json request response
     """
     r = requests.patch(url=url, data=data, auth=(user, pwd))
     print("PATCH:" + str(r.status_code))
@@ -78,11 +80,12 @@ def patchDB(user, pwd, data, url):
 #makes a POST (makes new instance) request to given url, returns dict
 def postDB(user, pwd, data, url):
     """
-    Sends a POST request to the URL
-    :param data:
-    :param user: a string
-    :param password: a string
+    Sends a POST request to url
+    :param user: username
+    :param pwd: password
     :param url: URL for request
+    :param data: data to request
+    :return: json request response
     """
     r = requests.post(url=url, data=data, auth=(user, pwd))
     print("POST:" + str(r.status_code))
@@ -92,10 +95,12 @@ def postDB(user, pwd, data, url):
 #makes a PUT (overwrites instance) request to given url, returns dict
 def putDB(user, pwd, data, url):
     """
-    Sends a PUT request to the URL
-    :param user: a string
-    :param password: a string
+    Sends a PUT request to url
+    :param user: username
+    :param pwd: password
     :param url: URL for request
+    :param data: data to request
+    :return: json request response
     """
     r = requests.put(url=url, data=data, auth=(user, pwd))
     print("PUT:" + str(r.status_code))
@@ -105,10 +110,11 @@ def putDB(user, pwd, data, url):
 #makes a DELETE (delete instance) request to given url, returns dict
 def delDB(user, pwd, url):
     """
-    Sends a DELETE request to the URL
-    :param user: a string
-    :param password: a string
+    Sends a DELETE request to url
+    :param user: username
+    :param pwd: password
     :param url: URL for request
+    :return: json request response
     """
     r = requests.delete(url=url, auth=(user, pwd))
     print("DELETE:" + str(r.status_code))
