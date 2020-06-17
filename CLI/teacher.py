@@ -29,9 +29,9 @@ from datetime import datetime
 def getTeacher(ion_user, password):
     """
     Gets information about a teacher from the api
-    param ion_user: a teacher
-    param password: the teacher's password
-    return: teacher information or error
+    :param ion_user: a teacher
+    :param password: the teacher's password
+    :return: teacher information or error
     """
     URL = "http://127.0.0.1:8000/api/teachers/" + ion_user + "/"
     r = requests.get(url=URL, auth=(ion_user,password))
@@ -53,10 +53,10 @@ def getTeacher(ion_user, password):
 def getDB(user, pwd, url):
     """
     Sends a GET request to url
-    param user: username
-    param pwd: password
-    param url: URL for request
-    return: json request response
+    :param user: username
+    :param pwd: password
+    :param url: URL for request
+    :return: json request response
     """
     r = requests.get(url=url, auth=(user, pwd))
     print("GET:" + str(r.status_code))
@@ -66,11 +66,11 @@ def getDB(user, pwd, url):
 def patchDB(user, pwd, data, url):
     """
     Sends a PATCH request to url
-    param user: username
-    param pwd: password
-    param url: URL for request
-    param data: data to request
-    return: json request response
+    :param user: username
+    :param pwd: password
+    :param url: URL for request
+    :param data: data to request
+    :return: json request response
     """
     r = requests.patch(url=url, data=data, auth=(user, pwd))
     print("PATCH:" + str(r.status_code))
@@ -81,11 +81,11 @@ def patchDB(user, pwd, data, url):
 def postDB(user, pwd, data, url):
     """
     Sends a POST request to url
-    param user: username
-    param pwd: password
-    param url: URL for request
-    param data: data to request
-    return: json request response
+    :param user: username
+    :param pwd: password
+    :param url: URL for request
+    :param data: data to request
+    :return: json request response
     """
     r = requests.post(url=url, data=data, auth=(user, pwd))
     print("POST:" + str(r.status_code))
@@ -96,11 +96,11 @@ def postDB(user, pwd, data, url):
 def putDB(user, pwd, data, url):
     """
     Sends a PUT request to url
-    param user: username
-    param pwd: password
-    param url: URL for request
-    param data: data to request
-    return: json request response
+    :param user: username
+    :param pwd: password
+    :param url: URL for request
+    :param data: data to request
+    :return: json request response
    """
     r = requests.put(url=url, data=data, auth=(user, pwd))
     print("PUT:" + str(r.status_code))
@@ -111,10 +111,10 @@ def putDB(user, pwd, data, url):
 def delDB(user, pwd, url):
     """
     Sends a DELETE request to url
-    param user: username
-    param pwd: password
-    param url: URL for request
-    return: json request response
+    :param user: username
+    :param pwd: password
+    :param url: URL for request
+    :return: json request response
     """
     r = requests.delete(url=url, auth=(user, pwd))
     print("DELETE:" + str(r.status_code))
@@ -124,7 +124,7 @@ def delDB(user, pwd, url):
 def command(command):
     """
     Runs a shell command
-    param command: shell command
+    :param command: shell command
     """
     ar = []
     command = command.split(" ")
@@ -145,7 +145,7 @@ class Teacher:
         # intitialze fields after GET request
         """
         Initializes a Teacher with the data from the api
-        param data: api data
+        :param data: api data
         """
         self.git = data['git']
         self.username = data['ion_user']
@@ -178,7 +178,7 @@ class Teacher:
     def checkClass(self, path):
         """
         Checks if a directory is valid for creating a class
-        param path: path to the new class directory
+        :param path: path to the new class directory
         """
         cname = path.split("/")
         cname = cname[len(cname) - 1]
@@ -221,7 +221,7 @@ class Teacher:
     def checkInDB(self, path):
         """
         Checks if "path" is in the database
-        param path: path to directory
+        :param path: path to directory
         """
         n = path.split("/")
         n = n[len(n) - 1]
@@ -234,7 +234,7 @@ class Teacher:
     def addClass(self, path):
         """
         Creates a class from an existing directory, adding it to the proper git repository and the api
-        param path:
+        :param path:
         """
         cname = path.split("/")
         cname = cname[len(cname) - 1]
@@ -276,7 +276,7 @@ class Teacher:
     def makeClass(self, cname):
         """
         Makes a class with its own new directory
-        param cname: name of class
+        :param cname: name of class
         """
         # check if class exists
         path = self.username + "/" + cname
@@ -314,7 +314,7 @@ class Teacher:
     def deleteClass(self, path):
         """
         Deletes an existing class
-        param path: class directory path
+        :param path: class directory path
         """
         if not os.path.exists(path):
             print(path + " does not exist locally.")
@@ -348,8 +348,8 @@ class Teacher:
     def isStudent(self, student):
         """
         Checks if the student exists
-        param student: a student
-        return: True if student exists, False otherwise
+        :param student: a student
+        :return: True if student exists, False otherwise
         """
         r = requests.get(url="http://127.0.0.1:8000/api/students/" + student + "/",
                          auth=(self.username, self.password))
@@ -360,9 +360,9 @@ class Teacher:
     def reqStudent(self, sname, cname):
         """
         Request student informatiion from the api
-        param sname: student's name
-        param cname: class name
-        return: True if successful
+        :param sname: student's name
+        :param cname: class name
+        :return: True if successful
         """
         if not self.isStudent(sname):
             print(sname + " does not exist.")
@@ -406,9 +406,9 @@ class Teacher:
     def addStudent(self, sname, cname):
         """
         Adds a student to a class
-        param sname: student name
-        param cname: class name
-        return:
+        :param sname: student name
+        :param cname: class name
+        :return:
         """
         if not self.isStudent(sname):
             print(sname + " does not exist.")
@@ -476,9 +476,9 @@ class Teacher:
     def reqAddStudentList(self, array, cname):
         """
         Runs addStudent() on all students in array
-        param array: an array of students
-        param cname: class name
-        return: students that have not confirmed the request
+        :param array: an array of students
+        :param cname: class name
+        :return: students that have not confirmed the request
         """
         unconf = []
         for i in range(len(array)):
@@ -492,10 +492,10 @@ class Teacher:
     def addAssignment(self, path, course, due):
         """
         Creates an assignment for "course" that is  due on "due"
-        param path: directory of assignment
-        param course: course name
-        param due: due date
-        return: False if unsuccessful
+        :param path: directory of assignment
+        :param course: course name
+        :param due: due date
+        :return: False if unsuccessful
         """
         parts = path.split("/")
         aname = parts[len(parts) - 1]
@@ -566,7 +566,7 @@ class Teacher:
                 'path': path,
                 'classes': course['name'],
                 'teacher': self.username,
-                'due_date': due,
+                'due_date': str(due),
                 'owner':self.id
             }
             postDB(self.username, self.password, ass, 'http://127.0.0.1:8000/api/assignments/')
@@ -676,9 +676,9 @@ class Teacher:
     def getChanges(self, student, course, commits):
         """
         Checks for new submissions by a student
-        param student: the student
-        param course: the course
-        param commits: commits the CLI has made for the assignment
+        :param student: the student
+        :param course: the course
+        :param commits: commits the CLI has made for the assignment
         """
         course = getDB(self.username, self.password, "http://127.0.0.1:8000/api/classes/" + course + "/")
         ar = self.getCommits(student, course['name'], commits)
@@ -735,14 +735,16 @@ class Teacher:
     def comment(self):
         """
         The ultimate form of laughter
-        return: pure joy
+        :return: pure joy
         """
         print("heheheh")
 
 
-# data = getTeacher("eharris1","PWD")
+data = getTeacher("eharris1",'hackgroup1')
 # print(data)
-#t = Teacher(data, "PWD")
+t = Teacher(data, 'hackgroup1')
+t.addAssignment("eharris1/Truck_eharris1/Assignment1", "Truck_eharris1", '2020-08-11 16:58:33.383124')
+
 # t.makeClass("APLit_eharris1")
 # t.updateAssignment("eharris1/APLit_eharris1/BookReport", "APLit_eharris1", '2020-08-11 16:58:33.383124')
 # ar = ['2022rkhondak','2022inafi','2023rumareti']
@@ -752,6 +754,13 @@ class Teacher:
 # t.getChanges('2022rkhondak','APLit_eharris1', 10)
 
 '''
+{
+    "name": "a",
+    "due_date": '2020-08-11 16:58:33.383124',
+    "path": "",
+    "teacher": ""
+}
+
 TO-DO
 - More checks
     - add students to APLit_eharris1
