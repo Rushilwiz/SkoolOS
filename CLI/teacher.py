@@ -96,7 +96,7 @@ def putDB(user, pwd, data, url):
     :param user: a string
     :param password: a string
     :param url: URL for request
-    """
+   """
     r = requests.put(url=url, data=data, auth=(user, pwd))
     print("PUT:" + str(r.status_code))
     return r.json()
@@ -152,6 +152,13 @@ class Teacher:
         self.classes = data['classes']
         if os.path.isdir(self.username + "/Students"):
             print("Synced to " + self.username)
+            existing_classes = os.listdir(self.username)
+            for  c in self.classes:
+                if not c in str(existing_classes):
+                    os.mkdir(self.username + "/" + c)
+                    print("Updated: " + c)
+                    command("touch " + self.username + "/" + c + "/README.md")
+
         else:
             os.makedirs(self.username + "/Students")
 
@@ -727,7 +734,7 @@ class Teacher:
 
 # data = getTeacher("eharris1","PWD")
 # print(data)
-# t = Teacher(data, "PWD")
+#t = Teacher(data, "PWD")
 # t.makeClass("APLit_eharris1")
 # t.updateAssignment("eharris1/APLit_eharris1/BookReport", "APLit_eharris1", '2020-08-11 16:58:33.383124')
 # ar = ['2022rkhondak','2022inafi','2023rumareti']
