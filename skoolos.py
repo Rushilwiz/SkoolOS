@@ -244,7 +244,7 @@ def teacherCLI(user, password):
         # selected a class
         else:
             #Pull confirmed students directory
-            teacher.getStudents(course)
+            #teacher.getStudents(course)
             option = classOptionsTeacher(teacher, course)
             if option == '1':
                 EXIT = addStudentsTeacher(teacher, course)

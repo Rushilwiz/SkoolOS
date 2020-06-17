@@ -164,11 +164,16 @@ class Teacher:
                     os.mkdir(self.username + "/" + c)
                     print("Updated: " + c)
                     command("touch " + self.username + "/" + c + "/README.md")
-                    os.makedirs(self.username + "/Students/" + c)
+                    try:
+                        os.makedirs(self.username + "/Students/" + c)
+                    except:
+                        pass
 
         else:
-            os.makedirs(self.username + "/Students")
-
+            try:
+                os.makedirs(self.username + "/Students")
+            except:
+                pass
         # 2020-05-11 12:25:00
 
     # class name format: <course-name>_<ion_user>
@@ -299,7 +304,10 @@ class Teacher:
             os.mkdir(path)
             f = open(path + "/README.md", "w")
             f.close()
-            os.makedirs(self.username + "/Students/" + cname)
+            try:
+                os.makedirs(self.username + "/Students/" + cname)
+            except:
+                pass
             # push to remote repo
             # os.chdir(path)
             # for a in assignments:
@@ -740,10 +748,10 @@ class Teacher:
         print("heheheh")
 
 
-data = getTeacher("eharris1",'hackgroup1')
+#data = getTeacher("eharris1",'hackgroup1')
 # print(data)
-t = Teacher(data, 'hackgroup1')
-t.addAssignment("eharris1/Truck_eharris1/Assignment1", "Truck_eharris1", '2020-08-11 16:58:33.383124')
+#t = Teacher(data, 'hackgroup1')
+#t.addAssignment("eharris1/Truck_eharris1/Assignment1", "Truck_eharris1", '2020-08-11 16:58:33.383124')
 
 # t.makeClass("APLit_eharris1")
 # t.updateAssignment("eharris1/APLit_eharris1/BookReport", "APLit_eharris1", '2020-08-11 16:58:33.383124')
