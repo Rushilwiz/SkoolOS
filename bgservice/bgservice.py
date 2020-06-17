@@ -162,4 +162,3 @@ def stop_watching():
             + "The paths to these files are listed below:\n")
         print(*suspicious_files, sep='\n')
     sys.stdout = STDOUT
-    print("Done watching.\n")
