@@ -3,6 +3,7 @@ import sys
 import os
 import pyinotify
 import checker
+from pathlib import Path
 
 
 class EventHandler(pyinotify.ProcessEvent):
@@ -112,7 +113,7 @@ DIR = None
 START_TIME = None
 
 
-def watch_dir(watched_dir="/tmp", log_dir="/tmp/skooloslogs"):
+def watch_dir(watched_dir=str(Path.home()), log_dir="SkoolOS/logs"):
     """
     Watches the specified directory for changes and outputs it in
     human readable format to a log file in the specified log directory.
