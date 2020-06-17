@@ -178,3 +178,14 @@ When you are ready, you can submit an assignment:
     ? Select:   (Use arrow keys)
     Assignment1
     ❯ Back
+
+3. Testing:
+============
+
+For testing purposes, we recommed having both student and teacher users on the CLI.
+
+1. Adding students/confiming
+
+On a teacher user (eharris1), add an student to a given class (English12_eharris1). Then, exit out of the CLI and run skoolos.py again, but select a student account.
+Selecting a student account should automatically accept the teacher's invitation. You can then begin creating assignments as a teacher. We recommend switching between accounts,
+modifying assignments on the students end, exiting, then viewing them in the 'Student' directory as a teacher.
