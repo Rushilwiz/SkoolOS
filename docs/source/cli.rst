@@ -172,7 +172,7 @@ To make changes to a class, you must first select that class via the CLI.
 You can then view the assignments associated with the class. Open you work directory and modify files within your assignments. At any time, you can 'Save' or go 'Back'. 
 When you are ready, you can submit an assignment:
 
-::
+:
 
     ? Select:   (Use arrow keys)
     Save
