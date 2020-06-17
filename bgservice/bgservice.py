@@ -137,6 +137,7 @@ def watch_dir(watched_dir="/tmp", log_dir="/tmp/skooloslogs"):
     NOTIFIER.start()
     sys.stdout = open("/dev/null", 'w')
     wm.add_watch(watched_dir, mask, rec=True)
+    time.sleep(1)
     sys.stdout = logfile
     print("Start time: " +
           time.strftime("%A, %B %d, %Y %H:%M:%S", time.localtime()) + "\n")
